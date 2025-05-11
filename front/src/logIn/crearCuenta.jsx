@@ -37,6 +37,7 @@ export default function CrearCuenta() {
   // Socio Estudiante específico
   const [matriculaSocio, setMatriculaSocio] = useState("");
   const [semestreSocio, setSemestreSocio] = useState("");
+  const [carreraS, setCarreraS] = useState("");
   const [correoInstitucional, setCorreoInstitucional] = useState("");
   const [correoAlternativo, setCorreoAlternativo] = useState("");
   const [ine, setIne] = useState("");
@@ -108,10 +109,10 @@ export default function CrearCuenta() {
 
   const handleRegistro = async () => {
     if (!validarFormulario()) return;
-
+  
     let url = "";
     let body = {};
-
+  
     if (tipoUsuario === "estudiante") {
       url = "http://localhost:5001/registro/alumno";
       body = {
@@ -127,9 +128,8 @@ export default function CrearCuenta() {
         telefono,
       };
     } else if (tipoUsuario === "socio") {
-
       if (tipoSocio === "estudiante") {
-        url = "http://localhost:5000/registro/socio";
+        url = "http://localhost:5001/registro/socio";
         body = {
           correo: email,
           contraseña: password,
@@ -138,7 +138,7 @@ export default function CrearCuenta() {
           telefono_socio: telefonoSocio,
           redes_sociales: redesSociales,
           notificaciones_socio: notificacionesSocio,
-          id_carrera: carrera,
+          id_carrera: carreraS,
           matricula: matriculaSocio,
           semestre_acreditado: semestreSocio,
           correo_institucional: correoInstitucional,
@@ -146,7 +146,7 @@ export default function CrearCuenta() {
           ine,
         };
       } else if (tipoSocio === "entidad") {
-        url = "http://localhost:5000/registro/socio";
+        url = "http://localhost:5001/registro/socio";
         body = {
           correo: email,
           contraseña: password,
@@ -172,28 +172,15 @@ export default function CrearCuenta() {
           telefono_entidad: telefonoEntidad,
         };
       }
-
-      url = "http://localhost:5001/registro/socio";
-      body = {
-        correo: email,
-        contraseña: password,
-        nombre,
-        status: status,
-        tipo_socio: tipoSocio,
-        telefono_socio: telefonoSocio,
-        redes_sociales: redesSociales,
-        notificaciones_socio: notificacionesSocio,
-      };
-
     }
-
+  
     try {
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-
+  
       const data = await res.json();
       if (res.ok) {
         alert("✅ Cuenta creada exitosamente");
@@ -207,10 +194,6 @@ export default function CrearCuenta() {
   };
 
   return (
-
-    <div className="container">
-      <div className="form-box">
-        <h1 className="title">Crear cuenta</h1>
 
     <div className="login-container">
   <div className="login-form-box">
@@ -236,20 +219,7 @@ export default function CrearCuenta() {
       {errorEmail && <span className="error">{errorEmail}</span>}
     </div>
 
-
-        <label>Tipo de usuario</label>
-        <select value={tipoUsuario} onChange={(e) => setTipoUsuario(e.target.value)}>
-          <option value="estudiante">Estudiante</option>
-          <option value="socio">Socio formador</option>
-        </select>
-
-        <div className="input-group">
-          <label>Correo</label>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-          {errorEmail && <span className="error">{errorEmail}</span>}
-        </div>
-
-        <div className="input-group">
+    <div className="input-group">
           <label>Contraseña</label>
           <div className="input-box">
             <input
@@ -261,6 +231,7 @@ export default function CrearCuenta() {
           </div>
           {errorPassword && <span className="error">{errorPassword}</span>}
         </div>
+        
 
         <div className="input-group">
           <label>Nombre completo</label>
@@ -306,6 +277,10 @@ export default function CrearCuenta() {
                 <div className="input-group">
                   <label>Matrícula</label>
                   <input value={matriculaSocio} onChange={(e) => setMatriculaSocio(e.target.value)} />
+                </div>
+                <div className="input-group">
+                  <label>Carrera</label>
+                  <input value={carreraS} onChange={(e) => setCarreraS(e.target.value)} />
                 </div>
                 <div className="input-group">
                   <label>Correo institucional</label>

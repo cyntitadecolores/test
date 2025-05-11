@@ -10,7 +10,7 @@ export default function CrearCuentaAdmin() {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleRegistro = async () => {
-    const url = "http://localhost:5000/registro/administrador";
+    const url = "http://localhost:5001/registro/administrador";
     const body = {
       correo: email,
       contraseña: password,
