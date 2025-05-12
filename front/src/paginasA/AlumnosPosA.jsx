@@ -24,7 +24,7 @@ function AlumnosPos() {
     };
 
     useEffect(() => {
-        axios.get('http://localhost:5001/postulaciones_alumnos')
+        axios.get('http://localhost:5003/postulaciones_alumnos')
             .then(response => {
                 setPostulaciones(response.data);
             })
@@ -44,7 +44,7 @@ function AlumnosPos() {
         const nuevoValor = valorEditado;
 
         try {
-            const response = await fetch(`http://localhost:5001/postulaciones_alumnos/${filaId.id_proyecto}/${filaId.id_estudiante}/editar`, {
+            const response = await fetch(`http://localhost:5003/postulaciones_alumnos/${filaId.id_proyecto}/${filaId.id_estudiante}/editar`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -54,7 +54,7 @@ function AlumnosPos() {
 
             const data = await response.json();
             if (response.ok) {
-                const postulacionesActualizadas = await axios.get('http://localhost:5001/postulaciones_alumnos');
+                const postulacionesActualizadas = await axios.get('http://localhost:5003/postulaciones_alumnos');
                 setPostulaciones(postulacionesActualizadas.data);
                 setCeldaSeleccionada(null);
                 setValorEditado('');

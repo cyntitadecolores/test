@@ -47,7 +47,7 @@ const handleVerPostulaciones = (id_proyecto) => {
   return (
     <div className="cube">
       <NavCub />
-      <h1 className="titulo">Proyectos que han sido aprobados</h1>
+      <h1 className="titulo">Proyectos que han sido aceptados</h1>
 
       {!proyectoSeleccionado && (
         <div className="tabla-container">

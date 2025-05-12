@@ -765,7 +765,7 @@ app.get('/proyectos/aprobados', (req, res) => {
       END AS estado_postulacion
     FROM Proyecto p
     JOIN Periodo per ON per.id_periodo = p.id_periodo
-    WHERE p.status_proyecto = 'aprobado'
+    WHERE p.status_proyecto = 'aceptado'
   `;
   db.query(query, (err, results) => {
     if (err) {

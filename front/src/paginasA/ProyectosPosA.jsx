@@ -95,7 +95,7 @@ function ProyectosPos() {
 };
 
     useEffect(() => {
-        axios.get('http://localhost:5001/proyectos')
+        axios.get('http://localhost:5003/proyectos')
             .then(response => {
                 setProyectos(response.data);
             })
@@ -115,7 +115,7 @@ function ProyectosPos() {
         const nuevoValor = valorEditado;  
     
         try {
-            const response = await fetch(`http://localhost:5001/proyecto/${filaId}/editar`, {
+            const response = await fetch(`http://localhost:5003/proyecto/${filaId}/editar`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -125,7 +125,7 @@ function ProyectosPos() {
 
             const data = await response.json();
             if (response.ok) {
-                const proyectosActualizados = await axios.get('http://localhost:5001/proyectos');
+                const proyectosActualizados = await axios.get('http://localhost:5003/proyectos');
                 setProyectos(proyectosActualizados.data);
                 setCeldaSeleccionada(null);  
                 setValorEditado('');  
