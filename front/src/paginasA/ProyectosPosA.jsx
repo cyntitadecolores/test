@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import NavCub from '../componentes/navegacion';
 import './tablasA.css';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 function ProyectosPos() {
     const [proyectos, setProyectos] = useState([]);
@@ -11,6 +13,7 @@ function ProyectosPos() {
     const [valorOriginal, setValorOriginal] = useState('');
     const [filteredText, setFilteredText] = useState('');
     const columnasFijas = ['nombre', 'nombre_proyecto'];
+    const [mostrarFiltros, setMostrarFiltros] = useState(false);
 
 
     const columnasDisponibles = {
@@ -73,8 +76,26 @@ function ProyectosPos() {
     };
     
 
+    const exportarAExcel = () => {
+    const datosAExportar = proyectosFiltrados.map(p => {
+        const fila = {};
+        [...columnasFijas, ...columnasVisibles].forEach(col => {
+            fila[columnasDisponibles[col]] = p[col];
+        });
+        return fila;
+    });
+
+    const hoja = XLSX.utils.json_to_sheet(datosAExportar);
+    const libro = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(libro, hoja, 'proyectosPostulados');
+
+    const excelBuffer = XLSX.write(libro, { bookType: 'xlsx', type: 'array' });
+    const archivo = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    saveAs(archivo, 'proyectosPostulados.xlsx');
+};
+
     useEffect(() => {
-        axios.get('http://localhost:5000/proyectos')
+        axios.get('http://localhost:5001/proyectos')
             .then(response => {
                 setProyectos(response.data);
             })
@@ -94,7 +115,7 @@ function ProyectosPos() {
         const nuevoValor = valorEditado;  
     
         try {
-            const response = await fetch(`http://localhost:5000/proyecto/${filaId}/editar`, {
+            const response = await fetch(`http://localhost:5001/proyecto/${filaId}/editar`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -104,7 +125,7 @@ function ProyectosPos() {
 
             const data = await response.json();
             if (response.ok) {
-                const proyectosActualizados = await axios.get('http://localhost:5000/proyectos');
+                const proyectosActualizados = await axios.get('http://localhost:5001/proyectos');
                 setProyectos(proyectosActualizados.data);
                 setCeldaSeleccionada(null);  
                 setValorEditado('');  
@@ -124,7 +145,7 @@ function ProyectosPos() {
     };
 
     function actualizarStatus(id, nuevoStatus) {
-        axios.put(`http://localhost:5000/proyecto/${id}/status`, { status: nuevoStatus })
+        axios.put(`http://localhost:5001/proyecto/${id}/status`, { status: nuevoStatus })
             .then(() => {
                 setProyectos(prev =>
                     prev.map(proy =>
@@ -148,40 +169,54 @@ function ProyectosPos() {
     );
 
     return (
-        <div className="cube" style={{ marginLeft: '260px', padding: '20px' }}>
-            <NavCub />
-            <h1>Proyectos Postulados Pendientes</h1>
+    <div className="cube" style={{ marginLeft: '260px', padding: '20px' }}>
+        <NavCub />
+        <h1>Proyectos Postulados Pendientes</h1>
 
-            <div className="filtros-columnas">
-                <h3>Columnas a mostrar:</h3>
-                {Object.entries(columnasDisponibles).map(([key, label]) => (
-                    <label key={key} style={{ marginRight: '10px' }}>
-                        <input
-                            type="checkbox"
-                            checked={columnasVisibles.includes(key)|| columnasFijas.includes(key)}
-                            onChange={() => {
-                                if (columnasFijas.includes(key)) return;
-                                setColumnasVisibles(prev =>
-                                    prev.includes(key)
-                                        ? prev.filter(col => col !== key)
-                                        : [...prev, key]
-                                );
-                            }}
-                            disabled={columnasFijas.includes(key)}
-                        />
-                        {label}
-                    </label>
-                ))}
+        <button
+            onClick={() => setMostrarFiltros(prev => !prev)}
+            style={{ marginBottom: '20px' }}
+        >
+            {mostrarFiltros ? 'Ver Tabla' : 'Aplicar Filtros'}
+        </button>
+
+        {mostrarFiltros ? (
+            <div className="filtros-columnas-wrapper">
+                <h3>Selecciona las columnas que deseas mostrar:</h3>
+                <div className="filtros-columnas">
+                    {Object.entries(columnasDisponibles).map(([key, label]) => (
+                        <label key={key}>
+                            <input
+                                type="checkbox"
+                                checked={columnasVisibles.includes(key) || columnasFijas.includes(key)}
+                                onChange={() => {
+                                    if (columnasFijas.includes(key)) return;
+                                    setColumnasVisibles(prev =>
+                                        prev.includes(key)
+                                            ? prev.filter(col => col !== key)
+                                            : [...prev, key]
+                                    );
+                                }}
+                                disabled={columnasFijas.includes(key)}
+                            />
+                            {label}
+                        </label>
+                    ))}
+                </div>
             </div>
-
+        ) : (
             <div className="tabla-container">
-            <p> Buscar: </p>
-            <input type='text' value={filteredText} onChange={handleChange}></input>
+                <p>Buscar:</p>
+                <input
+                    type="text"
+                    value={filteredText}
+                    onChange={handleChange}
+                />
                 <div className="tabla-scroll-wrapper">
                     <table className="tabla-proyectos">
                         <thead>
                             <tr>
-                            {[...columnasFijas, ...columnasVisibles].map(col => (
+                                {[...columnasFijas, ...columnasVisibles].map(col => (
                                     <th key={col}>{columnasDisponibles[col]}</th>
                                 ))}
                                 <th>Acciones</th>
@@ -214,41 +249,47 @@ function ProyectosPos() {
                                     ))}
                                     <td>
                                         <button
-        className="aprobar"
-        onClick={() => actualizarStatus(proyecto.id_proyecto, 'aprobado')}
-    >
-        Aprobar
-    </button>
-    <button
-        className="rechazar"
-        onClick={() => actualizarStatus(proyecto.id_proyecto, 'rechazado')}
-        style={{ marginLeft: '8px' }}
-    >
-        Rechazar
-    </button>
+                                            className="aprobar"
+                                            onClick={() => actualizarStatus(proyecto.id_proyecto, 'aprobado')}
+                                        >
+                                            Aprobar
+                                        </button>
+                                        <button
+                                            className="rechazar"
+                                            onClick={() => actualizarStatus(proyecto.id_proyecto, 'rechazado')}
+                                            style={{ marginLeft: '8px' }}
+                                        >
+                                            Rechazar
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
+                    <button onClick={exportarAExcel} style={{ marginBottom: '20px', marginLeft: '10px' }}>
+    Descargar Excel
+</button>
+
                 </div>
             </div>
+        )}
 
-            {celdaSeleccionada && (
-                <div className="editor-container" style={{ marginTop: '20px' }}>
-                    <h3>Editando: {columnasDisponibles[celdaSeleccionada.columna]}</h3>
-                    <input
-                        type="text"
-                        value={valorEditado}
-                        onChange={(e) => setValorEditado(e.target.value)}
-                        style={{ marginRight: '10px' }}
-                    />
-                    <button onClick={guardarCambio}>Guardar cambios</button>
-                    <button onClick={cancelarEdicion} style={{ marginLeft: '8px' }}>Cancelar</button>
-                </div>
-            )}
-        </div>
-    );
+        {celdaSeleccionada && (
+            <div className="editor-container" style={{ marginTop: '20px' }}>
+                <h3>Editando: {columnasDisponibles[celdaSeleccionada.columna]}</h3>
+                <input
+                    type="text"
+                    value={valorEditado}
+                    onChange={(e) => setValorEditado(e.target.value)}
+                    style={{ marginRight: '10px' }}
+                />
+                <button onClick={guardarCambio}>Guardar cambios</button>
+                <button onClick={cancelarEdicion} style={{ marginLeft: '8px' }}>Cancelar</button>
+            </div>
+        )}
+    </div>
+);
+
 }
 
 export default ProyectosPos;

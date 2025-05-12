@@ -1,7 +1,7 @@
 const express = require("express");
 const mysql = require("mysql2");
 const cors = require("cors");
-const bcrypt = require("bcrypt");
+const bcrypt = require('bcryptjs');
 const dotenv = require("dotenv")
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
@@ -135,165 +135,145 @@ app.post('/registro/administrador', (req, res) => {
 });
 
 app.post('/registro/socio', (req, res) => {
-    const {
-        correo,
-        contraseña,
-        nombre,
-        tipo_socio, // "Estudiante" o "Entidad"
-        telefono_socio,
-        redes_sociales,
-        notificaciones_socio,
-        // Datos para Socio_Estudiante
-        id_carrera,
-        matricula,
-        semestre_acreditado,
-        correo_institucional,
-        correo_alternativo,
-        ine,
-        logo,
-        // Datos para Socio_Entidad
-        nombre_entidad,
-        mision,
-        vision,
-        objetivos,
-        objetivo_ods_socio,
-        poblacion,
-        numero_beneficiarios_socio,
-        nombre_responsable,
-        puesto_responsable,
-        correo_responsable,
-        direccion_entidad,
-        horario_entidad,
-        correo_entidad,
-        correo_responsable_general,
-        telefono_entidad
-    } = req.body;
+  const {
+      correo,
+      contraseña,
+      nombre,
+      tipo_socio, // "Estudiante" o "Entidad"
+      telefono_socio,
+      redes_sociales,
+      notificaciones_socio,
+      // Datos para Socio_Estudiante
+      id_carrera,
+      matricula,
+      semestre_acreditado,
+      correo_institucional,
+      correo_alternativo,
+      ine,
+      logo,
+      // Datos para Socio_Entidad
+      nombre_entidad,
+      mision,
+      vision,
+      objetivos,
+      objetivo_ods_socio,
+      poblacion,
+      numero_beneficiarios_socio,
+      nombre_responsable,
+      puesto_responsable,
+      correo_responsable,
+      direccion_entidad,
+      horario_entidad,
+      correo_entidad,
+      correo_responsable_general,
+      telefono_entidad
+  } = req.body;
 
-    if (!correo || !contraseña || !nombre || !tipo_socio) {
-        return res.status(400).json({ message: 'Faltan datos obligatorios de Socio' });
-    }
+  if (!correo || !contraseña || !nombre || !tipo_socio) {
+      return res.status(400).json({ message: 'Faltan datos obligatorios de Socio' });
+  }
 
-    bcrypt.hash(contraseña, 10, (err, hash) => {
-        if (err) return res.status(500).json({ message: 'Error al encriptar contraseña' });
+  // Primero valida que no exista el correo
+  db.query('SELECT * FROM Socio WHERE correo = ?', [correo], (err, result) => {
+      if (err) return res.status(500).json({ message: 'Error en la base de datos' });
 
-        const socioQuery = `
-            INSERT INTO Socio (correo, contraseña, nombre, status, tipo_socio, telefono_socio, redes_sociales, notificaciones_socio)
-            VALUES (?, ?, ?, 'pendiente', ?, ?, ?, ?)
-        `;
+      if (result.length > 0) {
+          return res.status(400).json({ message: 'El correo electrónico ya está registrado.' });
+      }
 
-        const socioValues = [
-            correo,
-            hash,
-            nombre,
-            tipo_socio,
-            telefono_socio || null,
-            redes_sociales || null,
-            notificaciones_socio || null
-        ];
+      // Encriptar contraseña
+      bcrypt.hash(contraseña, 10, (err, hash) => {
+          if (err) return res.status(500).json({ message: 'Error al encriptar contraseña' });
 
-        db.query(socioQuery, socioValues, (err, result) => {
-            if (err) {
-                console.error('Error al registrar socio:', err);
-                return res.status(500).json({ message: 'Error al registrar socio' });
-            }
+          // Insertar en tabla Socio
+          const socioQuery = `
+              INSERT INTO Socio (correo, contraseña, nombre, status, tipo_socio, telefono_socio, redes_sociales, notificaciones_socio)
+              VALUES (?, ?, ?, 'pendiente', ?, ?, ?, ?)
+          `;
+          const socioValues = [
+              correo,
+              hash,
+              nombre,
+              tipo_socio,
+              telefono_socio || null,
+              redes_sociales || null,
+              notificaciones_socio || null
+          ];
 
-            const id_socio = result.insertId;
+          db.query(socioQuery, socioValues, (err, result) => {
+              if (err) {
+                  console.error('Error al registrar socio:', err);
+                  return res.status(500).json({ message: 'Error al registrar socio' });
+              }
 
-            if (tipo_socio === 'Estudiante') {
-                const estudianteQuery = `
-                    INSERT INTO Socio_Estudiante (id_socio, id_carrera, matricula, semestre_acreditado, correo_institucional, correo_alternativo, ine, logo)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                `;
-                const estudianteValues = [
-                    id_socio,
-                    id_carrera,
-                    matricula,
-                    semestre_acreditado,
-                    correo_institucional,
-                    correo_alternativo,
-                    ine,
-                    logo
-                ];
-                db.query(estudianteQuery, estudianteValues, (err) => {
-                    if (err) {
-                        console.error('Error al registrar socio estudiante:', err);
-                        return res.status(500).json({ message: 'Error al registrar socio estudiante' });
-                    }
-                    return res.json({ message: 'Socio estudiante registrado exitosamente' });
-                });
+              const id_socio = result.insertId;
 
-            } else if (tipo_socio === 'Entidad') {
-                const entidadQuery = `
-                    INSERT INTO Socio_Entidad (
-                        id_socio, nombre_entidad, mision, vision, objetivos, objetivo_ods_socio,
-                        poblacion, numero_beneficiarios_socio, nombre_responsable, puesto_responsable,
-                        correo_responsable, direccion_entidad, horario_entidad, correo_entidad,
-                        correo_responsable_general, telefono_entidad
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                `;
-                const entidadValues = [
-                    id_socio,
-                    nombre_entidad,
-                    mision,
-                    vision,
-                    objetivos,
-                    objetivo_ods_socio,
-                    poblacion,
-                    numero_beneficiarios_socio,
-                    nombre_responsable,
-                    puesto_responsable,
-                    correo_responsable,
-                    direccion_entidad,
-                    horario_entidad,
-                    correo_entidad,
-                    correo_responsable_general,
-                    telefono_entidad
-                ];
-                db.query(entidadQuery, entidadValues, (err) => {
-                    if (err) {
-                        console.error('Error al registrar socio entidad:', err);
-                        return res.status(500).json({ message: 'Error al registrar socio entidad' });
-                    }
-                    return res.json({ message: 'Socio entidad registrado exitosamente' });
-                });
+              if (tipo_socio === 'Estudiante') {
+                  const estudianteQuery = `
+                      INSERT INTO Socio_Estudiante (id_socio, id_carrera, matricula, semestre_acreditado, correo_institucional, correo_alternativo, ine, logo)
+                      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                  `;
+                  const estudianteValues = [
+                      id_socio,
+                      id_carrera,
+                      matricula,
+                      semestre_acreditado,
+                      correo_institucional,
+                      correo_alternativo,
+                      ine,
+                      logo
+                  ];
+                  db.query(estudianteQuery, estudianteValues, (err) => {
+                      if (err) {
+                          console.error('Error al registrar socio estudiante:', err);
+                          return res.status(500).json({ message: 'Error al registrar socio estudiante' });
+                      }
+                      return res.json({ message: 'Socio estudiante registrado exitosamente' });
+                  });
 
-            } else {
-                return res.status(400).json({ message: 'Tipo de socio no válido' });
-            }
+              } else if (tipo_socio === 'Entidad') {
+                  const entidadQuery = `
+                      INSERT INTO Socio_Entidad (
+                          id_socio, nombre_entidad, mision, vision, objetivos, objetivo_ods_socio,
+                          poblacion, numero_beneficiarios_socio, nombre_responsable, puesto_responsable,
+                          correo_responsable, direccion_entidad, horario_entidad, correo_entidad,
+                          correo_responsable_general, telefono_entidad
+                      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                  `;
+                  const entidadValues = [
+                      id_socio,
+                      nombre_entidad,
+                      mision,
+                      vision,
+                      objetivos,
+                      objetivo_ods_socio,
+                      poblacion,
+                      numero_beneficiarios_socio,
+                      nombre_responsable,
+                      puesto_responsable,
+                      correo_responsable,
+                      direccion_entidad,
+                      horario_entidad,
+                      correo_entidad,
+                      correo_responsable_general,
+                      telefono_entidad
+                  ];
+                  db.query(entidadQuery, entidadValues, (err) => {
+                      if (err) {
+                          console.error('Error al registrar socio entidad:', err);
+                          return res.status(500).json({ message: 'Error al registrar socio entidad' });
+                      }
+                      return res.json({ message: 'Socio entidad registrado exitosamente' });
+                  });
 
-    // Validar que el correo no exista
-    db.query('SELECT * FROM Socio WHERE correo = ?', [correo], (err, result) => {
-        if (err) {
-        return res.status(500).json({ message: 'Error en la base de datos' });
-        }
-
-        if (result.length > 0) {
-        return res.status(400).json({ message: 'El correo electrónico ya está registrado.' });
-        }
-
-        // Si el correo no existe, validar la contraseña
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-        if (!passwordRegex.test(contraseña)) {
-        return res.status(400).json({ message: 'La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.' });
-        }
-
-        bcrypt.hash(contraseña, 10, (err, hash) => {
-            if (err) return res.status(500).json({ message: 'Error al encriptar contraseña' });
-
-            db.query(
-                'INSERT INTO Socio (correo, contraseña, nombre, status, tipo_socio, telefono_socio, redes_sociales, notificaciones_socio) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                [correo, hash, nombre, 'pendiente', tipo_socio, telefono_socio, redes_sociales, notificaciones_socio],
-                (err, result) => {
-                    if (err) {
-                        console.error('Error al registrar socio:', err);
-                        return res.status(500).json({ message: 'Error al registrar socio' });
-                    }
-                    res.json({ message: 'Socio registrado exitosamente' });
-            });
-
-        });
-    });
+              } else {
+                  return res.status(400).json({ message: 'Tipo de socio no válido' });
+              }
+          });
+      });
+  });
 });
+
 
 
 // Obtener socios pendientes
@@ -397,20 +377,35 @@ app.get('/socio/aprobados', (req, res) => {
     });
   });
 
-  // Obtener info individual del socio
+// Obtener info individual del socio, incluyendo detalles según tipo
 app.get('/socio/:id', (req, res) => {
-    const { id } = req.params;
-    db.query('SELECT * FROM Socio WHERE id_socio = ?', [id], (err, results) => {
-      if (err) {
-        console.error('Error al obtener socio:', err);
-        return res.status(500).json({ message: 'Error del servidor' });
-      }
-      if (results.length === 0) {
-        return res.status(404).json({ message: 'Socio no encontrado' });
-      }
-      res.json(results[0]);
-    });
+  const { id } = req.params;
+
+  const querySocio = 'SELECT * FROM Socio WHERE id_socio = ?';
+  db.query(querySocio, [id], (err, socioResults) => {
+    if (err) return res.status(500).json({ message: 'Error del servidor' });
+    if (socioResults.length === 0) return res.status(404).json({ message: 'Socio no encontrado' });
+
+    const socio = socioResults[0];
+
+    if (socio.tipo_socio === 'Entidad') {
+      const queryEntidad = 'SELECT * FROM Socio_Entidad WHERE id_socio = ?';
+      db.query(queryEntidad, [id], (err, entidadResults) => {
+        if (err) return res.status(500).json({ message: 'Error al obtener detalles de entidad' });
+        res.json({ ...socio, detalles: entidadResults[0] });
+      });
+    } else if (socio.tipo_socio === 'Estudiante') {
+      const queryEstudiante = 'SELECT * FROM Socio_Estudiante WHERE id_socio = ?';
+      db.query(queryEstudiante, [id], (err, estudianteResults) => {
+        if (err) return res.status(500).json({ message: 'Error al obtener detalles de estudiante' });
+        res.json({ ...socio, detalles: estudianteResults[0] });
+      });
+    } else {
+      res.json(socio);
+    }
   });
+});
+
 
   
 // Obtener todos los usuarios
@@ -743,6 +738,73 @@ app.put('/postulacion/:id_proyecto/:id_estudiante', (req, res) => {
       return res.status(500).json({ message: 'Error al actualizar el status' });
     }
     res.json({ message: 'Status actualizado correctamente' });
+  });
+});
+
+// Obtener proyectos aprobados con el periodo
+app.get('/proyectos/aprobados', (req, res) => {
+  const query = `
+    SELECT 
+      p.*,
+      per.periodo,
+      (
+        SELECT COUNT(*) 
+        FROM Postulacion pos 
+        WHERE pos.id_proyecto = p.id_proyecto AND pos.status NOT IN ('rechazada', 'cancelada')
+      ) AS postulaciones_activas,
+      p.numero_beneficiarios_proyecto AS cupo_base,
+      ROUND(p.numero_beneficiarios_proyecto * 1.1) AS cupo_maximo,
+      CASE 
+        WHEN (
+          SELECT COUNT(*) 
+          FROM Postulacion pos 
+          WHERE pos.id_proyecto = p.id_proyecto AND pos.status NOT IN ('rechazada', 'cancelada')
+        ) >= ROUND(p.numero_beneficiarios_proyecto * 1.1)
+        THEN 'Lleno'
+        ELSE 'Disponible'
+      END AS estado_postulacion
+    FROM Proyecto p
+    JOIN Periodo per ON per.id_periodo = p.id_periodo
+    WHERE p.status_proyecto = 'aprobado'
+  `;
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error al obtener proyectos:', err);
+      return res.status(500).json({ message: 'Error al obtener proyectos' });
+    }
+    res.json(results);
+  });
+});
+
+app.get('/proyectoss/:id', (req, res) => {
+    const { id } = req.params;
+    db.query('SELECT * FROM Proyecto p JOIN Periodo per ON per.id_periodo = p.id_periodo WHERE p.id_proyecto = ?', [id], (err, results) => {
+      if (err) {
+        console.error('Error al obtener socio:', err);
+        return res.status(500).json({ message: 'Error del servidor' });
+      }
+      if (results.length === 0) {
+        return res.status(404).json({ message: 'Proyecto no encontrado' });
+      }
+      res.json(results[0]);
+    });
+  });
+
+  // Obtener postulaciones por id_proyecto
+app.get('/proyectos/:id/postulaciones', (req, res) => {
+  const idProyecto = req.params.id;
+  const sql = `
+    SELECT p.*, e.nombre AS nombre_estudiante
+    FROM Postulacion p
+    JOIN Estudiante e ON p.id_estudiante = e.id_estudiante
+    WHERE p.id_proyecto = ?
+  `;
+  db.query(sql, [idProyecto], (err, results) => {
+    if (err) {
+      console.error('Error al obtener postulaciones:', err);
+      return res.status(500).send('Error del servidor');
+    }
+    res.json(results);
   });
 });
 

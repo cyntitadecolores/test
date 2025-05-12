@@ -13,6 +13,7 @@ function NavCub() {
           <li><Link to="/proyectosPosA">Proyectso Pos</Link></li>
           <li><Link to="/alumnosPosA">Alumnos Pos</Link></li>
           <li><Link to="/sociosAprobadosA">Socios</Link></li>
+          <li><Link to="/proyectosAprobadosA">Proyectos</Link></li>
         </ul>
       </nav>
       <header className="top-bar">
