@@ -9,32 +9,33 @@ export default function SignupPage() {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    try {
-      const res = await fetch('http://localhost:5001/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ correo: email, contraseña: password })
-      });
+  try {
+    const res = await fetch('http://localhost:5002/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ correo: email, contraseña: password })
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      if (res.ok) {
-        console.log('✅ Usuario autenticado:', data);
+    if (res.ok) {
+      console.log('✅ Usuario autenticado:', data);
 
-        // Almacenar el token en localStorage
-        localStorage.setItem('jwt', data.token); // Almacena el JWT
-        
-        if (data.tipo === 'estudiante') navigate('/inicioE');
-        else if (data.tipo === 'administrador') navigate('/');
-        else if (data.tipo === 'socio') navigate('/inicioS');
-      } else {
-        alert(data.message || "Error al iniciar sesión");
-      }
-    } catch (error) {
-      console.error("Error en login:", error);
-      alert("Error de red");
+      // Almacenar el token en localStorage
+      localStorage.setItem('jwt', data.token); // Almacena el JWT
+
+      if (data.tipo === 'estudiante') navigate('/inicioE');
+      else if (data.tipo === 'administrador') navigate('/');
+      else if (data.tipo === 'socio') navigate('/inicioS');
+    } else {
+      alert(data.message || "Error al iniciar sesión");
     }
-  };
+  } catch (error) {
+    console.error("Error en login:", error);
+    alert("Error de red");
+  }
+};
+
 
   return (
     <div className="login-container">

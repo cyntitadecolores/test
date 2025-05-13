@@ -114,7 +114,7 @@ export default function CrearCuenta() {
     let body = {};
   
     if (tipoUsuario === "estudiante") {
-      url = "http://localhost:5001/registro/alumno";
+      url = "http://localhost:5002/registro/alumno";
       body = {
         correo: email,
         contraseña: password,
@@ -129,7 +129,7 @@ export default function CrearCuenta() {
       };
     } else if (tipoUsuario === "socio") {
       if (tipoSocio === "estudiante") {
-        url = "http://localhost:5001/registro/socio";
+        url = "http://localhost:5002/registro/socio";
         body = {
           correo: email,
           contraseña: password,
@@ -146,7 +146,7 @@ export default function CrearCuenta() {
           ine,
         };
       } else if (tipoSocio === "entidad") {
-        url = "http://localhost:5001/registro/socio";
+        url = "http://localhost:5002/registro/socio";
         body = {
           correo: email,
           contraseña: password,
