@@ -17,63 +17,78 @@ function ProyectosPos() {
 
 
     const columnasDisponibles = {
-        id_proyecto: 'ID Proyecto',
-        nombre: 'nombre socio',
-        status_proyecto: 'Status Proyecto',
-        crn: 'CRN',
-        campus: 'Campus',
-        grupo: 'Grupo',
-        clave_materia: 'Clave Materia',
-        id_periodo: 'ID Periodo',
-        fecha_postulacion_proyecto: 'Fecha Postulación Proyecto',
-        nombre_proyecto: 'Nombre Proyecto',
-        problema_social: 'Problema Social',
-        vulnerabilidad_atendida: 'Vulnerabilidad Atendida',
-        edad_poblacion: 'Edad Población',
-        zona_poblacion: 'Zona Población',
-        numero_beneficiarios_proyecto: 'Número Beneficiarios Proyecto',
-        objetivo_proyecto: 'Objetivo Proyecto',
-        acciones_estudiantado: 'Acciones Estudiantado',
-        producto_servicio_entregar: 'Producto/Servicio a Entregar',
-        entregable_esperado: 'Entregable Esperado',
-        medida_impacto: 'Medida Impacto',
-        nuevo_reconocimiento: 'Nuevo Reconocimiento',
-        nombre_ods: 'Nombre ODS 1',
-        id_ods_2: 'ID ODS 2',
-        dias_actividades: 'Días Actividades',
-        carreras_proyecto: 'Carreras Proyecto',
-        habilidades_alumno: 'Habilidades Alumno',
-        modalidad: 'Modalidad',
-        direccion_escrita: 'Dirección Escrita',
-        valor_proyecto: 'Valor Proyecto',
-        periodo_repetido: 'Periodo Repetido',
-        induccion_es: 'Inducción ES',
-        propuesta_semana_tec: 'Propuesta Semana TEC',
-        propuesta_inmersion_social: 'Propuesta Inmersión Social',
-        propuesta_bloque: 'Propuesta Bloque',
-        indicaciones_campus: 'Indicaciones Campus',
-        enlace_maps: 'Enlace Maps',
-        entrevista: 'Entrevista',
-        pregunta_descarte: 'Pregunta Descarte',
-        conocimiento_horarios: 'Conocimiento Horarios',
-        areas: 'Áreas',
-        nombre_grupo_whatsapp: 'Nombre Grupo WhatsApp',
-        enlace_whatsapp: 'Enlace WhatsApp',
-        status_grupo_whatsapp: 'Status Grupo WhatsApp',
-        alumnos_postulados: 'Alumnos Postulados',
-        alumnos_aceptados: 'Alumnos Aceptados',
-        cupos_disponibles: 'Cupos Disponibles',
-        region_proyecto: 'Región Proyecto',
-        fecha_implementacion: 'Fecha Implementación',
-        nomenclatura_registro: 'Nomenclatura Registro',
-        diagnostico_previo: 'Diagnóstico Previo',
-        vulnerabilidad_atendida_2: 'Vulnerabilidad Atendida 2',
-        edad_poblacion_2: 'Edad Población 2',
-        horario: 'Horario',
-        duracion_experiencia: 'Duración Experiencia',
-        horas_acreditar: 'Horas Acreditar',
-        indicaciones_campus_2: 'Indicaciones Campus 2'
-    };
+    id_proyecto: 'ID Proyecto',
+    correo_registro_info: 'Correo Registro',
+    region_proyecto: 'Región Proyecto',
+    id_campus: 'ID Campus',
+    crn: 'CRN',
+    grupo: 'Grupo',
+    clave_materia: 'Clave Materia',
+    id_periodo: 'ID Periodo',
+    fecha_implementacion: 'Fecha Implementación',
+    nombre_osf: 'Nombre OSF',
+    razon_osf: 'Razón OSF',
+    poblacion_osf: 'Población OSF',
+    num_beneficiarios_osf: 'Número Beneficiarios OSF',
+    ods_osf: 'ODS OSF',
+    telefono_osf: 'Teléfono OSF',
+    datos_osf: 'Datos OSF',
+    contacto_coordinador: 'Contacto Coordinador',
+    redes_sociales: 'Redes Sociales OSF',
+    nombre_proyecto: 'Nombre Proyecto',
+    nomenclatura_registro: 'Nomenclatura Registro',
+    diagnostico_previo: 'Diagnóstico Previo',
+    problema_social: 'Problema Social',
+    vulnerabilidad_atendida_1: 'Vulnerabilidad Atendida 1',
+    edad_poblacion_1: 'Edad Población 1',
+    vulnerabilidad_atendida_2: 'Vulnerabilidad Atendida 2',
+    edad_poblacion_2: 'Edad Población 2',
+    zona_poblacion: 'Zona Población',
+    numero_beneficiarios_proyecto: 'Número Beneficiarios Proyecto',
+    objetivo_proyecto: 'Objetivo del Proyecto',
+    ods_proyecto_1: 'ODS Proyecto 1',
+    ods_proyecto_2: 'ODS Proyecto 2',
+    acciones_estudiantado: 'Acciones del Estudiantado',
+    producto_servicio_entregar: 'Producto/Servicio a Entregar',
+    entregable_esperado: 'Entregable Esperado',
+    medida_impacto: 'Medida de Impacto',
+    dias_actividades: 'Días de Actividades',
+    horario_proyecto: 'Horario del Proyecto',
+    carreras_proyecto_1: 'Carrera Proyecto 1',
+    carreras_proyecto_2: 'Carrera Proyecto 2',
+    habilidades_alumno: 'Habilidades Requeridas',
+    cupos_proyecto: 'Cupos del Proyecto',
+    modalidad: 'Modalidad',
+    direccion_escrita: 'Dirección Escrita',
+    duracion_experiencia: 'Duración de la Experiencia',
+    valor_proyecto: 'Valor del Proyecto',
+    periodo_repetido: '¿Periodo Repetido?',
+    induccion_ss: 'Inducción SS',
+    propuesta_semana_tec: 'Propuesta Semana TEC',
+    propuesta_inmersion_social: 'Propuesta Inmersión Social',
+    propuesta_bloque: 'Propuesta Bloque',
+    indicaciones_especiales: 'Indicaciones Campus',
+    status_proyecto: 'Status del Proyecto',
+    entrevista: '¿Entrevista?',
+    pregunta_descarte: 'Pregunta de Descarte',
+    enlace_maps: 'Enlace a Google Maps',
+    enlace_whatsApp: 'Enlace WhatsApp',
+    nombre_whatsApp: 'Nombre Grupo WhatsApp',
+    status_whatsapp: 'Status Grupo WhatsApp',
+    alumnos_postulados: 'Alumnos Postulados',
+    alumnos_aceptados: 'Alumnos Aceptados',
+    alumnos_rechazados: 'Alumnos Rechazados',
+    cupos_disponibles: 'Cupos Disponibles',
+    datatime_postulacion: 'Fecha Postulación Proyecto',
+    inicio_actividades: 'Inicio de Actividades',
+    carta_exclusion: 'Carta de Exclusión',
+    anuncio_canvas: 'Anuncio en Canvas',
+    porcentaje_canvas: 'Porcentaje en Canvas',
+    status_actividad: 'Status de Actividad',
+    Nota: 'Nota',
+    id_socio: 'ID Socio',
+    status: 'Status General'
+};
     
 
     const exportarAExcel = () => {
@@ -145,18 +160,16 @@ function ProyectosPos() {
     };
 
     function actualizarStatus(id, nuevoStatus) {
-        axios.put(`http://localhost:5001/proyecto/${id}/status`, { status: nuevoStatus })
-            .then(() => {
-                setProyectos(prev =>
-                    prev.map(proy =>
-                        proy.id_proyecto === id ? { ...proy, status_proyecto: nuevoStatus } : proy
-                    )
-                );
-            })
-            .catch(error => {
-                console.error('Error al actualizar el status:', error);
-            });
-    }
+    axios.put(`http://localhost:5003/proyecto/${id}/status`, { status: nuevoStatus })
+        .then(() => {
+            setProyectos(prev =>
+                prev.filter(proy => proy.id_proyecto !== id) // Lo eliminamos de la tabla al aprobar o rechazar
+            );
+        })
+        .catch(error => {
+            console.error('Error al actualizar el status:', error);
+        });
+}
 
     const handleChange = (e) => {
         setFilteredText(e.target.value.toLowerCase());

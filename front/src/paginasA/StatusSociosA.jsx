@@ -8,13 +8,13 @@ function StatusSocios() {
   const [socioSeleccionado, setSocioSeleccionado] = useState(null);
 
   useEffect(() => {
-    axios.get('http://localhost:5001/socio/pendiente')
+    axios.get('http://localhost:5003/socio/pendiente')
       .then(response => setSocios(response.data))
       .catch(error => console.error('Error al obtener socios:', error));
   }, []);
 
   const cambiarStatus = (id, nuevoStatus) => {
-    axios.put(`http://localhost:5001/socio/${id}/status`, { status: nuevoStatus })
+    axios.put(`http://localhost:5003/socio/${id}/status`, { status: nuevoStatus })
       .then(() => {
         alert('Status actualizado');
         window.location.reload();
@@ -23,7 +23,7 @@ function StatusSocios() {
   };
 
   const handleVerMas = (id) => {
-    axios.get(`http://localhost:5001/socio/${id}`)
+    axios.get(`http://localhost:5003/socio/${id}`)
       .then(response => {
         setSocioSeleccionado(response.data);
         console.log("Socio seleccionado:", response.data);
@@ -85,46 +85,59 @@ function StatusSocios() {
       )}
 
       {socioSeleccionado && (
-        <div className="modal">
-          <div className="modal-content">
-            <h2>Detalles del Socio</h2>
-            <p><strong>Nombre:</strong> {socioSeleccionado.nombre}</p>
-            <p><strong>Correo:</strong> {socioSeleccionado.correo}</p>
-            <p><strong>Teléfono:</strong> {socioSeleccionado.telefono_socio}</p>
-            <p><strong>Tipo de Socio:</strong> <span className="badge aprobado">{socioSeleccionado.tipo_socio}</span></p>
-            <p><strong>Redes Sociales:</strong> {socioSeleccionado.redes_sociales}</p>
+  <div className="modal">
+    <div className="modal-content">
+      <h2>Detalles del Socio</h2>
 
-            {socioSeleccionado.tipo_socio === 'Entidad' && socioSeleccionado.detalles && (
-              <div className="detalle-entidad">
-                <h3>Información de la Entidad</h3>
-                <p><strong>Nombre Entidad:</strong> {socioSeleccionado.detalles.nombre_entidad}</p>
-                <p><strong>Misión:</strong> {socioSeleccionado.detalles.mision}</p>
-                <p><strong>Visión:</strong> {socioSeleccionado.detalles.vision}</p>
-                <p><strong>Objetivos:</strong> {socioSeleccionado.detalles.objetivos}</p>
-                <p><strong>ODS:</strong> {socioSeleccionado.detalles.objetivo_ods_socio}</p>
-                <p><strong>Población:</strong> {socioSeleccionado.detalles.poblacion}</p>
-                <p><strong>Número de Beneficiarios:</strong> {socioSeleccionado.detalles.numero_beneficiarios_socio}</p>
-                <p><strong>Responsable:</strong> {socioSeleccionado.detalles.nombre_responsable} ({socioSeleccionado.detalles.puesto_responsable})</p>
-                <p><strong>Correo Responsable:</strong> {socioSeleccionado.detalles.correo_responsable}</p>
-              </div>
-            )}
+      {/* Información general de la tabla Socio */}
+      <p><strong>Nombre:</strong> {socioSeleccionado.nombre}</p>
+      <p><strong>Correo:</strong> {socioSeleccionado.correo}</p>
+      <p><strong>Teléfono:</strong> {socioSeleccionado.telefono_socio}</p>
+      <p><strong>Redes Sociales:</strong> {socioSeleccionado.redes_sociales}</p>
+      <p><strong>Status:</strong> <span className={badgeClass(socioSeleccionado.status)}>{socioSeleccionado.status}</span></p>
+      <p><strong>Tipo de Socio:</strong> <span className="badge aprobado">{socioSeleccionado.tipo_socio}</span></p>
 
-            {socioSeleccionado.tipo_socio === 'Estudiante' && socioSeleccionado.detalles && (
-              <div className="detalle-estudiante">
-                <h3>Información del Estudiante</h3>
-                <p><strong>Matrícula:</strong> {socioSeleccionado.detalles.matricula}</p>
-                <p><strong>Semestre Acreditado:</strong> {socioSeleccionado.detalles.semestre_acreditado}</p>
-                <p><strong>Correo Institucional:</strong> {socioSeleccionado.detalles.correo_institucional}</p>
-                <p><strong>Correo Alternativo:</strong> {socioSeleccionado.detalles.correo_alternativo}</p>
-                <p><strong>INE:</strong> {socioSeleccionado.detalles.ine}</p>
-                {socioSeleccionado.detalles.logo && <img src={`ruta/del/logo/${socioSeleccionado.detalles.logo}`} alt="Logo estudiante" style={{ maxWidth: "100px" }} />}
-              </div>
-            )}
-
-            <button className="cerrar-btn" onClick={cerrarInfo}>Cerrar socio</button>
-          </div>
+      {/* Detalles si es Entidad */}
+      {socioSeleccionado.tipo_socio === 'Entidad' && socioSeleccionado.detalles && (
+        <div className="detalle-entidad">
+          <h3>Información de la Entidad</h3>
+          <p><strong>Nombre de la Entidad:</strong> {socioSeleccionado.detalles.nombre_entidad}</p>
+          <p><strong>Misión:</strong> {socioSeleccionado.detalles.mision}</p>
+          <p><strong>Visión:</strong> {socioSeleccionado.detalles.vision}</p>
+          <p><strong>Objetivos:</strong> {socioSeleccionado.detalles.objetivos}</p>
+          <p><strong>Población:</strong> {socioSeleccionado.detalles.poblacion}</p>
+          <p><strong>Número de Beneficiarios:</strong> {socioSeleccionado.detalles.numero_beneficiarios_socio}</p>
+          <p><strong>Responsable:</strong> {socioSeleccionado.detalles.nombre_responsable} ({socioSeleccionado.detalles.puesto_responsable})</p>
+          <p><strong>Correo del Responsable:</strong> {socioSeleccionado.detalles.correo_responsable}</p>
+          <p><strong>Dirección:</strong> {socioSeleccionado.detalles.direccion_entidad}</p>
+          <p><strong>Horario:</strong> {socioSeleccionado.detalles.horario_entidad}</p>
+          <p><strong>Teléfono:</strong> {socioSeleccionado.detalles.telefono_entidad}</p>
         </div>
       )}
+
+      {/* Detalles si es Estudiante */}
+      {socioSeleccionado.tipo_socio === 'Estudiante' && socioSeleccionado.detalles && (
+        <div className="detalle-estudiante">
+          <h3>Información del Estudiante</h3>
+          <p><strong>Matrícula:</strong> {socioSeleccionado.detalles.matricula}</p>
+          <p><strong>Semestre Acreditado:</strong> {socioSeleccionado.detalles.semestre_acreditado}</p>
+          <p><strong>Correo Institucional:</strong> {socioSeleccionado.detalles.correo_institucional}</p>
+          <p><strong>Correo Alternativo:</strong> {socioSeleccionado.detalles.correo_alternativo}</p>
+          <p><strong>INE:</strong> {socioSeleccionado.detalles.ine}</p>
+          {socioSeleccionado.detalles.logo && (
+            <img
+              src={`ruta/del/logo/${socioSeleccionado.detalles.logo}`}
+              alt="Logo estudiante"
+              style={{ maxWidth: "100px" }}
+            />
+          )}
+        </div>
+      )}
+
+      <button className="cerrar-btn" onClick={cerrarInfo}>Cerrar socio</button>
+    </div>
+  </div>
+)}
     </div>
   );
 }

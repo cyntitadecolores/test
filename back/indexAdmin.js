@@ -105,20 +105,20 @@ app.get('/proyectos/aprobados', (req, res) => {
         FROM Postulacion pos 
         WHERE pos.id_proyecto = p.id_proyecto AND pos.status NOT IN ('rechazada', 'cancelada')
       ) AS postulaciones_activas,
-      p.numero_beneficiarios_proyecto AS cupo_base,
-      ROUND(p.numero_beneficiarios_proyecto * 1.1) AS cupo_maximo,
+      CAST(p.num_beneficiarios_osf AS UNSIGNED) AS cupo_base,
+      ROUND(CAST(p.num_beneficiarios_osf AS UNSIGNED) * 1.1) AS cupo_maximo,
       CASE 
         WHEN (
           SELECT COUNT(*) 
           FROM Postulacion pos 
           WHERE pos.id_proyecto = p.id_proyecto AND pos.status NOT IN ('rechazada', 'cancelada')
-        ) >= ROUND(p.numero_beneficiarios_proyecto * 1.1)
+        ) >= ROUND(CAST(p.num_beneficiarios_osf AS UNSIGNED) * 1.1)
         THEN 'Lleno'
         ELSE 'Disponible'
       END AS estado_postulacion
     FROM Proyecto p
     JOIN Periodo per ON per.id_periodo = p.id_periodo
-    WHERE p.status_proyecto = 'aceptado'
+    WHERE p.status = 'aprobado'
   `;
   db.query(query, (err, results) => {
     if (err) {
@@ -128,6 +128,7 @@ app.get('/proyectos/aprobados', (req, res) => {
     res.json(results);
   });
 });
+
 
 app.get('/proyectoss/:id', (req, res) => {
     const { id } = req.params;
@@ -163,11 +164,19 @@ app.get('/proyectos/:id/postulaciones', (req, res) => {
 
 // Obtener proyectos pendientes
 app.get('/proyectos', (req, res) => {
-    db.query('SELECT * FROM Proyecto JOIN socio ON proyecto.id_socio = socio.id_socio JOIN campus ON proyecto.id_campus = campus.id_campus JOIN ods ON proyecto.id_ods = ods.id_ods WHERE status_proyecto = "pendiente"', (err, results) => {
+    db.query(`
+        SELECT * 
+        FROM Proyecto 
+        JOIN socio ON Proyecto.id_socio = socio.id_socio 
+        JOIN campus ON Proyecto.id_campus = campus.id_campus 
+        JOIN ods ON Proyecto.ods_osf = ods.id_ods 
+        WHERE Proyecto.status = "pendiente"
+    `, (err, results) => {
         if (err) return res.status(500).json({ message: 'Error al obtener proyectos' });
         res.json(results);
     });
 });
+
 
 // Editar valores del proyecto
   app.put('/proyecto/:id/editar', (req, res) => {
@@ -194,7 +203,7 @@ app.put('/proyecto/:id/status', (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
   
-    db.query('UPDATE Proyecto SET status_proyecto = ? WHERE id_proyecto = ?', [status, id], (err, result) => {
+    db.query('UPDATE Proyecto SET status = ? WHERE id_proyecto = ?', [status, id], (err, result) => {
       if (err) {
         console.error('Error al actualizar el status:', err);
         return res.status(500).json({ message: 'Error al actualizar status' });
@@ -204,17 +213,70 @@ app.put('/proyecto/:id/status', (req, res) => {
   });
 
 //obtener socios aprobados
-app.get('/socio/aprobados', (req, res) => {
-    db.query('SELECT id_socio, nombre, correo, tipo_socio FROM Socio WHERE status = "Aceptado"', (err, results) => {
-      if (err) {
-        console.error('Error al obtener socios Aceptados:', err);
-        return res.status(500).json({ message: 'Error al obtener socios' });
-      }
-      res.json(results);
-    });
-  });
+app.get('/socioaceptados', (req, res) => {
+  const query = 'SELECT * FROM Socio WHERE status = "Aceptado"';
 
-// Obtener info individual del socio, incluyendo detalles según tipo
+  db.query(query, async (err, socios) => {
+    if (err) {
+      console.error('Error al obtener socios Aceptados:', err);
+      return res.status(500).json({ message: 'Error al obtener socios' });
+    }
+
+    // Procesar cada socio para verificar si es estudiante o entidad
+    const sociosConDetalles = await Promise.all(socios.map(socio => {
+      return new Promise((resolve, reject) => {
+        const queryEstudiante = 'SELECT * FROM SOCIO_ESTUDIANTE WHERE id_socio = ?';
+        db.query(queryEstudiante, [socio.id_socio], (err, estudianteResults) => {
+          if (err) {
+            console.error('Error al obtener detalles del estudiante:', err);
+            return reject(err);
+          }
+
+          if (estudianteResults.length > 0) {
+            // Es estudiante
+            resolve({
+              ...socio,
+              tipo_socio: 'Estudiante',
+              detalles: estudianteResults[0]
+            });
+          } else {
+            // Es entidad
+            resolve({
+              ...socio,
+              tipo_socio: 'Entidad',
+              detalles: {
+                nombre_entidad: socio.nombre_osf,
+                mision: socio.mision,
+                vision: socio.vision,
+                objetivos: socio.objetivos,
+                poblacion: socio.poblacion_osf,
+                numero_beneficiarios_socio: socio.num_beneficiarios_osf,
+                nombre_responsable: socio.nombre_representante,
+                puesto_responsable: socio.puesto_representante,
+                correo_responsable: socio.correo,
+                objetivo_ods_socio: socio.id_ods
+              }
+            });
+          }
+        });
+      });
+    }));
+
+    res.json(sociosConDetalles);
+  });
+});
+
+//obtener socio pendiente
+app.get('/socio/pendiente', (req, res) => {
+  db.query('SELECT * FROM socio WHERE status = "pendiente"', (err, results) => {
+    if (err) {
+      console.error('Error al obtener socios pendientes:', err);
+      return res.status(500).json({ message: 'Error al obtener socios' });
+    }
+    res.json(results);
+  });
+});
+
 app.get('/socio/:id', (req, res) => {
   const { id } = req.params;
 
@@ -225,34 +287,37 @@ app.get('/socio/:id', (req, res) => {
 
     const socio = socioResults[0];
 
-    if (socio.tipo_socio === 'Entidad') {
-      const queryEntidad = 'SELECT * FROM Socio_Entidad WHERE id_socio = ?';
-      db.query(queryEntidad, [id], (err, entidadResults) => {
-        if (err) return res.status(500).json({ message: 'Error al obtener detalles de entidad' });
-        res.json({ ...socio, detalles: entidadResults[0] });
-      });
-    } else if (socio.tipo_socio === 'Estudiante') {
+    if (socio.tipo_socio === 'Estudiante') {
       const queryEstudiante = 'SELECT * FROM Socio_Estudiante WHERE id_socio = ?';
       db.query(queryEstudiante, [id], (err, estudianteResults) => {
         if (err) return res.status(500).json({ message: 'Error al obtener detalles de estudiante' });
-        res.json({ ...socio, detalles: estudianteResults[0] });
+
+        return res.json({
+          ...socio,
+          tipo_socio: 'Estudiante',
+          detalles: estudianteResults[0] || {}
+        });
+      });
+    } else if (socio.tipo_socio === 'Entidad') {
+      const queryEntidad = 'SELECT * FROM Socio_Entidad WHERE id_socio = ?';
+      db.query(queryEntidad, [id], (err, entidadResults) => {
+        if (err) return res.status(500).json({ message: 'Error al obtener detalles de entidad' });
+
+        return res.json({
+          ...socio,
+          tipo_socio: 'Entidad',
+          detalles: entidadResults[0] || {}
+        });
       });
     } else {
-      res.json(socio);
+      return res.status(400).json({ message: 'Tipo de socio desconocido' });
     }
   });
 });
 
-// Obtener socios pendientes
-app.get('/socio/pendiente', (req, res) => {
-    db.query('SELECT id_socio, nombre, correo, status FROM Socio WHERE status = "pendiente"', (err, results) => {
-      if (err) {
-        console.error('Error al obtener socios pendientes:', err);
-        return res.status(500).json({ message: 'Error al obtener socios' });
-      }
-      res.json(results);
-    });
-  });
+
+
+
   
   // Actualizar el status de un socio
   app.put('/socio/:id/status', (req, res) => {
@@ -271,7 +336,7 @@ app.get('/socio/pendiente', (req, res) => {
 
 // Registro de administrador
 app.post('/registro/administrador', (req, res) => {
-    const { correo, contraseña, nombre } = req.body;
+    const { correo, password, nombre } = req.body;
 
     // Validar que el correo no exista
     db.query('SELECT * FROM Administrador WHERE correo = ?', [correo], (err, result) => {
@@ -285,15 +350,15 @@ app.post('/registro/administrador', (req, res) => {
 
         // Si el correo no existe, validar la contraseña
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-        if (!passwordRegex.test(contraseña)) {
+        if (!passwordRegex.test(password)) {
         return res.status(400).json({ message: 'La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.' });
         }
 
-        bcrypt.hash(contraseña, 10, (err, hash) => {
+        bcrypt.hash(password, 10, (err, hash) => {
             if (err) return res.status(500).json({ message: 'Error al encriptar contraseña' });
 
             db.query(
-                'INSERT INTO Administrador (correo, contraseña, nombre) VALUES (?, ?, ?)',
+                'INSERT INTO Administrador (correo, contraseña, nombre, status) VALUES (?, ?, ? ,"Aceptado" )',
                 [correo, hash, nombre],
                 (err, result) => {
                     if (err) {

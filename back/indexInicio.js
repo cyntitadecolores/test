@@ -236,69 +236,68 @@ app.post('/registro/socio', (req, res) => {
   });
 });
 
-// Ruta de login
-  app.post('/login', (req, res) => {
-    const { correo, contraseña } = req.body;
+app.post('/login', (req, res) => {
+  const { correo, contraseña } = req.body;
   
-    const usuarios = [
-      { tabla: 'Estudiante' },
-      { tabla: 'Administrador' },
-      { tabla: 'Socio' }
-    ];
+  // Array de tablas a verificar
+  const usuarios = ['Estudiante', 'Administrador', 'Socio'];
+
+  let index = 0;
   
-    let index = 0;
-  
-    const buscarUsuario = () => {
-      if (index >= usuarios.length) {
-        return res.status(401).json({ message: 'Credenciales incorrectas' });
+  // Función para realizar la búsqueda del usuario
+  const buscarUsuario = () => {
+    if (index >= usuarios.length) {
+      return res.status(401).json({ message: 'Credenciales incorrectas' });
+    }
+    
+    const tabla = usuarios[index];
+    
+    db.query(`SELECT * FROM ${tabla} WHERE correo = ?`, [correo], (err, results) => {
+      if (err) {
+        console.error(`❌ Error buscando en ${tabla}:`, err);
+        return res.status(500).json({ message: 'Error del servidor' });
       }
-  
-      const { tabla } = usuarios[index];
-  
-      db.query(`SELECT * FROM ${tabla} WHERE correo = ?`, [correo], (err, results) => {
-        if (err) {
-          console.error(`❌ Error buscando en ${tabla}:`, err);
-          return res.status(500).json({ message: 'Error del servidor' });
+
+      if (results.length === 0) {
+        index++;
+        buscarUsuario(); // Buscar en la siguiente tabla
+      } else {
+        const usuario = results[0];
+
+        // Si es socio y su status no es "aceptado", rechazar login
+        if (tabla === 'Socio' && usuario.status !== 'aceptado') {
+          return res.status(403).json({ message: 'Tu cuenta aún no ha sido aceptada' });
         }
-  
-        if (results.length === 0) {
-          index++;
-          buscarUsuario();
-        } else {
-          const usuario = results[0];
-  
-          // Si es socio y su status no es "aceptado", rechazar login
-          if (tabla === 'Socio' && usuario.status !== 'aceptado') {
-            return res.status(403).json({ message: 'Tu cuenta aún no ha sido aceptada' });
+
+        // Comparar la contraseña
+        bcrypt.compare(contraseña, usuario.contraseña, (err, esValido) => {
+          if (err) return res.status(500).json({ message: 'Error al verificar contraseña' });
+
+          if (esValido) {
+            // Generar JWT
+            const token = jwt.sign(
+              { id: usuario.id_socio || usuario.id_estudiante || usuario.id_administrador, tipo: tabla.toLowerCase() }, // Cambié para que también funcione con Estudiante y Administrador
+              process.env.JWT_SECRET,
+              { expiresIn: '1h' }
+            );
+
+            return res.json({
+              message: 'Login exitoso',
+              token,
+              tipo: tabla.toLowerCase(),
+              datos: usuario
+            });
+          } else {
+            return res.status(401).json({ message: 'Contraseña incorrecta' });
           }
-  
-          bcrypt.compare(contraseña, usuario.contraseña, (err, esValido) => {
-            if (err) return res.status(500).json({ message: 'Error al verificar contraseña' });
-  
-            if (esValido) {
-              // Generar JWT
-              const token = jwt.sign(
-                { id: usuario.id_socio, tipo: tabla.toLowerCase() }, // Datos del usuario a incluir
-                process.env.JWT_SECRET, // Llave secreta para firmar el token
-                { expiresIn: '1h' } // El token expirará en 1 hora
-              );
-  
-              return res.json({
-                message: 'Login exitoso',
-                token, // Enviar el token al frontend
-                tipo: tabla.toLowerCase(),
-                datos: usuario
-              });
-            } else {
-              return res.status(401).json({ message: 'Contraseña incorrecta' });
-            }
-          });
-        }
-      });
-    };
-  
-    buscarUsuario();
-  });
+        });
+      }
+    });
+  };
+
+  buscarUsuario(); // Iniciar búsqueda
+});
+
   
 const PORT = 5002;
 app.listen(PORT, () => {

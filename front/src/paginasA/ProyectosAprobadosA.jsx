@@ -10,9 +10,8 @@ function ProyectosAprobados() {
   const [postulaciones, setPostulaciones] = useState([]);
   const [mostrarTablaPostulaciones, setMostrarTablaPostulaciones] = useState(false);
 
-
   useEffect(() => {
-    axios.get('http://localhost:5001/proyectos/aprobados')
+    axios.get('http://localhost:5003/proyectos/aprobados')
       .then(response => setProyectos(response.data))
       .catch(error => console.error('Error al obtener proyectos:', error));
   }, []);
@@ -24,25 +23,29 @@ function ProyectosAprobados() {
   );
 
   const handleVerMas = (id) => {
-  axios.get(`http://localhost:5001/proyectoss/${id}`)
-    .then(response => {
-      setProyectoSeleccionado(response.data); // ✅ ahora es un objeto, no un array
-      console.log("Proyecto seleccionado:", response.data);
-    })
-    .catch(error => console.error('Error al obtener info del proyecto:', error));
-};
+    axios.get(`http://localhost:5003/proyectoss/${id}`)
+      .then(response => {
+        setProyectoSeleccionado(response.data); // ✅ ahora es un objeto, no un array
+        console.log("Proyecto seleccionado:", response.data);
+      })
+      .catch(error => console.error('Error al obtener info del proyecto:', error));
+  };
 
-const handleVerPostulaciones = (id_proyecto) => {
-  axios.get(`http://localhost:5001/proyectos/${id_proyecto}/postulaciones`)
+  const handleVerPostulaciones = (id_proyecto) => {
+  console.log('Cargando postulaciones para el proyecto ID:', id_proyecto); // Verificar el ID
+  axios.get(`http://localhost:5003/proyectos/${id_proyecto}/postulaciones`)
     .then(response => {
+      console.log('Postulaciones:', response.data); // Verificar los datos obtenidos
       setPostulaciones(response.data);
       setMostrarTablaPostulaciones(true);
     })
-    .catch(error => console.error('Error al obtener postulaciones:', error));
+    .catch(error => {
+      console.error('Error al obtener postulaciones:', error);
+    });
 };
 
-
   const cerrarInfo = () => setProyectoSeleccionado(null);
+  const cerrarTablaPostulaciones = () => setMostrarTablaPostulaciones(false);
 
   return (
     <div className="cube">
@@ -77,17 +80,16 @@ const handleVerPostulaciones = (id_proyecto) => {
                   <td>{proyecto.clave_materia}</td>
                   <td>{proyecto.periodo}</td>
                   <td>
-  {proyecto.estado_postulacion === 'Disponible' ? (
-    <span
-      className="disponible-link"
-      onClick={() => handleVerPostulaciones(proyecto.id_proyecto)}
-      style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
-    >
-      Disponible ({proyecto.postulaciones_activas}/{proyecto.cupo_maximo})
-    </span>
-  ) : 'Lleno'}
-</td>
-
+                    {proyecto.estado_postulacion === 'Disponible' ? (
+                      <span
+                        className="disponible-link"
+                        onClick={() => handleVerPostulaciones(proyecto.id_proyecto)}
+                        style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+                      >
+                        Disponible ({proyecto.postulaciones_activas}/{proyecto.cupo_maximo})
+                      </span>
+                    ) : 'Lleno'}
+                  </td>
                   <td>
                     <button className="ver-mas-link" onClick={() => handleVerMas(proyecto.id_proyecto)}>
                       Ver más
@@ -115,8 +117,8 @@ const handleVerPostulaciones = (id_proyecto) => {
 
       {mostrarTablaPostulaciones && (
   <div className="tabla-container">
-     <h2>Postulaciones del Proyecto</h2>
-      <p><strong>Proyecto:</strong> {mostrarTablaPostulaciones.nombre_proyecto}</p>
+    <h2>Postulaciones del Proyecto</h2>
+    <p><strong>Proyecto:</strong> {proyectoSeleccionado ? proyectoSeleccionado.nombre_proyecto : ''}</p>
     <table className="tabla-proyectos">
       <thead>
         <tr>
@@ -131,13 +133,13 @@ const handleVerPostulaciones = (id_proyecto) => {
           <tr key={post.id_estudiante}>
             <td>{post.id_estudiante}</td>
             <td>{post.nombre_estudiante}</td>
-            <td>{new Date(post.fecha_postulacion_estudiante).toLocaleDateString()}</td>
+            <td>{new Date(post.fecha_postulacion).toLocaleDateString()}</td>
             <td>{post.status}</td>
           </tr>
         ))}
       </tbody>
     </table>
-    <button className="cerrar-btn" onClick={() => setMostrarTablaPostulaciones(false)}>Cerrar tabla</button>
+    <button className="cerrar-btn" onClick={cerrarTablaPostulaciones}>Cerrar tabla</button>
   </div>
 )}
 
