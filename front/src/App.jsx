@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 import Inicio from './paginasA/InicioA';
 import AgregarAdmin from "./paginasA/AgregarAdminA";
 import StatusSocios from "./paginasA/StatusSociosA";
@@ -25,6 +26,7 @@ import CrearCuenta from './logIn/crearCuenta';
 function App() {
   return (
     <>
+      <ToastContainer />
       <Routes>
         <Route path="/" element={<Inicio />} />
         <Route path="/agregarAdminA" element={<AgregarAdmin />} />

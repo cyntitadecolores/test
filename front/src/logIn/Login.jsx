@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from 'react-router-dom';
 import "./Login.css";
+import { toast } from 'react-toastify';
+
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
@@ -23,16 +25,17 @@ export default function SignupPage() {
 
       // Almacenar el token en localStorage
       localStorage.setItem('jwt', data.token); // Almacena el JWT
+      toast.success("¡Inicio de sesión exitoso!");
 
       if (data.tipo === 'estudiante') navigate('/inicioE');
       else if (data.tipo === 'administrador') navigate('/');
       else if (data.tipo === 'socio') navigate('/inicioS');
     } else {
-      alert(data.message || "Error al iniciar sesión");
+      toast.error(data.message || "Error al iniciar sesión");
     }
   } catch (error) {
     console.error("Error en login:", error);
-    alert("Error de red");
+    toast.error("Error de red");
   }
 };
 

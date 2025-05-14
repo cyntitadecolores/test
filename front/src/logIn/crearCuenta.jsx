@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./Login.css";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; 
 
 export default function CrearCuenta() {
   const [tipoUsuario, setTipoUsuario] = useState("estudiante");
@@ -180,15 +182,39 @@ export default function CrearCuenta() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-  
+
       const data = await res.json();
       if (res.ok) {
-        alert("✅ Cuenta creada exitosamente");
+        toast.success("✅ Cuenta creada exitosamente", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
       } else {
-        alert("❌ Error: " + data.message);
+        toast.error("❌ Error: " + data.message, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
       }
     } catch (error) {
-      alert("❌ Ocurrió un error al crear la cuenta");
+      toast.error("❌ Ocurrió un error al crear la cuenta", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
       console.error("Error:", error);
     }
   };
