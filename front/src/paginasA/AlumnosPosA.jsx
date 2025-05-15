@@ -14,7 +14,7 @@ function AlumnosPos() {
     const [mostrarFiltros, setMostrarFiltros] = useState(false);
 
     const columnasDisponibles = {
-        nombre_proyecto: 'Nombre del proyecto',
+        nombre_proyecto: 'nombre_proyecto',
         nombre: 'Nombre Estudiante',
         fecha_postulacion: 'Fecha Postulación',
         expectativa: 'Expectativa',
@@ -190,14 +190,14 @@ function AlumnosPos() {
                                                 className="aprobar"
                                                 onClick={() => actualizarStatus(postulacion.id_proyecto, postulacion.id_estudiante, 'Aceptadx')}
                                             >
-                                                Aprobar
+                                                Aceptadx
                                             </button>
                                             <button
                                                 className="rechazar"
                                                 onClick={() => actualizarStatus(postulacion.id_proyecto, postulacion.id_estudiante, 'No aceptadx')}
                                                 style={{ marginLeft: '8px' }}
                                             >
-                                                Rechazar
+                                                No aceptadx
                                             </button>
                                         </td>
                                     </tr>

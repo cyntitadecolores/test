@@ -3,6 +3,7 @@ const cors = require('cors');
 const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
 const dotenv = require('dotenv');
+const jwt = require('jsonwebtoken');
 dotenv.config();
 
 const app = express();
@@ -29,6 +30,22 @@ db.connect(err => {
   else console.log('Conectado a la base de datos');
 });
 
+// Middleware para verificar el JWT
+const verifyToken = (req, res, next) => {
+  const token = req.header('Authorization')?.split(' ')[1]; // Obtén el token del encabezado Authorization
+
+  if (!token) {
+    return res.status(401).json({ message: 'Acceso denegado, no se proporcionó el token' });
+  }
+
+  try {
+    const verified = jwt.verify(token, process.env.JWT_SECRET); 
+    req.user = verified; 
+    next(); 
+  } catch (error) {
+    res.status(400).json({ message: 'Token inválido' });
+  }
+};
 
 // Obtener lista de campus
 app.get('/campus', (req, res) => {
@@ -256,7 +273,18 @@ app.post('/login', (req, res) => {
         return res.status(401).json({ error: 'Correo o contraseña incorrectos' });
       }
 
-      return res.json({ mensaje: 'Inicio de sesión exitoso', rol });
+      // Generar JWT
+      const token = jwt.sign(
+        {
+          id: usuario[campoId],
+          tipo: rol
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' }
+      );
+
+      return res.json({ mensaje: 'Inicio de sesión exitoso', rol, token });
+
     });
   };
 
@@ -318,10 +346,8 @@ app.get('/socios-estudiantes', (req, res) => {
 });
 
 
-
-
-
-const PORT = process.env.PORT || 8080;
+ 
+const PORT = 5002;
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+    console.log(`✅ Server running on port ${PORT}`);
 });

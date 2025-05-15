@@ -12,7 +12,7 @@ function ProyectosPos() {
     const [valorEditado, setValorEditado] = useState('');
     const [valorOriginal, setValorOriginal] = useState('');
     const [filteredText, setFilteredText] = useState('');
-    const columnasFijas = ['nombre', 'nombre_proyecto'];
+    const columnasFijas = ['Nombre OSF', 'nombre_proyecto'];
     const [mostrarFiltros, setMostrarFiltros] = useState(false);
 
 
@@ -163,7 +163,7 @@ function ProyectosPos() {
     axios.put(`http://localhost:5003/proyecto/${id}/status`, { status: nuevoStatus })
         .then(() => {
             setProyectos(prev =>
-                prev.filter(proy => proy.id_proyecto !== id) // Lo eliminamos de la tabla al aprobar o rechazar
+                prev.filter(proy => proy.id_proyecto !== id) 
             );
         })
         .catch(error => {
@@ -263,16 +263,16 @@ function ProyectosPos() {
                                     <td>
                                         <button
                                             className="aprobar"
-                                            onClick={() => actualizarStatus(proyecto.id_proyecto, 'aprobado')}
+                                            onClick={() => actualizarStatus(proyecto.id_proyecto, 'Aprobado')}
                                         >
-                                            Aprobar
+                                            Aprobado
                                         </button>
                                         <button
                                             className="rechazar"
-                                            onClick={() => actualizarStatus(proyecto.id_proyecto, 'rechazado')}
+                                            onClick={() => actualizarStatus(proyecto.id_proyecto, 'No aprobado')}
                                             style={{ marginLeft: '8px' }}
                                         >
-                                            Rechazar
+                                            No aprobado
                                         </button>
                                     </td>
                                 </tr>

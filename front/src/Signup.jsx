@@ -57,22 +57,24 @@ const Signup = () => {
   // useEffect se ejecuta una vez al cargar el componente
   useEffect(() => {
     // Carga los campus desde el backend
-    axios.get('http://localhost:8080/campus')
+
+    axios.get('http://localhost:5002/campus')
       .then(res => setCampusList(res.data))
       .catch(err => console.error('Error al cargar campus:', err));
 
     // Carga las carreras
-    axios.get('http://localhost:8080/carreras')
+    axios.get('http://localhost:5002/carreras')
       .then(res => setCarrerasList(res.data))
       .catch(err => console.error('Error al cargar carreras:', err));
 
     // Carga los ODS
-    axios.get('http://localhost:8080/ods')
+    axios.get('http://localhost:5002/ods')
       .then(res => setOdsList(res.data))
       .catch(err => console.error('Error al cargar ODS:', err));
 
     // Carga las poblaciones desde el ENUM de la tabla
-    axios.get('http://localhost:8080/poblaciones')
+
+    axios.get('http://localhost:5002/poblaciones')
       .then(res => setPoblaciones(res.data))
       .catch(err => console.error('Error al cargar poblaciones:', err));
   }, []);
@@ -138,7 +140,8 @@ const Signup = () => {
     setLoading(true); // Comienza la carga
 
     try {
-      const res = await axios.post('http://localhost:8080/signup', {
+
+      const res = await axios.post('http://localhost:5002/signup', {
         tipo,
         perfilSocio,
         ...formData,
@@ -150,7 +153,7 @@ const Signup = () => {
       setFormData(formDataInicial);
       setTipo('');
       setPerfilSocio('');
-      navigate('/');
+      navigate('/login');
     } catch (err) {
       alert(err.response?.data?.error || 'Error al registrar');
     } finally {

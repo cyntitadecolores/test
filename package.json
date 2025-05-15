@@ -10,12 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
     "express": "^4.21.2",
     "file-saver": "^2.0.5",
-    "mysql2": "^3.14.0",
+    "mysql2": "^3.14.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-toastify": "^11.0.5",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

@@ -10,12 +10,14 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:8080/login', { correo, contraseña });
-      const { rol } = res.data;
+      const res = await axios.post('http://localhost:5002/login', { correo, contraseña });
+      const { rol, token } = res.data;
 
-      if (rol === 'estudiante') navigate('/estudiante');
-      else if (rol === 'administrador') navigate('/administrador');
-      else if (rol === 'socio') navigate('/socio');
+      localStorage.setItem('token', token);
+
+      if (rol === 'estudiante') navigate('/inicioE');
+      else if (rol === 'administrador') navigate('/');
+      else if (rol === 'socio') navigate('/inicioS');
     } catch (err) {
       alert(err.response?.data?.error || 'Error al iniciar sesión');
     }

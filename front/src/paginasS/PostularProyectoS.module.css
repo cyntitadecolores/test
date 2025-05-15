@@ -8,6 +8,7 @@
   
   /* --- Tarjeta del formulario --------------------------------------- */
   .formBox {
+    margin-right: 500px;
     max-width: 900px;
     min-width: 500px;
     margin: 90px auto 50px;           /* despega del top-bar               */

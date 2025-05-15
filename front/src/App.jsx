@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 import Inicio from './paginasA/InicioA';
 import AgregarAdmin from "./paginasA/AgregarAdminA";
 import StatusSocios from "./paginasA/StatusSociosA";
@@ -25,6 +26,7 @@ import Signup from './Signup';
 function App() {
   return (
     <>
+      <ToastContainer />
       <Routes>
         <Route path="/" element={<Inicio />} />
         <Route path="/agregarAdminA" element={<AgregarAdmin />} />
@@ -46,7 +48,7 @@ function App() {
         <Route path="/postularProyectoS" element={<NuestrosProyectos />} />
 
         <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route path="/crearCuenta" element={<Signup />} />
       </Routes>
     </>
   );
