@@ -13,7 +13,7 @@ function NuestrosProyectosS() {
 
   // Obtener el ID del socio del localStorage
   const getIdSocio = () => {
-    const token = localStorage.getItem("jwt");
+    const token = localStorage.getItem("token");
     if (token) {
       try {
         const decoded = jwtDecode(token);
@@ -37,7 +37,13 @@ function NuestrosProyectosS() {
       }
 
       try {
-        const response = await fetch(`http://localhost:5001/proyectos/${id_socio}?status=${statusFilter}`);
+        const token = localStorage.getItem('token');
+const response = await fetch(`http://localhost:5001/proyectos/${id_socio}?status=${statusFilter}`, {
+  headers: {
+    'Authorization': `Bearer ${token}`, // <-- Aquí se envía correctamente
+  },
+});
+        
         const data = await response.json();
 
         if (response.ok) {
