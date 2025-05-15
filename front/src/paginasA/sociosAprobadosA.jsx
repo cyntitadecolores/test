@@ -57,7 +57,7 @@ function SociosAprobados() {
             <tbody>
               {sociosFiltrados.map((socio) => (
                 <tr key={socio.id_socio}>
-                  <td>{socio.nombre}</td>
+                  <td>{socio.nombre_osf}</td>
                   <td>{socio.correo}</td>
                   <td><span className="badge aprobado">{socio.tipo_socio}</span></td>
                   <td>
@@ -76,26 +76,22 @@ function SociosAprobados() {
         <div className="modal">
           <div className="modal-content">
             <h2>Detalles del Socio</h2>
-            <p><strong>Nombre OSF:</strong> {socioSeleccionado.nombre_osf}</p>
+
+            <p><strong>Nombre:</strong> {socioSeleccionado.nombre_osf}</p>
             <p><strong>Correo:</strong> {socioSeleccionado.correo}</p>
             <p><strong>Teléfono:</strong> {socioSeleccionado.telefono_osf}</p>
-            <p><strong>Tipo de Socio:</strong> <span className="badge aprobado">{socioSeleccionado.tipo_socio}</span></p>
             <p><strong>Redes Sociales:</strong> {socioSeleccionado.redes_sociales}</p>
-
-            {socioSeleccionado.tipo_socio === 'Entidad' && socioSeleccionado.detalles && (
-              <div className="detalle-entidad">
-                <h3>Información de la Entidad</h3>
-                <p><strong>Nombre Entidad:</strong> {socioSeleccionado.detalles.nombre_entidad}</p>
-                <p><strong>Misión:</strong> {socioSeleccionado.detalles.mision}</p>
-                <p><strong>Visión:</strong> {socioSeleccionado.detalles.vision}</p>
-                <p><strong>Objetivos:</strong> {socioSeleccionado.detalles.objetivos}</p>
-                <p><strong>ODS:</strong> {socioSeleccionado.detalles.objetivo_ods_socio}</p>
-                <p><strong>Población:</strong> {socioSeleccionado.detalles.poblacion}</p>
-                <p><strong>Número de Beneficiarios:</strong> {socioSeleccionado.detalles.numero_beneficiarios_socio}</p>
-                <p><strong>Responsable:</strong> {socioSeleccionado.detalles.nombre_responsable} ({socioSeleccionado.detalles.puesto_responsable})</p>
-                <p><strong>Correo Responsable:</strong> {socioSeleccionado.detalles.correo_responsable}</p>
-              </div>
-            )}
+            <p><strong>Tipo de Socio:</strong> <span className="badge aprobado">{socioSeleccionado.tipo_socio}</span></p>
+            <p><strong>Visión:</strong> {socioSeleccionado.vision}</p>
+            <p><strong>Misión:</strong> {socioSeleccionado.mision}</p>
+            <p><strong>Objetivos:</strong> {socioSeleccionado.objetivos}</p>
+            <p><strong>Población:</strong> {socioSeleccionado.poblacion_osf}</p>
+            <p><strong>Número de Beneficiarios:</strong> {socioSeleccionado.num_beneficiarios_osf}</p>
+            <p><strong>Nombre del Representante:</strong> {socioSeleccionado.nombre_representante}</p>
+            <p><strong>Puesto del Representante:</strong> {socioSeleccionado.puesto_representante}</p>
+            <p><strong>Dirección y Horario:</strong> {socioSeleccionado.direccion_horario}</p>
+            <p><strong>Notificaciones:</strong> {socioSeleccionado.notificaciones ? 'Sí' : 'No'}</p>
+            <p><strong>Nota:</strong> {socioSeleccionado.nota || 'N/A'}</p>
 
             {socioSeleccionado.tipo_socio === 'Estudiante' && socioSeleccionado.detalles && (
               <div className="detalle-estudiante">
@@ -104,13 +100,7 @@ function SociosAprobados() {
                 <p><strong>Matrícula:</strong> {socioSeleccionado.detalles.matricula}</p>
                 <p><strong>Semestre Acreditado:</strong> {socioSeleccionado.detalles.semestre_acreditado}</p>
                 <p><strong>INE:</strong> {socioSeleccionado.detalles.ine}</p>
-                {socioSeleccionado.detalles.logo && (
-                  <img
-                    src={`ruta/del/logo/${socioSeleccionado.detalles.logo}`}
-                    alt="Logo estudiante"
-                    style={{ maxWidth: "100px" }}
-                  />
-                )}
+                <p><strong>ID Carrera:</strong> {socioSeleccionado.detalles.id_carrera}</p>
               </div>
             )}
 

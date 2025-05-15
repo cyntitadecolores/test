@@ -49,9 +49,9 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-// Obtener postulaciones alumnos pendientes
+// Obtener postulaciones alumnos En revisión
 app.get('/postulaciones_alumnos', (req, res) => {
-    db.query('SELECT * FROM Postulacion JOIN Proyecto ON Postulacion.id_proyecto = Proyecto.id_proyecto JOIN estudiante ON postulacion.id_estudiante = estudiante.id_estudiante WHERE postulacion.status = "pendiente"', (err, results) => {
+    db.query('SELECT * FROM Postulacion JOIN Proyecto ON Postulacion.id_proyecto = Proyecto.id_proyecto JOIN estudiante ON postulacion.id_estudiante = estudiante.id_estudiante WHERE postulacion.status = "Inscrito"', (err, results) => {
         if (err) return res.status(500).json({ message: 'Error al obtener postulaciones' });
         res.json(results);
     });
@@ -118,7 +118,7 @@ app.get('/proyectos/aprobados', (req, res) => {
       END AS estado_postulacion
     FROM Proyecto p
     JOIN Periodo per ON per.id_periodo = p.id_periodo
-    WHERE p.status = 'aprobado'
+    WHERE p.status_proyecto = 'Aprobado'
   `;
   db.query(query, (err, results) => {
     if (err) {
@@ -162,7 +162,7 @@ app.get('/proyectos/:id/postulaciones', (req, res) => {
   });
 });
 
-// Obtener proyectos pendientes
+// Obtener proyectos En revisión
 app.get('/proyectos', (req, res) => {
     db.query(`
         SELECT * 
@@ -170,7 +170,7 @@ app.get('/proyectos', (req, res) => {
         JOIN socio ON Proyecto.id_socio = socio.id_socio 
         JOIN campus ON Proyecto.id_campus = campus.id_campus 
         JOIN ods ON Proyecto.ods_osf = ods.id_ods 
-        WHERE Proyecto.status = "pendiente"
+        WHERE Proyecto.status_proyecto = "En revisión"
     `, (err, results) => {
         if (err) return res.status(500).json({ message: 'Error al obtener proyectos' });
         res.json(results);
@@ -203,7 +203,7 @@ app.put('/proyecto/:id/status', (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
   
-    db.query('UPDATE Proyecto SET status = ? WHERE id_proyecto = ?', [status, id], (err, result) => {
+    db.query('UPDATE Proyecto SET status_proyecto = ? WHERE id_proyecto = ?', [status, id], (err, result) => {
       if (err) {
         console.error('Error al actualizar el status:', err);
         return res.status(500).json({ message: 'Error al actualizar status' });
@@ -266,11 +266,11 @@ app.get('/socioaceptados', (req, res) => {
   });
 });
 
-//obtener socio pendiente
+//obtener socio En revisión
 app.get('/socio/pendiente', (req, res) => {
-  db.query('SELECT * FROM socio WHERE status = "pendiente"', (err, results) => {
+  db.query('SELECT * FROM socio WHERE status = "En revisión"', (err, results) => {
     if (err) {
-      console.error('Error al obtener socios pendientes:', err);
+      console.error('Error al obtener socios En revisión:', err);
       return res.status(500).json({ message: 'Error al obtener socios' });
     }
     res.json(results);
@@ -287,8 +287,9 @@ app.get('/socio/:id', (req, res) => {
 
     const socio = socioResults[0];
 
-    if (socio.tipo_socio === 'Estudiante') {
-      const queryEstudiante = 'SELECT * FROM Socio_Estudiante WHERE id_socio = ?';
+    // Verificar si el socio tiene información en la tabla SOCIO_ESTUDIANTE
+    if (socio.tipo_socio.includes('Estudiante')) {
+      const queryEstudiante = 'SELECT * FROM SOCIO_ESTUDIANTE WHERE id_socio = ?';
       db.query(queryEstudiante, [id], (err, estudianteResults) => {
         if (err) return res.status(500).json({ message: 'Error al obtener detalles de estudiante' });
 
@@ -298,24 +299,16 @@ app.get('/socio/:id', (req, res) => {
           detalles: estudianteResults[0] || {}
         });
       });
-    } else if (socio.tipo_socio === 'Entidad') {
-      const queryEntidad = 'SELECT * FROM Socio_Entidad WHERE id_socio = ?';
-      db.query(queryEntidad, [id], (err, entidadResults) => {
-        if (err) return res.status(500).json({ message: 'Error al obtener detalles de entidad' });
-
-        return res.json({
-          ...socio,
-          tipo_socio: 'Entidad',
-          detalles: entidadResults[0] || {}
-        });
-      });
     } else {
-      return res.status(400).json({ message: 'Tipo de socio desconocido' });
+      // Si no hay detalles en SOCIO_ESTUDIANTE, consideramos que es un socio de tipo Entidad
+      return res.json({
+        ...socio,
+        tipo_socio: 'Entidad',
+        detalles: {} // En este caso no hay detalles adicionales para los socios entidad
+      });
     }
   });
 });
-
-
 
 
   
@@ -358,7 +351,7 @@ app.post('/registro/administrador', (req, res) => {
             if (err) return res.status(500).json({ message: 'Error al encriptar contraseña' });
 
             db.query(
-                'INSERT INTO Administrador (correo, contraseña, nombre, status) VALUES (?, ?, ? ,"Aceptado" )',
+                'INSERT INTO Administrador (correo, contraseña, nombre) VALUES (?, ?, ?)',
                 [correo, hash, nombre],
                 (err, result) => {
                     if (err) {

@@ -14,7 +14,7 @@ function AlumnosPos() {
     const [mostrarFiltros, setMostrarFiltros] = useState(false);
 
     const columnasDisponibles = {
-        nombre_proyecto: 'Nombre del proyecto',
+        nombre_proyecto: 'nombre_proyecto',
         nombre: 'Nombre Estudiante',
         fecha_postulacion: 'Fecha Postulación',
         expectativa: 'Expectativa',
