@@ -1,9 +1,68 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import NavCub from '../componentes/navegacionE';
 
 function VisualizarProyectos() {
   const [proyectos, setProyectos] = useState([]);
   const [error, setError] = useState(null);
+  const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
+  const [mostrarRequiere, setMostrarRequiere] = useState(false);
+  const [mostrarMasInfo, setMostrarMasInfo] = useState(false);
+  const [mostrarPostularme, setMostrarPostularme] = useState(false);
+
+const [expectativa, setExpectativa] = useState('');
+const [razon, setRazon] = useState('');
+const [motivo, setMotivo] = useState('');
+const [preguntaDescarte, setPreguntaDescarte] = useState('');
+const [nota, setNota] = useState('');
+const [idProyectoPostulacion, setIdProyectoPostulacion] = useState(null);
+
+
+const handleSubmitPostulacion = async (e) => {
+  e.preventDefault();
+  const token = localStorage.getItem('token');
+
+  try {
+    const response = await fetch('http://localhost:5004/postular', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ 
+        id_proyecto: idProyectoPostulacion,
+        expectativa,
+        razon,
+        motivo,
+        preguntaDescarte,
+        nota
+      })
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      alert('Postulación registrada con éxito');
+      setMostrarPostularme(false);
+    } else {
+      alert('Error: ' + result.mensaje);
+    }
+  } catch (error) {
+    console.error('Error al postularme:', error);
+    alert('Error al postularme');
+  }
+};
+  
+  const requiere = () => {
+  setMostrarRequiere(true);
+  setMostrarMasInfo(false); // oculta la otra sección si está abierta
+};
+
+const masinfo = () => {
+  setMostrarMasInfo(true);
+  setMostrarRequiere(false); // oculta la otra sección si está abierta
+};
+
+
 
   useEffect(() => {
     fetch('http://localhost:5004/proyectos')
@@ -15,38 +74,210 @@ function VisualizarProyectos() {
       .catch(err => setError(err.message));
   }, []);
 
+  const handleInformacion = (id) => {
+    axios.get(`http://localhost:5003/proyectoss/${id}`)
+      .then(response => {
+        setProyectoSeleccionado(response.data);
+        console.log("Proyecto seleccionado:", response.data);
+      })
+      .catch(error => console.error('Error al obtener info del proyecto:', error));
+  };
+
+  const postularme = async () => {
+  const token = localStorage.getItem('token');
+
+  try {
+    const response = await fetch('http://localhost:5004/postular', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ id_proyecto: proyectoSeleccionado.id_proyecto })
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      alert('Postulación registrada con éxito');
+    } else {
+      alert('Error: ' + result.mensaje);
+    }
+  } catch (error) {
+    console.error('Error al postularme:', error);
+    alert('Error al postularme');
+  }
+};
+
+  const cerrarInfo = () => {
+    setProyectoSeleccionado(null);
+  };
 
   return (
     <div className="cube">
       <NavCub />
-      <div className="contenedor-principal">
-        <div>
-          <div className="contenido-centro">
-            <h1>Catálogo de Proyectos</h1>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            <div className="grid-proyectos">
-              {proyectos.length === 0 && <p>No hay proyectos disponibles.</p>}
-              {proyectos.map(proyecto => (
-                <div key={proyecto.id_proyecto} className="tarjeta-proyecto">
-                  <img 
-                    src={proyecto.imagen || 'https://via.placeholder.com/150'} 
-                    alt={proyecto.nombre} 
-                    className="imagen-proyecto" 
-                  />
-                  <h3 className="nombre-proyecto">{proyecto.nombre}</h3>
-                  <p className="hrs-proyecto">{proyecto.horas || 'N/A'} horas</p>
-                  <p className="modalidad-proyecto">{proyecto.modalidad || 'N/A'}</p>
-                  <p className="status-proyecto">Status: {proyecto.status_proyecto}</p>
-                  <p className="nombre-socio">Socio: {proyecto.nombre_socio}</p>
-                  <p className="nombre-campus">Campus: {proyecto.nombre_campus}</p>
-                  <p className="nombre-ods">ODS: {proyecto.nombre_ods}</p>
-                  <button className="boton-info">Información</button>
-                </div>
-              ))}
-            </div>
+      <h1 className="titulo">Catálogo de Proyectos</h1>
+
+      {!proyectoSeleccionado && (
+        <div >
+          <table >
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>CRN</th>
+                <th>Grupo</th>
+                <th>clave materia</th>
+                <th>Modalidad</th>
+                <th>Perido </th>
+                <th>Campus </th>
+                <th>Objetivo </th>
+                <th>Duracion </th>
+
+              </tr>
+            </thead>
+            <tbody>
+              {proyectos.length === 0 ? (
+                <tr><td >No hay proyectos disponibles.</td></tr>
+              ) : (
+                proyectos.map(proyecto => (
+                  <tr key={proyecto.id_proyecto}>
+                    <td>{proyecto.nombre_proyecto}</td>
+                    <td>{proyecto.crn}</td>
+                    <td>{proyecto.grupo}</td>
+                    <td>{proyecto.clave_materia}</td>
+                    <td>{proyecto.modalidad}</td>
+                    <td>{proyecto.horas}</td>
+                    <td>{proyecto.campus}</td>
+                    <td>{proyecto.objetivo_proyecto}</td>
+                    <td>{proyecto.duracion_experiencia}</td>
+                    <td>
+                      <button 
+                        className="boton-info" 
+                        onClick={() => handleInformacion(proyecto.id_proyecto)}
+                      >
+                        Información
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {proyectoSeleccionado && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>Detalles del Proyecto</h2>
+            <p><strong>Nombre:</strong> {proyectoSeleccionado.nombre_proyecto}</p>
+            <p><strong>Periodo:</strong> {proyectoSeleccionado.periodo}</p>
+            <p><strong>Modalidad:</strong> {proyectoSeleccionado.modalidad}</p>
+            <p><strong>Socio:</strong> {proyectoSeleccionado.nombre_osf}</p>
+            <p><strong>Poblacion:</strong> {proyectoSeleccionado.poblacion_osf}</p> 
+            <p><strong>Problematica:</strong> {proyectoSeleccionado.problema_social}</p>
+            <p><strong>Razon:</strong> {proyectoSeleccionado.razon_osf}</p>
+            <button className="cerrar-btn" onClick={requiere}>que se espera de mi?</button>
+            <button className="cerrar-btn" onClick={masinfo}>saber aun mas..</button>
+            <button
+  className="cerrar-btn"
+  onClick={() => {
+    setIdProyectoPostulacion(proyectoSeleccionado.id_proyecto); // ✅
+    setMostrarPostularme(true);
+    setProyectoSeleccionado(null);
+    setMostrarMasInfo(false);
+    setMostrarRequiere(false);
+  }}
+>
+  Postularme
+</button>
+
+            <button className="cerrar-btn" onClick={cerrarInfo}>Cerrar</button>
+
+            {mostrarRequiere && (
+        <div className="info-extra">
+          <h3>¿Qué se espera de mí?</h3>
+          <p><strong>Se ocupa diagnostico?:</strong>{proyectoSeleccionado.diagnostico_previo || 'No hay información disponible.'}</p>
+          <p><strong>Acciones:</strong>{proyectoSeleccionado.acciones_estudiantado || 'No hay información disponible.'}</p>
+          <p><strong>Producto entrega:</strong>{proyectoSeleccionado.producto_servicio_entregar || 'No hay información disponible.'}</p>
+          <p><strong>Entregable:</strong>{proyectoSeleccionado.entregable_esperado || 'No hay información disponible.'}</p>
+          <p><strong>Dias:</strong>{proyectoSeleccionado.dias_actividades || 'No hay información disponible.'}</p>
+          <p><strong>Horario:</strong>{proyectoSeleccionado.horario_proyecto || 'No hay información disponible.'}</p>
+          <p><strong>Habilidades:</strong>{proyectoSeleccionado.habilidades_alumno || 'No hay información disponible.'}</p>
+          <p><strong>Problema:</strong>{proyectoSeleccionado.problema_social || 'No hay información disponible.'}</p>
+
+        </div>
+      )}
+
+      {mostrarMasInfo && (
+        <div className="info-extra">
+          <h3>Más información</h3>
+          <p><strong>Num beneficiarios:</strong>{proyectoSeleccionado.num_beneficiarios_osf || 'No hay detalles adicionales.'}</p>
+          <p><strong>ODS osf:</strong>{proyectoSeleccionado.ods_osf || 'No hay detalles adicionales.'}</p>
+          <p><strong>Telefono:</strong>{proyectoSeleccionado.telefono_osf || 'No hay detalles adicionales.'}</p>
+          <p><strong>Datos:</strong>{proyectoSeleccionado.datos_osf || 'No hay detalles adicionales.'}</p>
+          <p><strong>Redes sociales:</strong>{proyectoSeleccionado.redes_sociales || 'No hay detalles adicionales.'}</p>
+          <p><strong>Vulnerabilidad 1:</strong>{proyectoSeleccionado.vulnerabilidad_atendida_1 || 'No hay detalles adicionales.'}</p>
+          <p><strong>Edad pobla 1:</strong>{proyectoSeleccionado.edad_poblacion_1 || 'No hay detalles adicionales.'}</p>
+          <p><strong>Vulnerabilidad 1::</strong>{proyectoSeleccionado.vulnerabilidad_atendida_2 || 'No hay detalles adicionales.'}</p>
+          <p><strong>Edad pobla 1::</strong>{proyectoSeleccionado.edad_poblacion_2 || 'No hay detalles adicionales.'}</p>
+          <p><strong>ODS 1:</strong>{proyectoSeleccionado.ods_proyecto_1 || 'No hay detalles adicionales.'}</p>
+          <p><strong>ODS 2:</strong>{proyectoSeleccionado.ods_proyecto_2 || 'No hay detalles adicionales.'}</p>
+          <p><strong>Direccion:</strong>{proyectoSeleccionado.direccion_escrita || 'No hay detalles adicionales.'}</p>
+        </div>
+      )}
           </div>
         </div>
-      </div>
+      )}
+       {mostrarPostularme && (
+  <div className="info-extra">
+    <h3>Formulario de Postulación</h3>
+    <form onSubmit={handleSubmitPostulacion}>
+      <label>
+        Expectativa:
+        <textarea 
+          value={expectativa} 
+          onChange={e => setExpectativa(e.target.value)} 
+          required
+        />
+      </label>
+      <label>
+        Razón:
+        <textarea 
+          value={razon} 
+          onChange={e => setRazon(e.target.value)} 
+          required
+        />
+      </label>
+      <label>
+        Motivo:
+        <textarea 
+          value={motivo} 
+          onChange={e => setMotivo(e.target.value)} 
+          required
+        />
+      </label>
+      <label>
+        Pregunta de descarte:
+        <textarea 
+          value={preguntaDescarte} 
+          onChange={e => setPreguntaDescarte(e.target.value)} 
+        />
+      </label>
+      <label>
+        Nota:
+        <textarea 
+          value={nota} 
+          onChange={e => setNota(e.target.value)} 
+        />
+      </label>
+
+      <button type="submit">Enviar Postulación</button>
+      <button onClick={() => setMostrarPostularme(false)} className="cerrar-btn">
+  Cancelar
+</button>
+    </form>
+  </div>
+)}
     </div>
   );
 }

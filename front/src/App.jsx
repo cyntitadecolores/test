@@ -19,8 +19,8 @@ import InicioS from './paginasS/InicioSo';
 import PostularProyecto from './paginasS/NuestrosProyectosS';
 import NuestrosProyectos from './paginasS/PostularProyectoS';
 
-import Login from './logIn/Login';
-import CrearCuenta from './logIn/crearCuenta';
+import Login from './Login';
+import Signup from './Signup';
 
 
 function App() {
@@ -48,7 +48,7 @@ function App() {
         <Route path="/postularProyectoS" element={<NuestrosProyectos />} />
 
         <Route path="/login" element={<Login />} />
-        <Route path="/crearCuenta" element={<CrearCuenta />} />
+        <Route path="/crearCuenta" element={<Signup />} />
       </Routes>
     </>
   );

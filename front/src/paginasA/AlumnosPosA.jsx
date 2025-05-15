@@ -190,14 +190,14 @@ function AlumnosPos() {
                                                 className="aprobar"
                                                 onClick={() => actualizarStatus(postulacion.id_proyecto, postulacion.id_estudiante, 'Aceptadx')}
                                             >
-                                                Aprobar
+                                                Aceptadx
                                             </button>
                                             <button
                                                 className="rechazar"
                                                 onClick={() => actualizarStatus(postulacion.id_proyecto, postulacion.id_estudiante, 'No aceptadx')}
                                                 style={{ marginLeft: '8px' }}
                                             >
-                                                Rechazar
+                                                No aceptadx
                                             </button>
                                         </td>
                                     </tr>

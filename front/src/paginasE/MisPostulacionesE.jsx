@@ -5,7 +5,7 @@ function MisPostulaciones() {
   const [datos, setDatos] = useState([]);
 
   useEffect(() => {
-    const token = localStorage.getItem('jwt');
+    const token = localStorage.getItem('token');
 
     fetch('http://localhost:5004/postulaciones', {
       headers: {

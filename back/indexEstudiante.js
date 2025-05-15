@@ -79,19 +79,47 @@ app.get('/postulaciones', verifyToken, (req, res) => {
   });
 });
 
+app.post('/postular', verifyToken, (req, res) => {
+  const idEstudiante = req.user.id;
+  const { id_proyecto, expectativa, razon, motivo, preguntaDescarte, nota } = req.body;
+
+  const sql = `
+    INSERT INTO postulacion (
+      id_estudiante, id_proyecto, fecha_postulacion, status,
+      expectativa, razon, motivo, pregunta_descarte, nota
+    ) VALUES (?, ?, NOW(), "Inscrito", ?, ?, ?, ?, ?)
+  `;
+
+  db.query(sql, [
+    idEstudiante, id_proyecto,
+    expectativa, razon, motivo, preguntaDescarte, nota
+  ], (err, result) => {
+    if (err) {
+      console.error(err); // <-- ¡IMPORTANTE para debugging!
+      return res.status(500).json({ mensaje: 'Error al postularse' });
+    }
+    res.json({ mensaje: 'Postulación registrada con éxito' });
+  });
+});
+
+
+
 // Obtener proyectos En revisión
 app.get('/proyectos', (req, res) => {
     db.query(`
         SELECT * 
         FROM Proyecto 
         JOIN socio ON Proyecto.id_socio = socio.id_socio 
-        JOIN campus ON Proyecto.id_campus = campus.id_campus 
-        JOIN ods ON Proyecto.ods_osf = ods.id_ods 
+        JOIN campus ON Proyecto.id_campus = campus.id_campus
+        JOIN periodo ON Proyecto.id_periodo = periodo.id_periodo
+        JOIN ods ON Proyecto.ods_osf = ods.id_ods
+        WHERE status_proyecto  = "aprobado"
     `, (err, results) => {
         if (err) return res.status(500).json({ message: 'Error al obtener proyectos' });
         res.json(results);
     });
 });
+
 
 const PORT = 5004;
 app.listen(PORT, () => {

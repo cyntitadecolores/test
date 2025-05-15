@@ -1,35 +1,33 @@
-const express = require("express");
-const mysql = require("mysql2");
-const cors = require("cors");
-const bcrypt = require('bcryptjs');
-const dotenv = require("dotenv")
+const express = require('express');
+const cors = require('cors');
+const mysql = require('mysql2');
+const bcrypt = require('bcrypt');
+const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
-const multer = require('multer');
-const path = require('path');
-
 dotenv.config();
 
 const app = express();
-app.use(cors());
+const corsOptions = {
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST'],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
+
 app.use(express.json());
 
-// Configura el servidor para servir archivos estáticos desde la carpeta 'uploads'
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
+// Conexión a la base de datos
 const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME
-  });
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME
+});
 
-// Conectar a la base de datos
-db.connect((err) => {
-    if (err) {
-        console.error("❌ Error al conectar a MySQL:", err);
-        return;
-    }
-    console.log("✅ Conectado a MySQL");
+db.connect(err => {
+  if (err) console.error('Error al conectar a la base de datos:', err);
+  else console.log('Conectado a la base de datos');
 });
 
 // Middleware para verificar el JWT
@@ -41,261 +39,309 @@ const verifyToken = (req, res, next) => {
   }
 
   try {
-    const verified = jwt.verify(token, process.env.JWT_SECRET); // Verifica el token
-    req.user = verified; // Guarda la información decodificada del token
-    next(); // Llama al siguiente middleware o ruta
+    const verified = jwt.verify(token, process.env.JWT_SECRET); 
+    req.user = verified; 
+    next(); 
   } catch (error) {
     res.status(400).json({ message: 'Token inválido' });
   }
 };
 
-// Registro de alumno
-app.post('/registro/alumno', (req, res) => {
-    const { correo, contraseña, nombre, matricula, id_carrera, semestre, id_campus, doble_titulacion, candidato_graduar, telefono } = req.body;
-
-    if (!correo || !contraseña || !nombre || !matricula || !id_carrera || !semestre || telefono === undefined || doble_titulacion === undefined || candidato_graduar === undefined) {
-        return res.status(400).json({ message: 'Faltan datos' });
-    }
-    
-    // Validar que el teléfono sea numérico y tenga al menos 10 caracteres
-    const phoneRegex = /^[0-9]{10,}$/;
-    if (!phoneRegex.test(telefono)) {
-        return res.status(400).json({ message: 'El teléfono debe ser numérico y tener al menos 10 dígitos' });
-    }
-
-    // Validar que el correo no exista
-    db.query('SELECT * FROM Estudiante WHERE correo = ?', [correo], (err, result) => {
-        if (err) {
-        return res.status(500).json({ message: 'Error en la base de datos' });
-        }
-
-        if (result.length > 0) {
-        return res.status(400).json({ message: 'El correo electrónico ya está registrado.' });
-        }
-
-        // Si el correo no existe, validar la contraseña
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-        if (!passwordRegex.test(contraseña)) {
-        return res.status(400).json({ message: 'La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.' });
-        }
-        bcrypt.hash(contraseña, 10, (err, hash) => {
-            if (err) return res.status(500).json({ message: 'Error al encriptar contraseña' });
-
-            db.query(
-                'INSERT INTO estudiante (correo, contraseña, nombre, matricula, id_carrera, semestre, doble_titulacion, id_campus, candidato_graduar, telefono) VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?)',
-                [correo, hash, nombre, matricula, id_carrera, semestre, doble_titulacion, id_campus, candidato_graduar, telefono],
-                (err, result) => {
-                    if (err) {
-                        console.error('Error al registrar alumno:', err);
-                        return res.status(500).json({ message: 'Error al registrar al alumno' });
-                    }
-                    res.json({ message: 'Alumno registrado exitosamente' });
-        
-            });
-        });
-    });
-});
-
-app.post('/registro/socio', (req, res) => {
-  const {
-      correo,
-      contraseña,
-      nombre,
-      tipo_socio, // "Estudiante" o "Entidad"
-      telefono_socio,
-      redes_sociales,
-      notificaciones_socio,
-      // Datos para Socio_Estudiante
-      id_carrera,
-      matricula,
-      semestre_acreditado,
-      correo_institucional,
-      correo_alternativo,
-      ine,
-      logo,
-      // Datos para Socio_Entidad
-      nombre_entidad,
-      mision,
-      vision,
-      objetivos,
-      objetivo_ods_socio,
-      poblacion,
-      numero_beneficiarios_socio,
-      nombre_responsable,
-      puesto_responsable,
-      correo_responsable,
-      direccion_entidad,
-      horario_entidad,
-      correo_entidad,
-      correo_responsable_general,
-      telefono_entidad
-  } = req.body;
-
-  if (!correo || !contraseña || !nombre || !tipo_socio) {
-      return res.status(400).json({ message: 'Faltan datos obligatorios de Socio' });
-  }
-
-  // Primero valida que no exista el correo
-  db.query('SELECT * FROM Socio WHERE correo = ?', [correo], (err, result) => {
-      if (err) return res.status(500).json({ message: 'Error en la base de datos' });
-
-      if (result.length > 0) {
-          return res.status(400).json({ message: 'El correo electrónico ya está registrado.' });
-      }
-
-      // Encriptar contraseña
-      bcrypt.hash(contraseña, 10, (err, hash) => {
-          if (err) return res.status(500).json({ message: 'Error al encriptar contraseña' });
-
-          // Insertar en tabla Socio
-          const socioQuery = `
-              INSERT INTO Socio (correo, contraseña, nombre, status, tipo_socio, telefono_socio, redes_sociales, notificaciones_socio)
-              VALUES (?, ?, ?, 'pendiente', ?, ?, ?, ?)
-          `;
-          const socioValues = [
-              correo,
-              hash,
-              nombre,
-              tipo_socio,
-              telefono_socio || null,
-              redes_sociales || null,
-              notificaciones_socio || null
-          ];
-
-          db.query(socioQuery, socioValues, (err, result) => {
-              if (err) {
-                  console.error('Error al registrar socio:', err);
-                  return res.status(500).json({ message: 'Error al registrar socio' });
-              }
-
-              const id_socio = result.insertId;
-
-              if (tipo_socio === 'Estudiante') {
-                  const estudianteQuery = `
-                      INSERT INTO Socio_Estudiante (id_socio, id_carrera, matricula, semestre_acreditado, correo_institucional, correo_alternativo, ine, logo)
-                      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                  `;
-                  const estudianteValues = [
-                      id_socio,
-                      id_carrera,
-                      matricula,
-                      semestre_acreditado,
-                      correo_institucional,
-                      correo_alternativo,
-                      ine,
-                      logo
-                  ];
-                  db.query(estudianteQuery, estudianteValues, (err) => {
-                      if (err) {
-                          console.error('Error al registrar socio estudiante:', err);
-                          return res.status(500).json({ message: 'Error al registrar socio estudiante' });
-                      }
-                      return res.json({ message: 'Socio estudiante registrado exitosamente' });
-                  });
-
-              } else if (tipo_socio === 'Entidad') {
-                  const entidadQuery = `
-                      INSERT INTO Socio_Entidad (
-                          id_socio, nombre_entidad, mision, vision, objetivos, objetivo_ods_socio,
-                          poblacion, numero_beneficiarios_socio, nombre_responsable, puesto_responsable,
-                          correo_responsable, direccion_entidad, horario_entidad, correo_entidad,
-                          correo_responsable_general, telefono_entidad
-                      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                  `;
-                  const entidadValues = [
-                      id_socio,
-                      nombre_entidad,
-                      mision,
-                      vision,
-                      objetivos,
-                      objetivo_ods_socio,
-                      poblacion,
-                      numero_beneficiarios_socio,
-                      nombre_responsable,
-                      puesto_responsable,
-                      correo_responsable,
-                      direccion_entidad,
-                      horario_entidad,
-                      correo_entidad,
-                      correo_responsable_general,
-                      telefono_entidad
-                  ];
-                  db.query(entidadQuery, entidadValues, (err) => {
-                      if (err) {
-                          console.error('Error al registrar socio entidad:', err);
-                          return res.status(500).json({ message: 'Error al registrar socio entidad' });
-                      }
-                      return res.json({ message: 'Socio entidad registrado exitosamente' });
-                  });
-
-              } else {
-                  return res.status(400).json({ message: 'Tipo de socio no válido' });
-              }
-          });
-      });
+// Obtener lista de campus
+app.get('/campus', (req, res) => {
+  db.query('SELECT id_campus, campus FROM Campus', (err, results) => {
+    if (err) return res.status(500).json({ error: 'Error al obtener campus' });
+    res.json(results);
   });
 });
 
+// Obtener lista de carreras
+app.get('/carreras', (req, res) => {
+  db.query('SELECT id_carrera, siglas_carrera, nombre FROM Carrera', (err, results) => {
+    if (err) return res.status(500).json({ error: 'Error al obtener carreras' });
+    res.json(results);
+  });
+});
+
+// Obtener lista de ODS
+app.get('/ods', (req, res) => {
+  db.query('SELECT id_ods, nombre_ods FROM Ods', (err, results) => {
+    if (err) return res.status(500).json({ error: 'Error al obtener ODS' });
+    res.json(results);
+  });
+});
+
+
+app.get('/poblaciones', (req, res) => {
+  const sql = `SHOW COLUMNS FROM Socio LIKE 'poblacion_osf'`;
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error al obtener poblaciones:', err);
+      return res.status(500).json({ error: 'Error al obtener poblaciones' });
+    }
+
+    // Extraer valores del tipo ENUM
+    const enumStr = results[0].Type;
+    const matches = enumStr.match(/enum\((.+)\)/i);
+
+    if (!matches) {
+      return res.status(500).json({ error: 'No se encontraron valores ENUM' });
+    }
+
+    const values = matches[1]
+      .split(',')
+      .map(val => val.trim().replace(/^'(.*)'$/, '$1'));
+
+    res.json(values);
+  });
+});
+
+
+
+// Endpoint para registro de estudiante y socio
+app.post('/signup', async (req, res) => {
+  const { tipo, perfilSocio, ...data } = req.body;
+
+  try {
+    const hashedPassword = await bcrypt.hash(data.contraseña, 10);
+
+    if (tipo === 'estudiante') {
+      const sql = `INSERT INTO Estudiante 
+        (id_carrera, id_campus, correo, contraseña, nombre, matricula, semestre, doble_titulacion, candidato_graduar, telefono)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+      const values = [
+        parseInt(data.id_carrera),
+        parseInt(data.id_campus),
+        data.correo,
+        hashedPassword,
+        data.nombre,
+        data.matricula,
+        data.semestre,
+        data.doble_titulacion ? 1 : 0,
+        data.candidato_graduar ? 1 : 0,
+        data.telefono
+      ];
+      db.query(sql, values, (err, result) => {
+        if (err) return res.status(500).json({ error: 'Error al registrar estudiante' });
+        return res.json({ mensaje: 'Estudiante registrado exitosamente' });
+      });
+
+    } else if (tipo === 'socio' && perfilSocio === 'lider') {
+      // Paso 1: Insertar socio base
+      const sqlSocio = `
+        INSERT INTO Socio (correo, contraseña, redes_sociales, telefono_osf, notificaciones, status)
+        VALUES (?, ?, ?, ?, ?, ?)`;
+
+      const valuesSocio = [
+        data.correo,
+        hashedPassword,
+        data.redes_sociales || '',
+        data.telefono_osf,
+        data.notificaciones ? 1 : 0,
+        'En revisión'
+      ];
+
+      db.query(sqlSocio, valuesSocio, (err, result) => {
+        if (err) return res.status(500).json({ error: 'Error al registrar socio base' });
+
+        const id_socio = result.insertId;
+
+        const sqlEstudiante = `
+          INSERT INTO SOCIO_ESTUDIANTE 
+          (id_socio, nombre_socio, id_carrera, matricula, semestre_acreditado, ine, logo) 
+          VALUES (?, ?, ?, ?, ?, ?, ?)`;
+
+        const valuesEstudiante = [
+          id_socio,
+          data.nombre_socio,
+          parseInt(data.id_carrera),
+          data.matricula,
+          data.semestre,
+          data.ine,
+          data.logo
+        ];
+
+        db.query(sqlEstudiante, valuesEstudiante, (err2, result2) => {
+          if (err2) return res.status(500).json({ error: 'Error al registrar socio estudiante' });
+          return res.json({ mensaje: 'Socio estudiante registrado exitosamente' });
+        });
+      });
+
+    } else if (tipo === 'socio') {
+      const sqlSocio = `INSERT INTO Socio 
+        (correo, contraseña, nombre_osf, telefono_osf, redes_sociales, vision, mision, objetivos, poblacion_osf, num_beneficiarios_osf, 
+        id_ods, nombre_representante, puesto_representante, direccion_horario, notificaciones, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+      const valuesSocio = [
+        data.correo,
+        hashedPassword,
+        data.nombre_osf,
+        data.telefono_osf,
+        data.redes_sociales,
+        data.vision,
+        data.mision,
+        data.objetivos,
+        data.poblacion_osf,
+        data.num_beneficiarios_osf,
+        data.id_ods,
+        data.nombre_representante,
+        data.puesto_representante,
+        data.direccion_horario,
+        data.notificaciones ? 1 : 0,
+        'En revisión'
+      ];
+
+      db.query(sqlSocio, valuesSocio, (err, result) => {
+        if (err) return res.status(500).json({ error: 'Error al registrar socio' });
+        return res.json({ mensaje: 'Socio registrado exitosamente' });
+      });
+
+    } else {
+      return res.status(400).json({ error: 'Tipo de usuario no válido' });
+    }
+  } catch (error) {
+    console.error('Error en /signup:', error);
+    return res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// Endpoint para registro de administradores
+app.post('/signup/administrador', async (req, res) => {
+  const { nombre, correo, contraseña } = req.body;
+
+  try {
+    // Validar que los campos necesarios estén presentes
+    if (!nombre || !correo || !contraseña) {
+      return res.status(400).json({ error: 'Faltan datos para el registro del administrador' });
+    }
+
+    // Hashear la contraseña
+    const hashedPassword = await bcrypt.hash(contraseña, 10);
+
+    // Insertar el administrador en la base de datos
+    const sql = 'INSERT INTO Administrador (correo, contraseña, nombre) VALUES (?, ?, ?)';
+    const values = [correo, hashedPassword, nombre];
+
+    db.query(sql, values, (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: 'Error al registrar administrador' });
+      }
+      return res.json({ mensaje: 'Administrador registrado exitosamente' });
+    });
+
+  } catch (error) {
+    console.error('Error en /signup/administrador:', error);
+    return res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+
+// Endpoint Login
+
 app.post('/login', (req, res) => {
   const { correo, contraseña } = req.body;
-  
-  // Array de tablas a verificar
-  const usuarios = ['Estudiante', 'Administrador', 'Socio'];
 
-  let index = 0;
-  
-  // Función para realizar la búsqueda del usuario
-  const buscarUsuario = () => {
-    if (index >= usuarios.length) {
-      return res.status(401).json({ message: 'Credenciales incorrectas' });
+  const tablas = [
+    { nombre: 'Estudiante', campoId: 'id_estudiante', rol: 'estudiante' },
+    { nombre: 'Administrador', campoId: 'id_administrador', rol: 'administrador' },
+    { nombre: 'Socio', campoId: 'id_socio', rol: 'socio' }
+  ];
+
+  const intentarLogin = (index = 0) => {
+    if (index >= tablas.length) {
+      return res.status(401).json({ error: 'Correo o contraseña incorrectos' });
     }
-    
-    const tabla = usuarios[index];
-    
-    db.query(`SELECT * FROM ${tabla} WHERE correo = ?`, [correo], (err, results) => {
+
+    const { nombre, campoId, rol } = tablas[index];
+    const sql = `SELECT ${campoId}, correo, contraseña FROM ${nombre} WHERE correo = ?`;
+
+    db.query(sql, [correo], async (err, results) => {
       if (err) {
-        console.error(`❌ Error buscando en ${tabla}:`, err);
-        return res.status(500).json({ message: 'Error del servidor' });
+        console.error(`Error al buscar en ${nombre}:`, err);
+        return res.status(500).json({ error: 'Error del servidor' });
       }
 
       if (results.length === 0) {
-        index++;
-        buscarUsuario(); // Buscar en la siguiente tabla
-      } else {
-        const usuario = results[0];
-
-        // Si es socio y su status no es "aceptado", rechazar login
-        if (tabla === 'Socio' && usuario.status !== 'aceptado') {
-          return res.status(403).json({ message: 'Tu cuenta aún no ha sido aceptada' });
-        }
-
-        // Comparar la contraseña
-        bcrypt.compare(contraseña, usuario.contraseña, (err, esValido) => {
-          if (err) return res.status(500).json({ message: 'Error al verificar contraseña' });
-
-          if (esValido) {
-            // Generar JWT
-            const token = jwt.sign(
-              { id: usuario.id_socio || usuario.id_estudiante || usuario.id_administrador, tipo: tabla.toLowerCase() }, // Cambié para que también funcione con Estudiante y Administrador
-              process.env.JWT_SECRET,
-              { expiresIn: '1h' }
-            );
-
-            return res.json({
-              message: 'Login exitoso',
-              token,
-              tipo: tabla.toLowerCase(),
-              datos: usuario
-            });
-          } else {
-            return res.status(401).json({ message: 'Contraseña incorrecta' });
-          }
-        });
+        return intentarLogin(index + 1); // Intenta con la siguiente tabla
       }
+
+      const usuario = results[0];
+      const contraseñaCorrecta = await bcrypt.compare(contraseña, usuario.contraseña);
+
+      if (!contraseñaCorrecta) {
+        return res.status(401).json({ error: 'Correo o contraseña incorrectos' });
+      }
+
+      // Generar JWT
+      const token = jwt.sign(
+        {
+          id: usuario[campoId],
+          tipo: rol
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' }
+      );
+
+      return res.json({ mensaje: 'Inicio de sesión exitoso', rol, token });
     });
   };
 
-  buscarUsuario(); // Iniciar búsqueda
+  intentarLogin();
+});
+
+
+
+// Obtener los datos de todos los usuarios
+
+// Estudiantes
+app.get('/estudiantes', (req, res) => {
+  const sql = `
+    SELECT E.*, C.nombre AS nombre_carrera, CA.campus AS nombre_campus
+    FROM Estudiante E
+    LEFT JOIN Carrera C ON E.id_carrera = C.id_carrera
+    LEFT JOIN Campus CA ON E.id_campus = CA.id_campus
+  `;
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: 'Error al obtener estudiantes' });
+    res.json(results);
+  });
+});
+
+// Administradores
+app.get('/administradores', (req, res) => {
+  db.query('SELECT * FROM Administrador', (err, results) => {
+    if (err) return res.status(500).json({ error: 'Error al obtener administradores' });
+    res.json(results);
+  });
+});
+
+// Socios OSF (organizaciones)
+app.get('/socios-osf', (req, res) => {
+  const sql = `
+    SELECT S.*, O.nombre_ods 
+    FROM Socio S
+    LEFT JOIN Ods O ON S.id_ods = O.id_ods
+    WHERE NOT EXISTS (SELECT 1 FROM SOCIO_ESTUDIANTE SE WHERE SE.id_socio = S.id_socio)
+  `;
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: 'Error al obtener socios OSF' });
+    res.json(results);
+  });
+});
+
+// Socios Estudiantes (líderes sociales)
+app.get('/socios-estudiantes', (req, res) => {
+  const sql = `
+    SELECT SE.*, S.correo, C.nombre AS nombre_carrera
+    FROM SOCIO_ESTUDIANTE SE
+    JOIN Socio S ON SE.id_socio = S.id_socio
+    LEFT JOIN Carrera C ON SE.id_carrera = C.id_carrera
+  `;
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: 'Error al obtener socios estudiantes' });
+    res.json(results);
+  });
 });
 
   
