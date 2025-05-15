@@ -118,7 +118,9 @@ app.get('/proyectos/aprobados', (req, res) => {
       END AS estado_postulacion
     FROM Proyecto p
     JOIN Periodo per ON per.id_periodo = p.id_periodo
+
     WHERE p.status_proyecto = 'Aprobado'
+
   `;
   db.query(query, (err, results) => {
     if (err) {
@@ -162,7 +164,10 @@ app.get('/proyectos/:id/postulaciones', (req, res) => {
   });
 });
 
-// Obtener proyectos En revisión
+
+
+// Obtener proyectos pendientes
+
 app.get('/proyectos', (req, res) => {
     db.query(`
         SELECT * 
@@ -309,8 +314,6 @@ app.get('/socio/:id', (req, res) => {
     }
   });
 });
-
-
   
   // Actualizar el status de un socio
   app.put('/socio/:id/status', (req, res) => {
@@ -352,6 +355,7 @@ app.post('/registro/administrador', (req, res) => {
 
             db.query(
                 'INSERT INTO Administrador (correo, contraseña, nombre) VALUES (?, ?, ?)',
+
                 [correo, hash, nombre],
                 (err, result) => {
                     if (err) {

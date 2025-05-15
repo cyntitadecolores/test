@@ -57,6 +57,7 @@ const Signup = () => {
   // useEffect se ejecuta una vez al cargar el componente
   useEffect(() => {
     // Carga los campus desde el backend
+
     axios.get('http://localhost:5002/campus')
       .then(res => setCampusList(res.data))
       .catch(err => console.error('Error al cargar campus:', err));
@@ -72,6 +73,7 @@ const Signup = () => {
       .catch(err => console.error('Error al cargar ODS:', err));
 
     // Carga las poblaciones desde el ENUM de la tabla
+
     axios.get('http://localhost:5002/poblaciones')
       .then(res => setPoblaciones(res.data))
       .catch(err => console.error('Error al cargar poblaciones:', err));
@@ -138,6 +140,7 @@ const Signup = () => {
     setLoading(true); // Comienza la carga
 
     try {
+
       const res = await axios.post('http://localhost:5002/signup', {
         tipo,
         perfilSocio,

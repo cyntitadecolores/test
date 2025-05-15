@@ -284,6 +284,7 @@ app.post('/login', (req, res) => {
       );
 
       return res.json({ mensaje: 'Inicio de sesión exitoso', rol, token });
+
     });
   };
 
@@ -344,7 +345,8 @@ app.get('/socios-estudiantes', (req, res) => {
   });
 });
 
-  
+
+ 
 const PORT = 5002;
 app.listen(PORT, () => {
     console.log(`✅ Server running on port ${PORT}`);
