@@ -50,6 +50,21 @@ const verifyToken = (req, res, next) => {
   }
 };
 
+
+// Estudiantes
+app.get('/estudiantes', (req, res) => {
+  const sql = `
+    SELECT E.*, C.nombre AS nombre_carrera, CA.campus AS nombre_campus
+    FROM Estudiante E
+    LEFT JOIN Carrera C ON E.id_carrera = C.id_carrera
+    LEFT JOIN Campus CA ON E.id_campus = CA.id_campus
+  `;
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: 'Error al obtener estudiantes' });
+    res.json(results);
+  });
+});
+
 app.get('/postulaciones', verifyToken, (req, res) => {
   const idEstudiante = req.user.id;
 
@@ -83,28 +98,47 @@ app.post('/postular', verifyToken, (req, res) => {
   const idEstudiante = req.user.id;
   const { id_proyecto, expectativa, razon, motivo, preguntaDescarte, nota } = req.body;
 
-  const sql = `
-    INSERT INTO postulacion (
-      id_estudiante, id_proyecto, fecha_postulacion, status,
-      expectativa, razon, motivo, pregunta_descarte, nota
-    ) VALUES (?, ?, NOW(), "Inscrito", ?, ?, ?, ?, ?)
+  // Verificar si ya existe una postulación de ese estudiante a ese proyecto
+  const verificarSQL = `
+    SELECT * FROM postulacion 
+    WHERE id_estudiante = ? AND id_proyecto = ?
   `;
 
-  db.query(sql, [
-    idEstudiante, id_proyecto,
-    expectativa, razon, motivo, preguntaDescarte, nota
-  ], (err, result) => {
+  db.query(verificarSQL, [idEstudiante, id_proyecto], (err, resultados) => {
     if (err) {
-      console.error(err); // <-- ¡IMPORTANTE para debugging!
-      return res.status(500).json({ mensaje: 'Error al postularse' });
+      console.error('Error al verificar postulación:', err);
+      return res.status(500).json({ mensaje: 'Error al verificar postulación existente' });
     }
-    res.json({ mensaje: 'Postulación registrada con éxito' });
+
+    if (resultados.length > 0) {
+      return res.status(400).json({ mensaje: 'Ya te has postulado a este proyecto' });
+    }
+
+    // Si no existe, insertar la nueva postulación
+    const insertarSQL = `
+      INSERT INTO postulacion (
+        id_estudiante, id_proyecto, fecha_postulacion, status,
+        expectativa, razon, motivo, pregunta_descarte, nota
+      ) VALUES (?, ?, NOW(), "En revisión", ?, ?, ?, ?, ?)
+    `;
+
+    db.query(insertarSQL, [
+      idEstudiante, id_proyecto,
+      expectativa, razon, motivo, preguntaDescarte, nota
+    ], (err, result) => {
+      if (err) {
+        console.error('Error al insertar postulación:', err);
+        return res.status(500).json({ mensaje: 'Error al postularse' });
+      }
+      res.json({ mensaje: 'Postulación registrada con éxito' });
+    });
   });
 });
 
 
 
-// Obtener proyectos En revisión
+
+// Obtener proyectos aprobados
 app.get('/proyectos', (req, res) => {
     db.query(`
         SELECT * 
@@ -113,12 +147,98 @@ app.get('/proyectos', (req, res) => {
         JOIN campus ON Proyecto.id_campus = campus.id_campus
         JOIN periodo ON Proyecto.id_periodo = periodo.id_periodo
         JOIN ods ON Proyecto.ods_osf = ods.id_ods
-        WHERE status_proyecto  = "aprobado"
+        WHERE status_proyecto  = "aprobado" AND status_actividad = 1
     `, (err, results) => {
         if (err) return res.status(500).json({ message: 'Error al obtener proyectos' });
         res.json(results);
     });
 });
+
+app.put('/postulaciones_alumnos/:id_proyecto/status', verifyToken, (req, res) => {
+  const { id_proyecto } = req.params;
+  const id_estudiante = req.user.id; // sacado del token
+  const { status } = req.body;
+
+  if (status === 'Inscrito') {
+    // Primero obtenemos el id_periodo del proyecto que quiere aceptar
+    db.query(
+      'SELECT id_periodo FROM Proyecto WHERE id_proyecto = ?',
+      [id_proyecto],
+      (err, proyectoResults) => {
+        if (err) {
+          console.error('Error al obtener proyecto:', err);
+          return res.status(500).json({ message: 'Error al obtener proyecto' });
+        }
+        if (proyectoResults.length === 0) {
+          return res.status(404).json({ message: 'Proyecto no encontrado' });
+        }
+
+        const idPeriodoNuevo = proyectoResults[0].id_periodo;
+
+        // Luego obtenemos los proyectos inscritos del estudiante con sus id_periodo
+        db.query(
+          `SELECT p.id_periodo FROM Postulacion ps
+           JOIN Proyecto p ON ps.id_proyecto = p.id_proyecto
+           WHERE ps.id_estudiante = ? AND ps.status = 'Inscrito'`,
+          [id_estudiante],
+          (err, postulacionesInscritas) => {
+            if (err) {
+              console.error('Error al obtener postulaciones inscritas:', err);
+              return res.status(500).json({ message: 'Error al obtener postulaciones' });
+            }
+
+            // Definimos los empalmes
+            const empalmes = {
+              1: [1,4,6],
+              2: [2,4,5,6],
+              3: [3,5,6],
+              4: [1,2,4,6,5],
+              5: [2,3,4,6,6],
+              6: [1,2,3,4,5,6],
+            };
+
+            // Revisamos conflictos
+            for (const post of postulacionesInscritas) {
+              const periodosEmpalmes = empalmes[post.id_periodo] || [];
+              if (periodosEmpalmes.includes(idPeriodoNuevo)) {
+                return res.status(400).json({
+                  message: `No puedes aceptar la postulacion porque tienes un proyecto inscrito en periodo ${post.id_periodo} que empalma con el periodo ${idPeriodoNuevo}`
+                });
+              }
+            }
+
+            // No hay conflictos, actualizamos el status
+            db.query(
+              'UPDATE Postulacion SET status = ? WHERE id_proyecto = ? AND id_estudiante = ?',
+              [status, id_proyecto, id_estudiante],
+              (err, result) => {
+                if (err) {
+                  console.error('Error al actualizar el status:', err);
+                  return res.status(500).json({ message: 'Error al actualizar status' });
+                }
+                res.json({ message: 'Status actualizado correctamente' });
+              }
+            );
+          }
+        );
+      }
+    );
+  } else {
+    // Si el status no es 'Inscrito', actualizar directamente
+    db.query(
+      'UPDATE Postulacion SET status = ? WHERE id_proyecto = ? AND id_estudiante = ?',
+      [status, id_proyecto, id_estudiante],
+      (err, result) => {
+        if (err) {
+          console.error('Error al actualizar el status:', err);
+          return res.status(500).json({ message: 'Error al actualizar status' });
+        }
+        res.json({ message: 'Status actualizado correctamente' });
+      }
+    );
+  }
+});
+
 
 
 const PORT = 5004;

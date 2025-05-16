@@ -1,8 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './navegacion.css';
+import { useNavigate } from 'react-router-dom';
 
-function NavCub({ onLogout }) {  // Recibimos la prop onLogout
+
+function NavCub() {
+  const navigate = useNavigate(); 
+
+  const handleLogout = () => {
+    localStorage.removeItem('token'); 
+    navigate('/login'); 
+  };  
+
   return (
     <div className="layout">
       <nav className="nav-bar">
@@ -12,7 +21,7 @@ function NavCub({ onLogout }) {  // Recibimos la prop onLogout
           <li><Link to="/postularProyectoS">Postular Proyecto</Link></li>
           <li><Link to="/nuestrosProyectosS">Nuetros proyectos</Link></li>
         </ul>
-        <button onClick={onLogout} className="logout-button">Cerrar sesión</button> {/* Botón de cerrar sesión */}
+        <button onClick={handleLogout} className="logout-btn">Cerrar sesión</button>
       </nav>
       <header className="top-bar">
         <div className="user-info">
