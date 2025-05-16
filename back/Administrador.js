@@ -49,9 +49,17 @@ const verifyToken = (req, res, next) => {
   }
 };
 
+// Administradores
+app.get('/administradores', (req, res) => {
+  db.query('SELECT * FROM Administrador', (err, results) => {
+    if (err) return res.status(500).json({ error: 'Error al obtener administradores' });
+    res.json(results);
+  });
+});
+
 // Obtener postulaciones alumnos En revisión
 app.get('/postulaciones_alumnos', (req, res) => {
-    db.query('SELECT * FROM Postulacion JOIN Proyecto ON Postulacion.id_proyecto = Proyecto.id_proyecto JOIN estudiante ON postulacion.id_estudiante = estudiante.id_estudiante WHERE postulacion.status = "Inscrito"', (err, results) => {
+    db.query('SELECT * FROM Postulacion JOIN Proyecto ON Postulacion.id_proyecto = Proyecto.id_proyecto JOIN estudiante ON postulacion.id_estudiante = estudiante.id_estudiante WHERE postulacion.status = "En revisión"', (err, results) => {
         if (err) return res.status(500).json({ message: 'Error al obtener postulaciones' });
         res.json(results);
     });
@@ -132,7 +140,7 @@ app.get('/proyectos/aprobados', (req, res) => {
 
 app.get('/proyectoss/:id', (req, res) => {
     const { id } = req.params;
-    db.query('SELECT * FROM Proyecto p JOIN Periodo per ON per.id_periodo = p.id_periodo WHERE p.id_proyecto = ?', [id], (err, results) => {
+    db.query('SELECT * FROM Proyecto p  WHERE p.id_proyecto = ?', [id], (err, results) => {
       if (err) {
         console.error('Error al obtener socio:', err);
         return res.status(500).json({ message: 'Error del servidor' });
