@@ -16,7 +16,6 @@ const VULNERABILIDADES = [
   "Personas con enfermedades crónicas/terminales",
   "Comunidad LGBTIQ+",
   "Medio ambiente",
-  "Niños, Niñas y Adolescentes",
   "Personas con discapacidad",
   "Jóvenes",
 ];
@@ -232,7 +231,7 @@ export default function PostularProyectoS() {
 
     // Obtener el ID del socio del localStorage
     const getIdSocio = () => {
-      const token = localStorage.getItem("jwt") || localStorage.getItem("token");
+      const token = localStorage.getItem("token") || localStorage.getItem("token");
       if (token) {
         try {
           const decoded = jwtDecode(token);
