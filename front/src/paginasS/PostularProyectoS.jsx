@@ -231,7 +231,7 @@ export default function PostularProyectoS() {
 
     // Obtener el ID del socio del localStorage
     const getIdSocio = () => {
-      const token = localStorage.getItem("token") || localStorage.getItem("token");
+      const token = localStorage.getItem("token");
       if (token) {
         try {
           const decoded = jwtDecode(token);
