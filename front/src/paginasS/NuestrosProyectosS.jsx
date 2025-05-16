@@ -13,11 +13,12 @@ function NuestrosProyectosS() {
 
   // Obtener el ID del socio del localStorage
   const getIdSocio = () => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("jwt") || localStorage.getItem("token");
     if (token) {
       try {
         const decoded = jwtDecode(token);
-        return decoded.id;
+        console.log("ID socio extraído del token:", decoded.id || decoded.id_socio || decoded.userId);
+        return decoded.id || decoded.id_socio || decoded.userId;
       } catch (error) {
         console.error("Error al decodificar el token:", error);
         return null;
@@ -25,6 +26,7 @@ function NuestrosProyectosS() {
     }
     return null;
   };
+  
 
   // Cargar los proyectos cuando el componente se monta
   useEffect(() => {

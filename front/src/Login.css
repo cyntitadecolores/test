@@ -1,0 +1,161 @@
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f4ee;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+  }
+  
+  .login-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .login-form-box{
+    background: #f9f4ee;
+    padding: 30px;
+    border-radius: 10px;
+    width: 350px;
+    text-align: center;
+  }
+  
+  .title {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 40px;
+    color: rgb(54, 54, 54);
+  }
+  
+  .input-group {
+    margin-bottom: 15px;
+    text-align: left;
+  }
+  
+  .input-group label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #333;
+  }
+  
+  .input-box {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    padding: 10px;
+    background-color: #f9f4ee;
+    margin-bottom: 50px;
+    color: #000;
+  }
+  
+  .input-box input {
+    border: none;
+    outline: none;
+    flex: 1;
+    background: none;
+    font-size: 14px;
+    color: #000;
+    padding-left: 10px;
+  }
+  
+  .toggle-btn {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .signup-btn {
+    background: #0056b3;
+    color: white;
+    border: none;
+    width: 100%;
+    padding: 10px;
+    border-radius: 20px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    margin-top: 20px;
+  }
+  
+  .signup-btn:hover {
+    background: #004494;
+  }
+  
+  .login-text {
+    font-size: 14px;
+    margin-top: 10px;
+  }
+  
+  .login-text a {
+    color: #0056b3;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 40px;
+  }
+  
+  .icon {
+    width: 20px; 
+    height: 20px;
+    margin-right: 10px;
+    vertical-align: middle;
+  }
+
+  select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    background-color: #f9f4ee;
+    outline: none;
+    margin-top: 5px;
+    color: #000;
+  }
+  
+  input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    background-color: #f9f4ee;
+    outline: none;
+    color: #000;
+  }
+  
+  .input-group input:focus,
+  select:focus {
+    border-color: #0056b3;
+  }
+  
+  .signup-btn:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+  }
+  
+  .signup-btn:disabled:hover {
+    background: #cccccc;
+  }
+  
+  @media (max-width: 400px) {
+    .form-box {
+      width: 90%;
+      padding: 20px;
+    }
+  
+    .title {
+      font-size: 24px;
+    }
+  }
+  
+  label {
+    color: black;
+    font-weight: bold;
+  }
