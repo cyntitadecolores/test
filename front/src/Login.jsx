@@ -23,7 +23,6 @@ const Login = () => {
     }
   };
 
-  
   return (
     <form onSubmit={handleLogin}>
       <h2>Iniciar sesión</h2>
