@@ -14,15 +14,20 @@ function InicioSo() {
   const token = localStorage.getItem('jwt');
 
   const getIdSocio = () => {
-    if (!token) return null;
-    try {
-      const decoded = jwtDecode(token);
-      return decoded.id || decoded.id_socio;
-    } catch (err) {
-      console.error('Error al decodificar token', err);
-      return null;
+    const token = localStorage.getItem("jwt") || localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        console.log("ID socio extraído del token:", decoded.id || decoded.id_socio || decoded.userId);
+        return decoded.id || decoded.id_socio || decoded.userId;
+      } catch (error) {
+        console.error("Error al decodificar el token:", error);
+        return null;
+      }
     }
+    return null;
   };
+  
 
   // Obtener las postulaciones
   useEffect(() => {

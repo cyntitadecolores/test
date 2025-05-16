@@ -77,47 +77,35 @@ const upload = multer({ storage: storage });
 app.post('/proyecto', upload.single('imagen'), (req, res) => {
   // ---------- Des-estructuramos el body ----------
   const {
-    id_socio, correo_registro_info, region_proyecto, id_campus, crn, grupo,
-    clave_materia, id_periodo, fecha_implementacion, nombre_osf, razon_osf,
-    poblacion_osf, num_beneficiarios_osf, ods_osf, telefono_osf, datos_osf,
-    contacto_coordinador, redes_sociales, nombre_proyecto, nomenclatura_registro,
-    diagnostico_previo, problema_social, vulnerabilidad_atendida_1, edad_poblacion_1,
+    id_socio, fecha_implementacion, nombre_proyecto, problema_social, vulnerabilidad_atendida_1, edad_poblacion_1,
     vulnerabilidad_atendida_2, edad_poblacion_2, zona_poblacion, numero_beneficiarios_proyecto,
     objetivo_proyecto, ods_proyecto_1, ods_proyecto_2, acciones_estudiantado,
     producto_servicio_entregar, entregable_esperado, medida_impacto, dias_actividades,
     horario_proyecto, carreras_proyecto_1, carreras_proyecto_2, habilidades_alumno,
     cupos_proyecto, modalidad, direccion_escrita, duracion_experiencia, valor_proyecto,
     periodo_repetido, induccion_ss, propuesta_semana_tec, propuesta_inmersion_social,
-    propuesta_bloque, indicaciones_especiales, entrevista, pregunta_descarte, enlace_maps,
-    enlace_whatsApp, nombre_whatsApp, status_whatsapp, carta_exclusion, anuncio_canvas,
-    porcentaje_canvas
+    propuesta_bloque, entrevista, pregunta_descarte, enlace_maps
   } = req.body;
 
   // ---------- Imagen ----------
   const img_proyecto = req.file ? `/uploads/${req.file.filename}` : null;
 
   // ---------- Datos requeridos mínimos ----------
-  if (!nombre_proyecto || !region_proyecto || !id_campus ||
-      !nombre_osf      || !problema_social || !objetivo_proyecto) {
+  if (!nombre_proyecto || !problema_social || !objetivo_proyecto) {
     return res.status(400).json({ message: 'Faltan datos requeridos' });
   }
 
   // ---------- Armado dinámico de columnas / placeholders ----------
   const columns = [
-    'id_socio', 'correo_registro_info', 'region_proyecto', 'id_campus', 'crn', 'grupo',
-    'clave_materia', 'id_periodo', 'fecha_implementacion', 'nombre_osf', 'razon_osf',
-    'poblacion_osf', 'num_beneficiarios_osf', 'ods_osf', 'telefono_osf', 'datos_osf',
-    'contacto_coordinador', 'redes_sociales', 'nombre_proyecto', 'nomenclatura_registro',
-    'diagnostico_previo', 'problema_social', 'vulnerabilidad_atendida_1', 'edad_poblacion_1',
+    'id_socio', 'fecha_implementacion', 'nombre_proyecto', 'problema_social', 'vulnerabilidad_atendida_1', 'edad_poblacion_1',
     'vulnerabilidad_atendida_2', 'edad_poblacion_2', 'zona_poblacion', 'numero_beneficiarios_proyecto',
     'objetivo_proyecto', 'ods_proyecto_1', 'ods_proyecto_2', 'acciones_estudiantado',
     'producto_servicio_entregar', 'entregable_esperado', 'medida_impacto', 'dias_actividades',
     'horario_proyecto', 'carreras_proyecto_1', 'carreras_proyecto_2', 'habilidades_alumno',
     'cupos_proyecto', 'modalidad', 'direccion_escrita', 'duracion_experiencia', 'valor_proyecto',
     'periodo_repetido', 'induccion_ss', 'propuesta_semana_tec', 'propuesta_inmersion_social',
-    'propuesta_bloque', 'indicaciones_especiales', 'entrevista', 'pregunta_descarte', 'enlace_maps',
-    'enlace_whatsApp', 'nombre_whatsApp', 'status_whatsapp', 'carta_exclusion', 'anuncio_canvas',
-    'porcentaje_canvas', 'img_proyecto', 'status'
+    'propuesta_bloque', 'entrevista', 'pregunta_descarte', 'enlace_maps', "img_proyecto", 'status_proyecto'
+
   ];
 
   const placeholders = columns.map(() => '?').join(',');
@@ -126,20 +114,16 @@ app.post('/proyecto', upload.single('imagen'), (req, res) => {
 
   // ---------- Valores en el mismo orden ----------
   const values = [
-    id_socio, correo_registro_info, region_proyecto, id_campus, crn, grupo,
-    clave_materia, id_periodo, fecha_implementacion, nombre_osf, razon_osf,
-    poblacion_osf, num_beneficiarios_osf, ods_osf, telefono_osf, datos_osf,
-    contacto_coordinador, redes_sociales, nombre_proyecto, nomenclatura_registro,
-    diagnostico_previo, problema_social, vulnerabilidad_atendida_1, edad_poblacion_1,
+    id_socio, fecha_implementacion, nombre_proyecto,
+    problema_social, vulnerabilidad_atendida_1, edad_poblacion_1,
     vulnerabilidad_atendida_2, edad_poblacion_2, zona_poblacion, numero_beneficiarios_proyecto,
     objetivo_proyecto, ods_proyecto_1, ods_proyecto_2, acciones_estudiantado,
     producto_servicio_entregar, entregable_esperado, medida_impacto, dias_actividades,
     horario_proyecto, carreras_proyecto_1, carreras_proyecto_2, habilidades_alumno,
     cupos_proyecto, modalidad, direccion_escrita, duracion_experiencia, valor_proyecto,
     periodo_repetido, induccion_ss, propuesta_semana_tec, propuesta_inmersion_social,
-    propuesta_bloque, indicaciones_especiales, entrevista, pregunta_descarte, enlace_maps,
-    enlace_whatsApp, nombre_whatsApp, status_whatsapp, carta_exclusion, anuncio_canvas,
-    porcentaje_canvas, img_proyecto, 'pendiente'      // status inicial
+    propuesta_bloque, entrevista, pregunta_descarte, enlace_maps,
+    img_proyecto, 'En revisión'      // status inicial
   ];
 
   // ---------- Ejecución ----------
@@ -151,6 +135,37 @@ app.post('/proyecto', upload.single('imagen'), (req, res) => {
     return res.status(201).json({ message: 'Proyecto creado exitosamente' });
   });
 });
+
+
+ // GET /socio/:id_socio - Obtener info del socio con solo campos específicos
+  app.get('/socio/:id_socio', (req, res) => {
+    const { id_socio } = req.params;
+
+    const query = `
+      SELECT 
+        id_socio,
+        correo,
+        nombre_osf,
+        telefono_osf,
+        redes_sociales,
+        poblacion_osf,
+        num_beneficiarios_osf,
+        id_ods
+      FROM socio
+      WHERE id_socio = ?
+    `;
+
+    db.query(query, [id_socio], (err, results) => {
+      if (err) {
+        console.error('❌ Error al obtener socio:', err);
+        return res.status(500).json({ message: 'Error del servidor' });
+      }
+      if (results.length === 0) {
+        return res.status(404).json({ message: 'Socio no encontrado' });
+      }
+      res.json(results[0]);
+    });
+  });
 
 
   app.get("/campus", (req, res) => {
@@ -192,9 +207,9 @@ app.post('/proyecto', upload.single('imagen'), (req, res) => {
       res.json(results);  // Retorna los periodos como un array de objetos
     });
   });
+
+
   
-
-
   // Obtener estudiantes postulados a un proyecto específico
 // 🚀 MySQL 8+: la agrupación se resuelve en la propia consulta
 
@@ -225,7 +240,7 @@ app.post('/proyecto', upload.single('imagen'), (req, res) => {
       JOIN Postulacion   Po ON P.id_proyecto = Po.id_proyecto
       JOIN Estudiante    E  ON Po.id_estudiante = E.id_estudiante
       JOIN Carrera       C  ON E.id_carrera   = C.id_carrera
-      WHERE P.id_socio = ? AND Po.status = 'inscrito'
+      WHERE P.id_socio = ? AND Po.status = 'Inscrito'
       GROUP BY P.id_proyecto, P.nombre_proyecto;
     `;
   
@@ -249,8 +264,9 @@ app.post('/proyecto', upload.single('imagen'), (req, res) => {
     // Normaliza para encajar con el ENUM real
     if (status === 'aceptado')    status = 'Aceptadx';
     if (status === 'no aceptado') status = 'No aceptadx';
+    if (status === 'inscrito')    status = 'Inscrito';
   
-    const estadosValidos = ['pendiente', 'Aceptadx', 'No aceptadx', 'Alumno declinó participación'];
+    const estadosValidos = ['Inscrito', 'Aceptadx', 'No aceptadx', 'Alumno declinó participación'];
     if (!estadosValidos.includes(status))
       return res.status(400).json({ message: 'Estado no permitido' });
   
@@ -294,7 +310,7 @@ app.get('/proyectos/aprobados', (req, res) => {
       END AS estado_postulacion
     FROM Proyecto p
     JOIN Periodo per ON per.id_periodo = p.id_periodo
-    WHERE p.status_proyecto = 'aceptado'
+    WHERE p.status_proyecto = 'Aprobado'
   `;
   db.query(query, (err, results) => {
     if (err) {
@@ -304,6 +320,7 @@ app.get('/proyectos/aprobados', (req, res) => {
     res.json(results);
   });
 });
+
 
 app.get('/proyectoss/:id', (req, res) => {
     const { id } = req.params;
@@ -368,7 +385,6 @@ app.get('/proyectos/:id_socio', verifyToken, (req, res) => {
     res.json(results);
   });
 });
-
 
 const PORT = 5001;
 app.listen(PORT, () => {
