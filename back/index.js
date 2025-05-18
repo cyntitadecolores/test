@@ -130,7 +130,7 @@ app.post('/signup', async (req, res) => {
     } else if (tipo === 'socio' && perfilSocio === 'lider') {
       // Paso 1: Insertar socio base
       const sqlSocio = `
-        INSERT INTO Socio (correo, contraseña, redes_sociales, telefono_osf, notificaciones, status)
+        INSERT INTO Socio (correo, contraseña, redes_sociales, telefono_osf, notificaciones, tipo_socio, status)
         VALUES (?, ?, ?, ?, ?, ?)`;
 
       const valuesSocio = [
@@ -139,6 +139,7 @@ app.post('/signup', async (req, res) => {
         data.redes_sociales || '',
         data.telefono_osf,
         data.notificaciones ? 1 : 0,
+        data.tipo_socio,
         'En revisión'
       ];
 
