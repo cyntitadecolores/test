@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import NavCub from '../componentes/navegacion';
 import './PaginasA.css';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function StatusSocios() {
   const [socios, setSocios] = useState([]);
@@ -18,7 +20,7 @@ function StatusSocios() {
   const cambiarStatus = (id, nuevoStatus) => {
     axios.put(`http://localhost:5003/socio/${id}/status`, { status: nuevoStatus })
       .then(() => {
-        alert('Status actualizado');
+        toast.error('Status actualizado');
         window.location.reload();
       })
       .catch(error => console.error('Error al actualizar status:', error));
@@ -97,7 +99,25 @@ function StatusSocios() {
           <div className="modal-content">
             <h2>Detalles del Socio</h2>
 
-            <p><strong>Nombre:</strong> {socioSeleccionado.nombre_osf}</p>
+            {socioSeleccionado.tipo_socio === 'Estudiante' && socioSeleccionado.detalles && (
+              <div className="detalle-estudiante">
+                <h3>Información del Estudiante</h3>
+                <p><strong>Correo:</strong> {socioSeleccionado.correo}</p>
+                <p><strong>Teléfono:</strong> {socioSeleccionado.telefono_osf}</p>
+                <p><strong>Status:</strong> <span className={badgeClass(socioSeleccionado.status)}>{socioSeleccionado.status}</span></p>
+                <p><strong>Tipo de Socio:</strong> <span className="badge aprobado">{socioSeleccionado.tipo_socio}</span></p>
+                <p><strong>Nombre:</strong> {socioSeleccionado.detalles.nombre_socio}</p>
+                <p><strong>Matrícula:</strong> {socioSeleccionado.detalles.matricula}</p>
+                <p><strong>Semestre Acreditado:</strong> {socioSeleccionado.detalles.semestre_acreditado}</p>
+                <p><strong>INE:</strong> {socioSeleccionado.detalles.ine}</p>
+                <p><strong>ID Carrera:</strong> {socioSeleccionado.detalles.id_carrera}</p>
+              </div>
+            )}
+
+            {socioSeleccionado.tipo_socio === 'Entidad' && socioSeleccionado.detalles && (
+              <div className="detalle-estudiante">
+                <h3>Información de la entidad</h3>
+                <p><strong>Nombre:</strong> {socioSeleccionado.nombre_osf}</p>
             <p><strong>Correo:</strong> {socioSeleccionado.correo}</p>
             <p><strong>Teléfono:</strong> {socioSeleccionado.telefono_osf}</p>
             <p><strong>Redes Sociales:</strong> {socioSeleccionado.redes_sociales}</p>
@@ -113,15 +133,6 @@ function StatusSocios() {
             <p><strong>Dirección y Horario:</strong> {socioSeleccionado.direccion_horario}</p>
             <p><strong>Notificaciones:</strong> {socioSeleccionado.notificaciones ? 'Sí' : 'No'}</p>
             <p><strong>Nota:</strong> {socioSeleccionado.nota || 'N/A'}</p>
-
-            {socioSeleccionado.tipo_socio === 'Estudiante' && socioSeleccionado.detalles && (
-              <div className="detalle-estudiante">
-                <h3>Información del Estudiante</h3>
-                <p><strong>Nombre:</strong> {socioSeleccionado.detalles.nombre_socio}</p>
-                <p><strong>Matrícula:</strong> {socioSeleccionado.detalles.matricula}</p>
-                <p><strong>Semestre Acreditado:</strong> {socioSeleccionado.detalles.semestre_acreditado}</p>
-                <p><strong>INE:</strong> {socioSeleccionado.detalles.ine}</p>
-                <p><strong>ID Carrera:</strong> {socioSeleccionado.detalles.id_carrera}</p>
               </div>
             )}
 
