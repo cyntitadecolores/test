@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import NavCub from '../componentes/navegacion';
 import './PaginasA.css';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function StatusSocios() {
   const [socios, setSocios] = useState([]);
@@ -18,7 +20,7 @@ function StatusSocios() {
   const cambiarStatus = (id, nuevoStatus) => {
     axios.put(`http://localhost:5003/socio/${id}/status`, { status: nuevoStatus })
       .then(() => {
-        alert('Status actualizado');
+        toast.error('Status actualizado');
         window.location.reload();
       })
       .catch(error => console.error('Error al actualizar status:', error));

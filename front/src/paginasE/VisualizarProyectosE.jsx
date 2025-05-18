@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import NavCub from '../componentes/navegacionE';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 function VisualizarProyectos() {
   const [proyectos, setProyectos] = useState([]);
@@ -41,14 +44,14 @@ const handleSubmitPostulacion = async (e) => {
 
     const result = await response.json();
     if (response.ok) {
-      alert('Postulación registrada con éxito');
+      toast.error('Postulación registrada con éxito');
       setMostrarPostularme(false);
     } else {
-      alert('Error: ' + result.mensaje);
+      toast.error('Error: ' + result.mensaje);
     }
   } catch (error) {
     console.error('Error al postularme:', error);
-    alert('Error al postularme');
+    toast.error('Error al postularme');
   }
 };
   
@@ -98,13 +101,13 @@ const masinfo = () => {
 
     const result = await response.json();
     if (response.ok) {
-      alert('Postulación registrada con éxito');
+      toast.error('Postulación registrada con éxito');
     } else {
-      alert('Error: ' + result.mensaje);
+      toast.error('Error: ' + result.mensaje);
     }
   } catch (error) {
     console.error('Error al postularme:', error);
-    alert('Error al postularme');
+    toast.error('Error al postularme');
   }
 };
 

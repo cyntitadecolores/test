@@ -1,6 +1,8 @@
 import { useState } from "react";
 import NavCub from '../componentes/navegacion';
 import { Link } from "react-router-dom";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 export default function CrearCuentaAdmin() {
@@ -29,12 +31,12 @@ export default function CrearCuentaAdmin() {
       const data = await res.json();
 
       if (res.ok) {
-        alert("✅ Cuenta de administrador creada exitosamente");
+        toast.error("✅ Cuenta de administrador creada exitosamente");
       } else {
-        alert("❌ Error: " + data.message);
+        toast.error("❌ Error: " + data.message);
       }
     } catch (error) {
-      alert("❌ Ocurrió un error al crear la cuenta");
+      toast.error("❌ Ocurrió un error al crear la cuenta");
       console.error("Error:", error);
     }
   };

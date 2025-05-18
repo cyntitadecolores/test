@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import NavCub from '../componentes/navegacionE';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 function MisPostulaciones() {
   const [datos, setDatos] = useState([]);
@@ -42,7 +45,7 @@ function MisPostulaciones() {
       .catch(error => {
       if (error.response && error.response.status === 400) {
         // Aquí mostramos el mensaje del backend
-        alert(error.response.data.message);
+        toast.error(error.response.data.message);
       } else {
         console.error('Error al actualizar el status:', error);
       }
