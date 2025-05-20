@@ -300,28 +300,31 @@ app.get('/socio/:id', (req, res) => {
 
     const socio = socioResults[0];
 
-    // Verificar si el socio tiene información en la tabla SOCIO_ESTUDIANTE
-    if (socio.tipo_socio.includes('Estudiante')) {
-      const queryEstudiante = 'SELECT * FROM SOCIO_ESTUDIANTE WHERE id_socio = ?';
-      db.query(queryEstudiante, [id], (err, estudianteResults) => {
-        if (err) return res.status(500).json({ message: 'Error al obtener detalles de estudiante' });
+    // Ahora solo verificamos si el socio existe en la tabla SOCIO_ESTUDIANTE
+    const queryEstudiante = 'SELECT * FROM SOCIO_ESTUDIANTE WHERE id_socio = ?';
+    db.query(queryEstudiante, [id], (err, estudianteResults) => {
+      if (err) return res.status(500).json({ message: 'Error al obtener detalles de estudiante' });
 
+      if (estudianteResults.length > 0) {
+        // Si hay resultados, es un estudiante
         return res.json({
           ...socio,
           tipo_socio: 'Estudiante',
-          detalles: estudianteResults[0] || {}
+          detalles: estudianteResults[0]
         });
-      });
-    } else {
-      // Si no hay detalles en SOCIO_ESTUDIANTE, consideramos que es un socio de tipo Entidad
-      return res.json({
-        ...socio,
-        tipo_socio: 'Entidad',
-        detalles: {} // En este caso no hay detalles adicionales para los socios entidad
-      });
-    }
+      } else {
+        // Si no hay resultados, es una entidad
+        return res.json({
+          ...socio,
+          tipo_socio: 'Entidad',
+          detalles: {}
+        });
+      }
+    });
   });
 });
+
+
   
   // Actualizar el status de un socio
   app.put('/socio/:id/status', (req, res) => {
