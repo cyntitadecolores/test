@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import NavCub from '../componentes/navegacionE';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 function VisualizarProyectos() {
   const [proyectos, setProyectos] = useState([]);
@@ -16,11 +19,39 @@ const [motivo, setMotivo] = useState('');
 const [preguntaDescarte, setPreguntaDescarte] = useState('');
 const [nota, setNota] = useState('');
 const [idProyectoPostulacion, setIdProyectoPostulacion] = useState(null);
+const [errores, setErrores] = useState([]);
+
 
 
 const handleSubmitPostulacion = async (e) => {
   e.preventDefault();
   const token = localStorage.getItem('token');
+
+  const campos = {
+    expectativa, razon, motivo, preguntaDescarte, nota
+  };
+
+  const erroresLocales = [];
+  const caracteresProhibidos = /[<>{}$%]/;
+
+  for (const [nombre, valor] of Object.entries(campos)) {
+    if (!valor || valor.trim().length < 50) {
+      erroresLocales.push(`El campo "${nombre}" debe tener al menos 50 caracteres.`);
+    }
+    if (valor.trim().length > 500) {
+      erroresLocales.push(`El campo "${nombre}" no debe exceder los 500 caracteres.`);
+    }
+    if (caracteresProhibidos.test(valor)) {
+      erroresLocales.push(`El campo "${nombre}" contiene caracteres no permitidos.`);
+    }
+  }
+
+  if (erroresLocales.length > 0) {
+    setErrores(erroresLocales);
+    return;
+  }
+
+  setErrores([]); // limpia errores antes del fetch
 
   try {
     const response = await fetch('http://localhost:5004/postular', {
@@ -41,16 +72,22 @@ const handleSubmitPostulacion = async (e) => {
 
     const result = await response.json();
     if (response.ok) {
-      alert('Postulación registrada con éxito');
+      toast.success('Postulación registrada con éxito');
       setMostrarPostularme(false);
     } else {
-      alert('Error: ' + result.mensaje);
+      // puede incluir errores del backend
+      if (result.errores) {
+        setErrores(result.errores);
+      } else {
+        toast.error('Error: ' + result.mensaje);
+      }
     }
   } catch (error) {
     console.error('Error al postularme:', error);
-    alert('Error al postularme');
+    toast.error('Error al postularme');
   }
 };
+
   
   const requiere = () => {
   setMostrarRequiere(true);
@@ -98,13 +135,13 @@ const masinfo = () => {
 
     const result = await response.json();
     if (response.ok) {
-      alert('Postulación registrada con éxito');
+      toast.error('Postulación registrada con éxito');
     } else {
-      alert('Error: ' + result.mensaje);
+      toast.error('Error: ' + result.mensaje);
     }
   } catch (error) {
     console.error('Error al postularme:', error);
-    alert('Error al postularme');
+    toast.error('Error al postularme');
   }
 };
 
@@ -229,55 +266,87 @@ const masinfo = () => {
         </div>
       )}
        {mostrarPostularme && (
-  <div className="info-extra">
-    <h3>Formulario de Postulación</h3>
-    <form onSubmit={handleSubmitPostulacion}>
-      <label>
-        Expectativa:
-        <textarea 
-          value={expectativa} 
-          onChange={e => setExpectativa(e.target.value)} 
-          required
-        />
-      </label>
-      <label>
-        Razón:
-        <textarea 
-          value={razon} 
-          onChange={e => setRazon(e.target.value)} 
-          required
-        />
-      </label>
-      <label>
-        Motivo:
-        <textarea 
-          value={motivo} 
-          onChange={e => setMotivo(e.target.value)} 
-          required
-        />
-      </label>
-      <label>
-        Pregunta de descarte:
-        <textarea 
-          value={preguntaDescarte} 
-          onChange={e => setPreguntaDescarte(e.target.value)} 
-        />
-      </label>
-      <label>
-        Nota:
-        <textarea 
-          value={nota} 
-          onChange={e => setNota(e.target.value)} 
-        />
-      </label>
+  <div className="info-extra formulario-postulacion">
+    <h3 style={{ textAlign: 'center' }}>Formulario de Postulación</h3>
 
-      <button type="submit">Enviar Postulación</button>
-      <button onClick={() => setMostrarPostularme(false)} className="cerrar-btn">
-  Cancelar
-</button>
-    </form>
+    {errores.length > 0 && (
+      <div style={{
+        backgroundColor: '#ffe0e0',
+        padding: '15px',
+        marginBottom: '20px',
+        borderRadius: '8px',
+        border: '1px solid red',
+        maxWidth: '700px',
+        margin: '0 auto'
+      }}>
+        <strong style={{ color: 'red' }}>Errores encontrados:</strong>
+        <ul style={{ marginTop: '10px' }}>
+          {errores.map((err, index) => (
+            <li key={index}>{err}</li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '20px',
+      maxWidth: '700px',
+      margin: '0 auto'
+    }}>
+      <div>
+        <label>Expectativa:</label>
+        <textarea 
+        className="campo-textarea"
+          value={expectativa}
+          onChange={e => setExpectativa(e.target.value)}
+          required 
+        />
+      </div>
+      <div>
+        <label>Razón:</label>
+        <textarea 
+        className="campo-textarea"
+          value={razon}
+          onChange={e => setRazon(e.target.value)}
+          required 
+        />
+      </div>
+      <div>
+        <label>Motivo:</label>
+        <textarea 
+        className="campo-textarea"
+          value={motivo}
+          onChange={e => setMotivo(e.target.value)}
+          required 
+        />
+      </div>
+      <div>
+        <label>Pregunta de descarte:</label>
+        <textarea 
+        className="campo-textarea"
+          value={preguntaDescarte}
+          onChange={e => setPreguntaDescarte(e.target.value)}
+        />
+      </div>
+      <div>
+        <label>Nota:</label>
+        <textarea 
+        className="campo-textarea"
+          value={nota}
+          onChange={e => setNota(e.target.value)}
+        />
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginTop: '20px' }}>
+        <button onClick={handleSubmitPostulacion} >Enviar Postulación</button>
+        <button onClick={() => setMostrarPostularme(false)}>Cancelar</button>
+      </div>
+    </div>
   </div>
 )}
+
     </div>
   );
 }
