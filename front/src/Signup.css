@@ -1,0 +1,134 @@
+/* Estilo global para html y body */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+/* Fondo exclusivo para Signup */
+.signup-page {
+  min-height: 100vh;
+  background-image: url('./src/assets/decoracionv2.png'); /* Ajusta esta ruta */
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Contenedor del formulario */
+.signup-container {
+  width: 500px; 
+  padding: 2rem;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Título */
+.signup-container h2 {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #1a1a1a;
+  border-bottom: none;
+  margin-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.signup-icon {
+  width: 100px;
+  margin-bottom: 0.5rem;
+}
+
+/* Etiquetas */
+.signup-container label {
+  display: block;
+  margin-top: 1rem;
+  font-weight: bold;
+  color: #1a1a1a;
+}
+
+/* Inputs y selects */
+.signup-container select,
+.signup-container input {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  border: 1px solid #ccd1d9;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+.signup-container input:focus,
+.signup-container select:focus {
+  border-color: #1a1a1a;
+  outline: none;
+}
+
+.signup-container input[type="checkbox"] {
+  width: auto;
+  margin-right: 0.5rem;
+}
+
+/* Textos pequeños y advertencias */
+.signup-container p {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+}
+
+.signup-container p[style*="color: red"] {
+  color: #e74c3c !important;
+}
+
+/* Botón */
+.signup-container button[type="submit"] {
+  margin-top: 2rem;
+  width: 100%;
+  background-color: #1a1a1a;
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.signup-container button[type="submit"]:hover {
+  background-color: rgb(34, 84, 173);
+}
+
+/* Checkbox label */
+.signup-container .checkbox-label {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+  font-weight: normal;
+  color: #555;
+}
+
+.signup-links {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.signup-links a {
+  color: rgb(34, 84, 173);
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.signup-links a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media screen and (max-width: 600px) {
+  .signup-container {
+    padding: 1rem;
+  }
+}

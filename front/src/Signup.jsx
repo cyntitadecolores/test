@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import './Signup.css';
+import logo from './assets/logo_servicio.png';
 
 const formDataInicial = {
   // Globales
@@ -162,7 +164,9 @@ const Signup = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <div className="signup-page">
+    <form onSubmit={handleSubmit} className="signup-container">
+      <img src={logo} alt="Logo Servicio Social" className="signup-icon" />
       <h2>Crear cuenta</h2>
 
       {/* Selección del tipo de cuenta */}
@@ -260,7 +264,7 @@ const Signup = () => {
           {/* Teléfono con validación */}
           <input
             name="telefono_osf"
-            placeholder="Teléfono del socio"
+            placeholder="Teléfono"
             value={formData.telefono_osf}
             onChange={handleChange}
             required
@@ -342,7 +346,12 @@ const Signup = () => {
       <button type="submit" disabled={loading}>
         {loading ? 'Registrando...' : 'Crear cuenta'}
       </button>
+
+      <div className="signup-links">
+            <Link to="/login">¿Ya tienes una cuenta?</Link>
+          </div>
     </form>
+    </div>
   );
 };
 

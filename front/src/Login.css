@@ -1,0 +1,113 @@
+/* Reset básico */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+/* Fondo general SOLO para login */
+.login-page {
+  height: 100vh;
+  background: linear-gradient(to bottom, rgba(255,255,255,0) 50%, #1a1a1a 50%),
+              url('src/assets/decoracion.png') no-repeat top center;
+  background-size: cover;
+  font-family: 'Segoe UI', sans-serif;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Contenedor central */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+/* Formulario */
+.login-form {
+  background: white;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  width: 350px;
+  text-align: center;
+  position: relative;
+}
+
+/* Header del formulario */
+.login-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.login-container h2 {
+  font-size: 2rem;
+  color: #1a1a1a;
+  margin-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: none;
+}
+
+.login-icon {
+  width: 100px;
+  margin-bottom: 0.5rem;
+}
+
+/* Campos */
+.login-form label {
+  text-align: left;
+  display: block;
+  font-size: 0.85rem;
+  color: #666;
+  margin: 0.5rem 0 0.25rem;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 0.65rem;
+  border: 1px solid #ccc;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  background-color: #f3f3f3;
+  box-sizing: border-box;
+}
+
+/* Botón */
+.login-form button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #1a1a1a;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background 0.3s ease;
+}
+
+.login-form button:hover {
+  background-color: rgb(34, 84, 173);
+}
+
+/* Enlaces inferiores */
+.login-links {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.login-links a {
+  color: rgb(34, 84, 173);
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.login-links a:hover {
+  text-decoration: underline;
+}

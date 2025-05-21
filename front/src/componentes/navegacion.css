@@ -19,6 +19,11 @@
     margin-top: 20px; 
 }
 
+.nav-bar img {
+    height: auto;
+    width: 110px;
+}
+
 .nav-bar a {
     display: block;
     padding: 10px 20px;
