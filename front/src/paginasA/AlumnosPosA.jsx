@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import NavCub from '../componentes/navegacion';
 import './tablasA.css';
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
 
 function AlumnosPos() {
     const [postulaciones, setPostulaciones] = useState([]);
@@ -21,6 +23,53 @@ function AlumnosPos() {
         razon: 'Razón',
         motivo: 'Motivo',
         pregunta_descarte: 'descarte',
+    };
+
+    const exportarAExcel = async () => {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('proyectosPostulados');
+    
+        // Generar las columnas dinámicamente según columnasFijas y columnasVisibles
+        const todasLasColumnas = [...columnasFijas, ...columnasVisibles];
+        worksheet.columns = todasLasColumnas.map(col => ({
+            header: columnasDisponibles[col],
+            key: col,
+            width: 25, 
+        }));
+    
+    
+        postulacionesFiltrados.forEach(p => {
+            const fila = {};
+            todasLasColumnas.forEach(col => {
+                fila[col] = p[col];
+            });
+            worksheet.addRow(fila);
+        });
+    
+        // Estilo para encabezado
+        const headerRow = worksheet.getRow(1);
+        headerRow.eachCell(cell => {
+            cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FF2F75B5' },
+            };
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+            cell.border = {
+                top: { style: 'thin' },
+                bottom: { style: 'thin' },
+                left: { style: 'thin' },
+                right: { style: 'thin' },
+            };
+        });
+    
+        // Generar archivo y descargarlo
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        });
+        saveAs(blob, 'alumnosPostulados.xlsx');
     };
 
     useEffect(() => {
@@ -152,7 +201,6 @@ function AlumnosPos() {
                                     {[...columnasFijas, ...columnasVisibles].map(col => (
                                         <th key={col}>{columnasDisponibles[col]}</th>
                                     ))}
-                                    <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -185,25 +233,14 @@ function AlumnosPos() {
                                                 )}
                                             </td>
                                         ))}
-                                        <td>
-                                            <button
-                                                className="aprobar"
-                                                onClick={() => actualizarStatus(postulacion.id_proyecto, postulacion.id_estudiante, 'Aceptadx')}
-                                            >
-                                                Aceptadx
-                                            </button>
-                                            <button
-                                                className="rechazar"
-                                                onClick={() => actualizarStatus(postulacion.id_proyecto, postulacion.id_estudiante, 'No aceptadx')}
-                                                style={{ marginLeft: '8px' }}
-                                            >
-                                                No aceptadx
-                                            </button>
-                                        </td>
+                                        
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
+                        <button onClick={exportarAExcel} style={{ marginBottom: '20px', marginLeft: '10px' }}>
+    Descargar Excel
+</button>
                     </div>
                 </div>
             )}
