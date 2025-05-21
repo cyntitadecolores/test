@@ -98,6 +98,28 @@ app.post('/postular', verifyToken, (req, res) => {
   const idEstudiante = req.user.id;
   const { id_proyecto, expectativa, razon, motivo, preguntaDescarte, nota } = req.body;
 
+  const campos = { expectativa, razon, motivo, preguntaDescarte, nota };
+  const errores = [];
+  const caracteresProhibidos = /[<>{}$%]/;
+  const longitudMin = 50;
+  const longitudMax = 500;
+
+  for (const [nombre, valor] of Object.entries(campos)) {
+    if (!valor || valor.trim().length < longitudMin) {
+      errores.push(`El campo "${nombre}" debe tener al menos ${longitudMin} caracteres.`);
+    }
+    if (valor.trim().length > longitudMax) {
+      errores.push(`El campo "${nombre}" no debe exceder los ${longitudMax} caracteres.`);
+    }
+    if (caracteresProhibidos.test(valor)) {
+      errores.push(`El campo "${nombre}" contiene caracteres no permitidos.`);
+    }
+  }
+
+  if (errores.length > 0) {
+    return res.status(400).json({ mensaje: 'Errores de validación', errores });
+  }
+
   // Verificar si ya existe una postulación de ese estudiante a ese proyecto
   const verificarSQL = `
     SELECT * FROM postulacion 
@@ -134,6 +156,7 @@ app.post('/postular', verifyToken, (req, res) => {
     });
   });
 });
+
 
 
 
