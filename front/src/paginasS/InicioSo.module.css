@@ -1,9 +1,12 @@
 /* InicioSo.module.css */
 .cube {
-    background-color: #f7f9fc;
-    padding: 20px;
-    font-family: Arial, sans-serif;
-  }
+  background-color: #f7f9fc;
+  padding: 100px;
+  font-family: Arial, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
   
   h1 {
     font-size: 2rem;
@@ -34,23 +37,28 @@
     font-size: 16px;
   }
   
-  .table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-  }
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 30px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
   
-  .table th, .table td {
-    padding: 10px;
-    text-align: left;
-    border: 1px solid #ddd;
-  }
-  
-  .table th {
-    background-color: #0033a0;
-    color: white;
-  }
-  
+.table th, .table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.table tr:hover {
+  background-color: #f1f1f1;
+}
+
+
   .respuestaButton {
     background-color: #4caf50;
     color: white;

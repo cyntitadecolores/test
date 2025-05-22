@@ -50,10 +50,6 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-
-
-//Endpoint paginas socio
-
 // -----------------------------------------
 // 1. Configuración de Multer
 // -----------------------------------------
@@ -74,72 +70,93 @@ const upload = multer({ storage: storage });
 // -----------------------------------------
 // 2. Endpoint POST /proyecto
 // -----------------------------------------
-app.post('/proyecto', upload.single('imagen'), (req, res) => {
-  // ---------- Des-estructuramos el body ----------
-  const {
-    id_socio, fecha_implementacion, nombre_proyecto, problema_social, vulnerabilidad_atendida_1, edad_poblacion_1,
-    vulnerabilidad_atendida_2, edad_poblacion_2, zona_poblacion, numero_beneficiarios_proyecto,
-    objetivo_proyecto, ods_proyecto_1, ods_proyecto_2, acciones_estudiantado,
-    producto_servicio_entregar, entregable_esperado, medida_impacto, dias_actividades,
-    horario_proyecto, carreras_proyecto_1, carreras_proyecto_2, habilidades_alumno,
-    cupos_proyecto, modalidad, direccion_escrita, duracion_experiencia, valor_proyecto,
-    periodo_repetido, induccion_ss, propuesta_semana_tec, propuesta_inmersion_social,
-    propuesta_bloque, entrevista, pregunta_descarte, enlace_maps
-  } = req.body;
+// ───── utilitario para pedir la info del socio ─────
+function getSocioInfo(id_socio, cb) {
+  const sql = `
+    SELECT correo,
+           nombre_osf,
+           telefono_osf,
+           redes_sociales,
+           poblacion_osf,
+           num_beneficiarios_osf,
+           id_ods               AS ods_osf
+    FROM   Socio
+    WHERE  id_socio = ?`;
 
-  // ---------- Imagen ----------
-  const img_proyecto = req.file ? `/uploads/${req.file.filename}` : null;
-
-  // ---------- Datos requeridos mínimos ----------
-  if (!nombre_proyecto || !problema_social || !objetivo_proyecto) {
-    return res.status(400).json({ message: 'Faltan datos requeridos' });
-  }
-
-  // ---------- Armado dinámico de columnas / placeholders ----------
-  const columns = [
-    'id_socio', 'fecha_implementacion', 'nombre_proyecto', 'problema_social', 'vulnerabilidad_atendida_1', 'edad_poblacion_1',
-    'vulnerabilidad_atendida_2', 'edad_poblacion_2', 'zona_poblacion', 'numero_beneficiarios_proyecto',
-    'objetivo_proyecto', 'ods_proyecto_1', 'ods_proyecto_2', 'acciones_estudiantado',
-    'producto_servicio_entregar', 'entregable_esperado', 'medida_impacto', 'dias_actividades',
-    'horario_proyecto', 'carreras_proyecto_1', 'carreras_proyecto_2', 'habilidades_alumno',
-    'cupos_proyecto', 'modalidad', 'direccion_escrita', 'duracion_experiencia', 'valor_proyecto',
-    'periodo_repetido', 'induccion_ss', 'propuesta_semana_tec', 'propuesta_inmersion_social',
-    'propuesta_bloque', 'entrevista', 'pregunta_descarte', 'enlace_maps', "img_proyecto", 'status_proyecto'
-
-  ];
-
-  const placeholders = columns.map(() => '?').join(',');
-
-  const query = `INSERT INTO Proyecto (${columns.join(',')}) VALUES (${placeholders})`;
-
-  // ---------- Valores en el mismo orden ----------
-  const values = [
-    id_socio, fecha_implementacion, nombre_proyecto,
-    problema_social, vulnerabilidad_atendida_1, edad_poblacion_1,
-    vulnerabilidad_atendida_2, edad_poblacion_2, zona_poblacion, numero_beneficiarios_proyecto,
-    objetivo_proyecto, ods_proyecto_1, ods_proyecto_2, acciones_estudiantado,
-    producto_servicio_entregar, entregable_esperado, medida_impacto, dias_actividades,
-    horario_proyecto, carreras_proyecto_1, carreras_proyecto_2, habilidades_alumno,
-    cupos_proyecto, modalidad, direccion_escrita, duracion_experiencia, valor_proyecto,
-    periodo_repetido, induccion_ss, propuesta_semana_tec, propuesta_inmersion_social,
-    propuesta_bloque, entrevista, pregunta_descarte, enlace_maps,
-    img_proyecto, 'En revisión'      // status inicial
-  ];
-
-  // ---------- Ejecución ----------
-  db.query(query, values, (err, _result) => {
-    if (err) {
-      console.error('❌ Error al registrar el proyecto:', err);
-      return res.status(500).json({ message: 'Error al registrar el proyecto' });
-    }
-    return res.status(201).json({ message: 'Proyecto creado exitosamente' });
+  db.query(sql, [id_socio], (err, rows) => {
+    if (err)        return cb(err);
+    if (!rows.length)
+      return cb(new Error('❌ Socio no encontrado'));
+    cb(null, rows[0]);
   });
-});
+}
 
+// ───── endpoint POST /proyecto ─────
+app.post(
+  '/proyecto',
+  upload.single('imagen'),
+  (req, res) => {
+    const {
+      id_socio,
+      /* todos los demás campos que vengan del body */
+    } = req.body;
+
+    // ---------- 1) obtenemos los datos del socio ----------
+    getSocioInfo(id_socio, (err, socio) => {
+      if (err) {
+        console.error(err);
+        return res.status(400).json({ message: err.message });
+      }
+
+      // ---------- 2) construimos el objeto final ----------
+      const payload = {
+        // ► datos que heredamos del socio
+        correo_registro_info  : socio.correo,
+        nombre_osf            : socio.nombre_osf,
+        telefono_osf          : socio.telefono_osf,
+        redes_sociales        : socio.redes_sociales,
+        poblacion_osf         : socio.poblacion_osf,
+        num_beneficiarios_osf : socio.num_beneficiarios_osf,
+        ods_osf               : socio.ods_osf,
+
+        // ► datos que llegan del formulario (pueden sobre-escribir)
+        ...req.body,
+
+        // ► valores por defecto / calculados
+        status_proyecto: 'En revisión'
+      };
+
+      // si vino imagen, la agregamos
+      if (req.file) payload.img_proyecto = `/uploads/${req.file.filename}`;
+
+      // ---------- 3) validaciones mínimas ----------
+      if (!payload.nombre_proyecto || !payload.problema_social || !payload.objetivo_proyecto) {
+        return res.status(400).json({ message: 'Faltan datos requeridos' });
+      }
+
+      // ---------- 4) generamos INSERT dinámico ----------
+      const columns      = Object.keys(payload);      // ['id_socio', 'correo_registro_info', ...]
+      const placeholders = columns.map(() => '?').join(',');
+      const values       = Object.values(payload);
+
+      const sql = `INSERT INTO Proyecto (${columns.join(',')}) VALUES (${placeholders})`;
+
+      db.query(sql, values, (e, _r) => {
+        if (e) {
+          console.error('❌ Error al registrar proyecto:', e);
+          return res.status(500).json({ message: 'Error al registrar proyecto' });
+        }
+        res.status(201).json({ message: 'Proyecto creado exitosamente' });
+      });
+    });
+  }
+);
 
  // GET /socio/:id_socio - Obtener info del socio con solo campos específicos
-  app.get('/socio/:id_socio', (req, res) => {
-    const { id_socio } = req.params;
+  app.get('/socio/:id_socio', verifyToken, (req, res) => {
+    const { id_socio } = req.params;   // <── ahora sí existe la var
+    if (+id_socio !== req.user.id)
+      return res.status(403).json({ message: 'Prohibido' });
 
     const query = `
       SELECT 
@@ -207,8 +224,6 @@ app.post('/proyecto', upload.single('imagen'), (req, res) => {
       res.json(results);  // Retorna los periodos como un array de objetos
     });
   });
-
-
   
   // Obtener estudiantes postulados a un proyecto específico
 // 🚀 MySQL 8+: la agrupación se resuelve en la propia consulta
@@ -240,7 +255,7 @@ app.post('/proyecto', upload.single('imagen'), (req, res) => {
       JOIN Postulacion   Po ON P.id_proyecto = Po.id_proyecto
       JOIN Estudiante    E  ON Po.id_estudiante = E.id_estudiante
       JOIN Carrera       C  ON E.id_carrera   = C.id_carrera
-      WHERE P.id_socio = ? AND Po.status = 'Inscrito'
+      WHERE P.id_socio = ? AND Po.status = 'En revisión'
       GROUP BY P.id_proyecto, P.nombre_proyecto;
     `;
   
@@ -284,7 +299,45 @@ app.post('/proyecto', upload.single('imagen'), (req, res) => {
       res.json({ message: 'Status actualizado correctamente' });
     });
   });
-  
+
+/* ===========================================================
+   3)  ALUMNOS ACEPTADOS / INSCRITOS POR CADA PROYECTO
+   GET /proyecto/:id_socio/inscritos
+   -----------------------------------------------------------*/
+app.get('/proyecto/:id_socio/inscritos', (req, res) => {
+  const { id_socio } = req.params;
+
+  const q = `
+    SELECT
+      P.id_proyecto,
+      P.nombre_proyecto,
+      JSON_ARRAYAGG(
+        JSON_OBJECT(
+          'id_estudiante',  E.id_estudiante,
+          'estudiante_nombre',  E.nombre,
+          'estudiante_correo',  E.correo,
+          'estudiante_carrera', C.nombre,
+          'fecha_postulacion_estudiante', Po.fecha_postulacion,
+          'status', Po.status                       -- ‹── para mostrar Aceptadx / Inscrito
+        )
+      ) AS alumnos
+    FROM Proyecto      P
+    JOIN Postulacion   Po ON P.id_proyecto = Po.id_proyecto
+    JOIN Estudiante    E  ON Po.id_estudiante = E.id_estudiante
+    JOIN Carrera       C  ON E.id_carrera    = C.id_carrera
+    WHERE P.id_socio = ?
+      AND Po.status IN ('Aceptadx','Inscrito')
+    GROUP BY P.id_proyecto , P.nombre_proyecto;
+  `;
+
+  db.query(q, [id_socio], (err, rows) => {
+    if (err) {
+      console.error('❌ Error al obtener aceptados/inscritos:', err);
+      return res.status(500).json({ message: 'Error del servidor' });
+    }
+    res.json(rows);
+  });
+});
 
 // Obtener proyectos aprobados con el periodo
 app.get('/proyectos/aprobados', (req, res) => {
@@ -321,7 +374,6 @@ app.get('/proyectos/aprobados', (req, res) => {
   });
 });
 
-
 app.get('/proyectoss/:id', (req, res) => {
     const { id } = req.params;
     db.query('SELECT * FROM Proyecto p JOIN Periodo per ON per.id_periodo = p.id_periodo WHERE p.id_proyecto = ?', [id], (err, results) => {
@@ -353,7 +405,6 @@ app.get('/proyectos/:id/postulaciones', (req, res) => {
     res.json(results);
   });
 });
-
 
 app.get('/proyectos/:id_socio', verifyToken, (req, res) => {
   const idSocio = req.user.id; // Esto es correcto si verifyToken setea req.user.id
