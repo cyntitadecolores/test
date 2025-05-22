@@ -40,11 +40,12 @@ function NuestrosProyectosS() {
 
       try {
         const token = localStorage.getItem('token');
-const response = await fetch(`http://localhost:5001/proyectos/${id_socio}?status=${statusFilter}`, {
-  headers: {
-    'Authorization': `Bearer ${token}`, // <-- Aquí se envía correctamente
-  },
-});
+
+        const response = await fetch(`http://localhost:5001/proyectos/${id_socio}?status=${statusFilter}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`, // <-- Aquí se envía correctamente
+          },
+        });
         
         const data = await response.json();
 
@@ -83,10 +84,11 @@ const response = await fetch(`http://localhost:5001/proyectos/${id_socio}?status
       {error && <p>{error}</p>}
 
       {/* Filtro por status */}
-      <select onChange={handleFilterChange} value={statusFilter}>
+      <select value={statusFilter} onChange={handleFilterChange}>
         <option value="todos">Todos</option>
-        <option value="pendiente">Pendientes</option>
-        <option value="aceptado">Aceptados</option>
+        <option value="Aprobado">Aprobados</option>
+        <option value="No aprobado">No aprobados</option>
+        <option value="En revisión">En revisión</option>
       </select>
 
       <div className={styles.proyectosContainer}>

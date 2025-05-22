@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import NavCub from '../componentes/navegacion';
 import './tablasA.css';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 
 function ProyectosPos() {
@@ -87,27 +87,55 @@ function ProyectosPos() {
     status_actividad: 'Status de Actividad',
     Nota: 'Nota',
     id_socio: 'ID Socio',
-    status: 'Status General'
 };
     
+const exportarAExcel = async () => {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('proyectosPostulados');
 
-    const exportarAExcel = () => {
-    const datosAExportar = proyectosFiltrados.map(p => {
+    // Generar las columnas dinámicamente según columnasFijas y columnasVisibles
+    const todasLasColumnas = [...columnasFijas, ...columnasVisibles];
+    worksheet.columns = todasLasColumnas.map(col => ({
+        header: columnasDisponibles[col],
+        key: col,
+        width: 25, // Puedes ajustar el ancho si lo necesitas
+    }));
+
+    // Agregar los datos
+    proyectosFiltrados.forEach(p => {
         const fila = {};
-        [...columnasFijas, ...columnasVisibles].forEach(col => {
-            fila[columnasDisponibles[col]] = p[col];
+        todasLasColumnas.forEach(col => {
+            fila[col] = p[col];
         });
-        return fila;
+        worksheet.addRow(fila);
     });
 
-    const hoja = XLSX.utils.json_to_sheet(datosAExportar);
-    const libro = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(libro, hoja, 'proyectosPostulados');
+    // Estilo para encabezado
+    const headerRow = worksheet.getRow(1);
+    headerRow.eachCell(cell => {
+        cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+        cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FF2F75B5' }, // azul oscuro
+        };
+        cell.alignment = { vertical: 'middle', horizontal: 'center' };
+        cell.border = {
+            top: { style: 'thin' },
+            bottom: { style: 'thin' },
+            left: { style: 'thin' },
+            right: { style: 'thin' },
+        };
+    });
 
-    const excelBuffer = XLSX.write(libro, { bookType: 'xlsx', type: 'array' });
-    const archivo = new Blob([excelBuffer], { type: 'application/octet-stream' });
-    saveAs(archivo, 'proyectosPostulados.xlsx');
+    // Generar archivo y descargarlo
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
+    saveAs(blob, 'proyectosPostulados.xlsx');
 };
+
 
     useEffect(() => {
         axios.get('http://localhost:5003/proyectos')

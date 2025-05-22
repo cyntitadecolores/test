@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import NavCub from '../componentes/navegacion';
 import "./PaginasA.css";
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
 
 function ProyectosAprobados() {
   const [proyectos, setProyectos] = useState([]);
@@ -15,6 +17,66 @@ function ProyectosAprobados() {
       .then(response => setProyectos(response.data))
       .catch(error => console.error('Error al obtener proyectos:', error));
   }, []);
+
+  const exportarAExcel = async () => {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('ProyectosAceptados');
+  
+    const columnas = [
+  { header: 'ID', key: 'id_proyecto' },
+  { header: 'Nombre', key: 'nombre_proyecto' },
+  { header: 'Clave', key: 'clave_materia' },
+  { header: 'Periodo', key: 'periodo' },
+  { header: 'CRN', key: 'crn' },
+  { header: 'Postulaciones Activas', key: 'postulaciones_activas' },
+  { header: 'Cupo Máximo', key: 'cupo_maximo' },
+  { header: 'Estado de Postulación', key: 'estado_postulacion' },
+];
+
+
+  worksheet.columns = columnas.map(col => ({
+    header: col.header,
+    key: col.key,
+    width: 30,
+  }));
+
+  proyectosFiltrados.forEach(proyecto => {
+  worksheet.addRow({
+    id_proyecto: proyecto.id_proyecto,
+    nombre_proyecto: proyecto.nombre_proyecto,
+    clave_materia: proyecto.clave_materia,
+    periodo: proyecto.periodo,
+    crn: proyecto.crn,
+    postulaciones_activas: proyecto.postulaciones_activas,
+    cupo_maximo: proyecto.cupo_maximo,
+    estado_postulacion: proyecto.estado_postulacion,
+  });
+});
+
+  
+    const headerRow = worksheet.getRow(1);
+    headerRow.eachCell(cell => {
+      cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF2F75B5' },
+      };
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      cell.border = {
+        top: { style: 'thin' },
+        bottom: { style: 'thin' },
+        left: { style: 'thin' },
+        right: { style: 'thin' },
+      };
+    });
+  
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
+    saveAs(blob, 'proyectosAceptados.xlsx');
+  };
 
   const proyectosFiltrados = proyectos.filter(proyecto =>
     Object.values(proyecto).some(valor =>
@@ -99,6 +161,9 @@ function ProyectosAprobados() {
               ))}
             </tbody>
           </table>
+          <button onClick={exportarAExcel} style={{ marginBottom: '20px', marginLeft: '10px' }}>
+    Descargar Excel
+</button>
         </div>
       )}
 

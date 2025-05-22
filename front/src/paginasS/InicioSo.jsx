@@ -10,11 +10,12 @@ function InicioSo() {
   const [error, setError] = useState(null);
   const [modalData, setModalData] = useState(null);
   const navigate = useNavigate();
+  const [inscritos,setInscritos] = useState([]);
 
   const token = localStorage.getItem('jwt');
 
   const getIdSocio = () => {
-    const token = localStorage.getItem("jwt") || localStorage.getItem("token");
+    const token = localStorage.getItem("token");
     if (token) {
       try {
         const decoded = jwtDecode(token);
@@ -51,9 +52,21 @@ function InicioSo() {
         }
       }
     };
+    const fetchInscritos = async () => {
+      const id = getIdSocio();
+      if (!id) return;
+
+      const r = await fetch(
+        `http://localhost:5001/proyecto/${id}/inscritos`,
+        { headers: { Authorization: `Bearer ${token}` }, signal: controller.signal }
+      );
+      const d = await r.json();
+      r.ok ? setInscritos(d) : console.error(d);
+    };
   
     fetchPostulaciones();
-    return () => controller.abort();
+    fetchInscritos();
+    
   }, [token]);
   
 
@@ -70,7 +83,6 @@ function InicioSo() {
     }); 
   };
   
-
   // Aceptar estudiante
   const handleAccept = async (id_proyecto, id_estudiante) => {
     try {
@@ -135,7 +147,7 @@ function InicioSo() {
           .filter(p => p.alumnos_postulados.length) // Elimina proyectos vacíos
       );
       alert('Estudiante no aceptado');
-      setModalData(null); // Cierra el modal
+      setModalData(null); // Cierra el mo dal
     } catch (err) {
       console.error(err);
       alert('Error de red');
@@ -184,6 +196,38 @@ function InicioSo() {
       ) : (
         <p>No tienes proyectos con estudiantes postulados.</p>
       )}
+
+      <h2>Alumnos aceptados / inscritos</h2>
+{inscritos.length ? (
+  <table className={styles.table}>
+    <thead>
+      <tr>
+        <th>Proyecto</th>
+        <th>Nombre</th>
+        <th>Correo</th>
+        <th>Carrera</th>
+        <th>Fecha</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {inscritos.map(p =>
+        p.alumnos.map(al => (
+          <tr key={al.id_estudiante}>
+            <td>{p.nombre_proyecto}</td>
+            <td>{al.estudiante_nombre}</td>
+            <td>{al.estudiante_correo}</td>
+            <td>{al.estudiante_carrera}</td>
+            <td>{new Date(al.fecha_postulacion_estudiante).toLocaleDateString('es-MX')}</td>
+            <td>{al.status}</td>
+          </tr>
+        ))
+      )}
+    </tbody>
+  </table>
+) : (
+  <p>Aún no tienes alumnos aceptados o inscritos.</p>
+)}
 
       {/* Mostrar el modal si hay datos seleccionados */}
       {modalData && (

@@ -2,17 +2,107 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import NavCub from '../componentes/navegacion';
 import "./PaginasA.css";
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
+
 
 function SociosAprobados() {
   const [socios, setSocios] = useState([]);
   const [filteredText, setFilteredText] = useState('');
   const [socioSeleccionado, setSocioSeleccionado] = useState(null);
 
+  
+
   useEffect(() => {
     axios.get('http://localhost:5003/socioaceptados')
       .then(response => setSocios(response.data))
       .catch(error => console.error('Error al obtener socios:', error));
   }, []);
+
+  const exportarAExcel = async () => {
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('sociosAceptados');
+
+  const columnas = [
+    { key: 'nombre', header: 'Nombre' },
+    { key: 'correo', header: 'Correo' },
+    { key: 'tipo_socio', header: 'Tipo de Socio' },
+    { key: 'telefono_osf', header: 'Teléfono' },
+    { key: 'nombre_socio', header: 'Nombre del Estudiante' },
+    { key: 'matricula', header: 'Matrícula' },
+    { key: 'semestre_acreditado', header: 'Semestre Acreditado' },
+    { key: 'ine', header: 'INE' },
+    { key: 'id_carrera', header: 'ID Carrera' },
+    { key: 'redes_sociales', header: 'Redes Sociales' },
+    { key: 'vision', header: 'Visión' },
+    { key: 'mision', header: 'Misión' },
+    { key: 'objetivos', header: 'Objetivos' },
+    { key: 'poblacion_osf', header: 'Población' },
+    { key: 'num_beneficiarios_osf', header: 'Número de Beneficiarios' },
+    { key: 'nombre_representante', header: 'Nombre del Representante' },
+    { key: 'puesto_representante', header: 'Puesto del Representante' },
+    { key: 'direccion_horario', header: 'Dirección y Horario' },
+    { key: 'notificaciones', header: 'Notificaciones' },
+    { key: 'nota', header: 'Nota' },
+  ];
+
+  worksheet.columns = columnas.map(col => ({
+    header: col.header,
+    key: col.key,
+    width: 30,
+  }));
+
+  sociosFiltrados.forEach(socio => {
+    const fila = {
+      nombre: socio.nombre_osf || socio.detalles?.nombre_socio || '',
+      correo: socio.correo || '',
+      tipo_socio: socio.tipo_socio || '',
+      telefono_osf: socio.telefono_osf || '',
+      nombre_socio: socio.detalles?.nombre_socio || '',
+      matricula: socio.detalles?.matricula || '',
+      semestre_acreditado: socio.detalles?.semestre_acreditado || '',
+      ine: socio.detalles?.ine || '',
+      id_carrera: socio.detalles?.id_carrera || '',
+      redes_sociales: socio.redes_sociales || '',
+      vision: socio.vision || '',
+      mision: socio.mision || '',
+      objetivos: socio.objetivos || '',
+      poblacion_osf: socio.poblacion_osf || '',
+      num_beneficiarios_osf: socio.num_beneficiarios_osf || '',
+      nombre_representante: socio.nombre_representante || '',
+      puesto_representante: socio.puesto_representante || '',
+      direccion_horario: socio.direccion_horario || '',
+      notificaciones: socio.notificaciones ? 'Sí' : 'No',
+      nota: socio.nota || '',
+    };
+    worksheet.addRow(fila);
+  });
+
+  const headerRow = worksheet.getRow(1);
+  headerRow.eachCell(cell => {
+    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+    cell.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FF2F75B5' },
+    };
+    cell.alignment = { vertical: 'middle', horizontal: 'center' };
+    cell.border = {
+      top: { style: 'thin' },
+      bottom: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+    };
+  });
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+  saveAs(blob, 'sociosAceptados.xlsx');
+};
+
+
 
   const sociosFiltrados = socios.filter(socio =>
     Object.values(socio).some(valor =>
@@ -57,7 +147,8 @@ function SociosAprobados() {
             <tbody>
               {sociosFiltrados.map((socio) => (
                 <tr key={socio.id_socio}>
-                  <td>{socio.nombre_osf}</td>
+                  <td>{socio.nombre_osf || socio.detalles?.nombre_socio}</td>
+
                   <td>{socio.correo}</td>
                   <td><span className="badge aprobado">{socio.tipo_socio}</span></td>
                   <td>
@@ -69,6 +160,9 @@ function SociosAprobados() {
               ))}
             </tbody>
           </table>
+          <button onClick={exportarAExcel} style={{ marginBottom: '20px', marginLeft: '10px' }}>
+    Descargar Excel
+</button>
         </div>
       )}
 
