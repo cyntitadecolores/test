@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './navegacion.css';
 
@@ -41,18 +41,34 @@ function NavCub() {
   return (
     <div className="layout">
       <nav className="nav-bar">
+        <img src="./src/assets/logo_servicio.png" alt="Logo" className="logo servicio social" />
+        <div className="nav-items">
         <ul>
-          <img src="./src/assets/logo_servicio.png" alt="Logo" className="logo servicio social" />
-          <li><Link to="/inicioE">Inicio Estudiante</Link></li>
-          <li><Link to="/visualizarProyectos">Visualizar Proyectos</Link></li>
-          <li><Link to="/misPostulaciones">Mis Postulaciones</Link></li>
-          <button onClick={handleLogout} className="logout-btn">Cerrar sesión</button>
+          <li className="nav-inicio-e">
+            <NavLink to="/inicioE" className={({ isActive }) => isActive ? 'active-link' : ''}>
+              Inicio
+            </NavLink>
+          </li>
+          
+          <li className="nav-visualizar-e">
+            <NavLink to="/visualizarProyectos" className={({ isActive }) => isActive ? 'active-link' : ''}>
+              Proyectos Disponibles
+            </NavLink>
+          </li>
+          
+          <li className="nav-postulaciones-e">
+            <NavLink to="/misPostulaciones" className={({ isActive }) => isActive ? 'active-link' : ''}>
+              Mis Postulaciones
+            </NavLink>
+          </li>
         </ul>
+        </div>
+        <button onClick={handleLogout} className="logout-btn">Cerrar sesión</button>
       </nav>
 
       <header className="top-bar">
         <div className="user-info">
-          <span className="notifications">🔔</span>
+          <img src="src/assets/iconoperfil.png" alt="Usuario" className="user-avatar" />
           <span className="username">{estudianteNombre || 'Cargando...'}</span>
         </div>
       </header>

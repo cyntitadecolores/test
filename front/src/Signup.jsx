@@ -14,7 +14,7 @@ const formDataInicial = {
   // Estudiante
   id_carrera: '', 
   id_campus: '', 
-  matricula: '', 
+  matricula: '',
   semestre: '1',
   telefono: '',
   doble_titulacion: false, 

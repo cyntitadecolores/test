@@ -1,115 +1,225 @@
 .nav-bar {
-    width: 200px; /* Asegúrate de que este ancho es el correcto */
-    background-color: #fbf6f6;
-    padding: 20px;
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 100vh;
-    border-right: 1px solid #dcdcdc;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  height: 100vh;
+  padding: 20px;
+  width: 200px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  border-right: 2px solid rgb(34, 84, 173);
+  font-family: 'Segoe UI', sans-serif;
+  
 }
+
+.nav-items {
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+}
+
 
 .nav-bar ul {
     list-style: none;
     padding: 0;
+    flex-direction: column;
+    align-items: center;
 }
 
 .nav-bar li {
-    margin-bottom: 40px;
+    margin-bottom: 20px;
     margin-top: 20px; 
+    width: 100%;
+}
+
+.nav-bar li a {
+  display: block;
+  background-color: rgb(34, 84, 173);
+  color: white;
+  text-align: center;
+  padding: 15px;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 15px;
+  transition: background-color 0.3s ease;
 }
 
 .nav-bar img {
     height: auto;
-    width: 110px;
-}
-
-.nav-bar a {
-    display: block;
-    padding: 10px 20px;
-    background-color: #0033A0;
-    border: 2px solid #0033A0; 
-    border-radius: 12px; 
-    text-decoration: none;
-    color: #fbf6f6; 
-    transition: background-color 0.3s ease;
+    width: 120px;
+    margin-left: 15px;
+    margin-top: 20px;
 }
 
 
 .top-bar {
-    background-color: #fbf6f6;
+    background-color: white;
     padding: 10px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
     position: fixed;
-    width: calc(100% - 220px);
+    width: calc(100% - 280px);
     top: 0;
     left: 240px;
-    height: 60px;
+    height: 80px;
     color: black;
-    border-bottom: 1px solid #dcdcdc;
+    border-bottom: 2px solid rgb(34, 84, 173);
+    font-family: 'Segoe UI', sans-serif;
 }
 
 .user-info {
     display: flex;
     align-items: center;
+    gap: 10px; 
+    margin-left: auto;
 }
 
 .notifications {
     font-size: 1.5em;
-    margin-right: 10px;
-    cursor: pointer;
-    margin-left: 990px;
 }
 
 .username {
     margin-left: 10px;
 }
 
-/* navegacion.css */
-.nav-bar-socio {
-    width: 200px;
-    background-color: #fbf6f6;
-    padding: 20px;
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 100vh;
-    border-right: 1px solid #dcdcdc;
-  }
+.user-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%; 
+  object-fit: cover;  
+}
+
+.logout-btn {
+  margin-top: auto; 
+  margin-left: 20px;
+  background-color: #7f0000;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80%;
+  margin-bottom: 100px;
+}
   
-  /* Uso de un nombre específico */
-  .top-bar-socio {
-    background-color: #fbf6f6;
-    padding: 10px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
-    position: fixed;
-    width: calc(100% - 220px);
-    top: 0;
-    left: 240px;
-    height: 60px;
-    color: black;
-    border-bottom: 1px solid #dcdcdc;
+  .logout-btn:hover {
+    background-color: #f12e2e;
+    transition: background-color 0.3s ease;
   }
   
 
-  .logout-button {
-    background-color: #f44336;  /* Rojo */
-    color: white;
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-left: 20px;
-  }
-  
-  .logout-button:hover {
-    background-color: #d32f2f;  /* Rojo oscuro */
-  }
-  
+  /* CAMBIOS HOVER DE BOTONES */
+
+  /* admin */
+  .nav-inicio a:hover {
+  background-color: #00ad8c; /* Verde */
+}
+
+.nav-dashboard a:hover {
+  background-color: #fc712c; /* Naranja */
+}
+
+.nav-proyectos a:hover {
+  background-color: #951ead; /* Morado */
+}
+
+.nav-alumnos a:hover {
+  background-color: #e9604b; /* Rojo */
+}
+
+.nav-socios a:hover {
+  background-color: #56b3e4; /* Azul claro */
+}
+
+.nav-aprobados a:hover {
+  background-color: black; /* Negro */
+}
+
+/* socio */
+.nav-inicio-s a:hover {
+  background-color: #00ad8c;
+}
+
+.nav-postular-s a:hover {
+  background-color: #fc712c;
+}
+
+.nav-proyectos-s a:hover {
+  background-color: #951ead;
+}
+
+/* estudiante */
+.nav-inicio-e a:hover {
+  background-color: #00ad8c; /* Verde */
+}
+
+.nav-visualizar-e a:hover {
+  background-color: #951ead; /* Azul */
+}
+
+.nav-postulaciones-e a:hover {
+  background-color: #e9604b; /* Naranja */
+}
+
+
+
+
+/* SE QUEDEN EN COLOR */
+
+/* admin */
+.nav-inicio .active-link {
+  background-color: #00ad8c;
+}
+
+.nav-dashboard .active-link {
+  background-color: #fc712c;
+}
+
+.nav-proyectos .active-link {
+  background-color: #951ead;
+}
+
+.nav-alumnos .active-link {
+  background-color: #e9604b;
+}
+
+.nav-socios .active-link {
+  background-color: #56b3e4;
+}
+
+.nav-aprobados .active-link {
+  background-color: black;
+}
+
+/* socio */
+.nav-inicio-s .active-link {
+  background-color: #00ad8c;
+}
+
+.nav-postular-s .active-link {
+  background-color: #fc712c;
+}
+
+.nav-proyectos-s .active-link {
+  background-color: #951ead;
+}
+
+/* estudiante */
+.nav-inicio-e .active-link {
+  background-color: #00ad8c;
+}
+
+.nav-visualizar-e .active-link {
+  background-color: #951ead;
+}
+
+.nav-postulaciones-e .active-link {
+  background-color: #e9604b;
+}
