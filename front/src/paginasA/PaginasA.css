@@ -14,6 +14,7 @@
   font-weight: bold;
   color: black;
   margin-bottom: 4rem;
+  border-bottom: none;
 }
 
 .nontitle {
@@ -301,7 +302,4 @@ select {
 .cerrar-btn:hover {
   background-color: #4d9fcb;
 }
-
-
-/* PROYECTOS POSTULADOS */
 

@@ -2,6 +2,7 @@ import NavCub from '../componentes/navegacion';
 import React, { useEffect, useState } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import axios from 'axios';
+import "./PaginasA.css";
 
 export default function DashBoardA() {
   const [rows, setRows] = useState([]);
@@ -72,15 +73,15 @@ export default function DashBoardA() {
   return (
     
     
-    <div style={{ height: 600, width: '100%', padding: '20px' }}>
+    <div className="main">
       <NavCub />
       
-      <h2>Panel de Proyectos</h2>
+      <h2 className="titulo">Panel de Proyectos</h2>
 
 
 
       {/* Filtros */}
-      <div style={{ marginBottom: '10px' }}>
+      <div>
         <input
           type="text"
           placeholder="Buscar..."

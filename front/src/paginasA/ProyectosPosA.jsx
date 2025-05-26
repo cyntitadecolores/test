@@ -216,7 +216,7 @@ const exportarAExcel = async () => {
 
         <button
             onClick={() => setMostrarFiltros(prev => !prev)}
-            style={{ marginBottom: '20px' }}
+            className="bttn-filtro"
         >
             {mostrarFiltros ? 'Ver Tabla' : 'Aplicar Filtros'}
         </button>
