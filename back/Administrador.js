@@ -383,3 +383,69 @@ const PORT = 5003;
 app.listen(PORT, () => {
     console.log(`✅ Server running on port ${PORT}`);
 });
+
+
+// Obtener todos los proyectos con búsqueda y filtros
+app.get('/proyectos_admin', (req, res) => {
+  const { search = '', periodo, status_proyecto, status_actividad } = req.query;
+
+  let sql = `
+    SELECT * FROM Proyecto
+    WHERE (
+      nombre_proyecto LIKE ? OR
+      razon_osf LIKE ? OR
+      problema_social LIKE ? OR
+      acciones_estudiantado LIKE ? OR
+      contacto_coordinador LIKE ?
+    )
+  `;
+  const params = Array(5).fill(`%${search}%`);
+
+  if (periodo) {
+    sql += ' AND id_periodo = ?';
+    params.push(periodo);
+  }
+
+  if (status_proyecto) {
+    sql += ' AND status_proyecto = ?';
+    params.push(status_proyecto);
+  }
+
+  if (status_actividad !== undefined) {
+    sql += ' AND status_actividad = ?';
+    params.push(status_actividad);
+  }
+
+  db.query(sql, params, (err, results) => {
+    if (err) {
+      console.error('❌ Error al obtener proyectos:', err);
+      return res.status(500).json({ message: 'Error al obtener proyectos' });
+    }
+    res.json(results);
+  });
+});
+
+
+// Actualizar varios campos del proyecto desde una tabla editable
+app.put('/proyectos_admin/:id', (req, res) => {
+  const { id } = req.params;
+  const campos = req.body;
+
+  const keys = Object.keys(campos);
+  const values = Object.values(campos);
+
+  if (keys.length === 0) {
+    return res.status(400).json({ message: 'No se enviaron datos para actualizar' });
+  }
+
+  const setString = keys.map(key => `\`${key}\` = ?`).join(', ');
+  const sql = `UPDATE Proyecto SET ${setString} WHERE id_proyecto = ?`;
+
+  db.query(sql, [...values, id], (err, result) => {
+    if (err) {
+      console.error('❌ Error al actualizar el proyecto:', err);
+      return res.status(500).json({ message: 'Error al actualizar el proyecto' });
+    }
+    res.json({ message: 'Proyecto actualizado exitosamente' });
+  });
+});
