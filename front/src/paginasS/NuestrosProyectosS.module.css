@@ -24,9 +24,6 @@ button {
   margin: 20px 0;
 }
 
-button:hover {
-  background-color: #005bb5; /* Cambio de color en hover */
-}
 
 .errorMsg {
   color: red;

@@ -3,9 +3,9 @@ import NavCub from '../componentes/navegacion';
 
 function Dashboard() {
     return (
-        <div className="cube">
+        <div className="main">
           <NavCub />
-          <h1>Dashboar</h1>
+          <h1 className="titulo">Dashboard</h1>
         </div>
       );
     }

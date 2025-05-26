@@ -122,7 +122,7 @@ function SociosAprobados() {
   const cerrarInfo = () => setSocioSeleccionado(null);
 
   return (
-    <div className="cube">
+    <div className="main">
       <NavCub />
       <h1 className="titulo">Socios que han sido aprobados</h1>
 

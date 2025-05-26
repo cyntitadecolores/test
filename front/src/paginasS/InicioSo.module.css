@@ -27,9 +27,6 @@
     margin: 20px 0;
   }
   
-  button:hover {
-    background-color: #005bb5;
-  }
   
   .errorMsg {
     color: red;
@@ -60,7 +57,7 @@
 
 
   .respuestaButton {
-    background-color: #4caf50;
+    
     color: white;
     padding: 5px 15px;
     font-size: 14px;
@@ -68,7 +65,5 @@
     cursor: pointer;
   }
   
-  .respuestaButton:hover {
-    background-color: #45a049;
-  }
+
   
