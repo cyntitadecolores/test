@@ -1,80 +1,115 @@
-import React, { useState, useEffect } from 'react';
-import NavCub from '../componentes/navegacionS';
-import styles from './NuestrosProyectosS.module.css';
-import { jwtDecode } from 'jwt-decode';
-import ModalProyecto from './ModalProyecto';
+import React, { useState, useCallback } from "react";
+import NavCub from "../componentes/navegacionS";
+import styles from "./NuestrosProyectosS.module.css";
+import ModalProyecto from "./ModalProyecto";
+import { jwtDecode } from "jwt-decode";
 
+/******************************
+ * Helpers y hooks reutilizables
+ ******************************/
 
-function NuestrosProyectosS() {
+// 1) Extraer id_socio desde el JWT almacenado
+function useSocioId() {
+  const token = localStorage.getItem("jwt") || localStorage.getItem("token");
+  if (!token) return null;
+  try {
+    const d = jwtDecode(token);
+    return d.id || d.id_socio || d.userId || null;
+  } catch (e) {
+    console.error("Error al decodificar JWT", e);
+    return null;
+  }
+}
+
+// 2) Hook para cargar proyectos filtrados
+function useProjects(initialFilter = "todos") {
+  const id_socio = useSocioId();
+  const [statusFilter, setStatusFilter] = useState(initialFilter);
   const [proyectos, setProyectos] = useState([]);
   const [error, setError] = useState(null);
-  const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null); // Para almacenar el proyecto seleccionado
-  const [statusFilter, setStatusFilter] = useState('todos'); // Para almacenar el filtro de status
+  const token = localStorage.getItem("token");
 
-  // Obtener el ID del socio del localStorage
-  const getIdSocio = () => {
-    const token = localStorage.getItem("jwt") || localStorage.getItem("token");
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        console.log("ID socio extraído del token:", decoded.id || decoded.id_socio || decoded.userId);
-        return decoded.id || decoded.id_socio || decoded.userId;
-      } catch (error) {
-        console.error("Error al decodificar el token:", error);
-        return null;
-      }
+  const fetchProjects = useCallback(async (filter) => {
+    if (!id_socio) {
+      setError("No se pudo obtener el ID del socio.");
+      return;
     }
-    return null;
-  };
-  
-
-  // Cargar los proyectos cuando el componente se monta
-  useEffect(() => {
-    const fetchProyectos = async () => {
-      const id_socio = getIdSocio();  // Obtén el id del socio
-
-      if (!id_socio) {
-        setError("No se pudo obtener el ID del socio.");
-        return;
-      }
-
-      try {
-        const token = localStorage.getItem('token');
-
-        const response = await fetch(`http://localhost:5001/proyectos/${id_socio}?status=${statusFilter}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`, // <-- Aquí se envía correctamente
-          },
-        });
-        
-        const data = await response.json();
-
-        if (response.ok) {
-          setProyectos(data); // Establece los proyectos en el estado
-        } else {
-          setError(data.message || "Error al cargar los proyectos");
+    try {
+      const resp = await fetch(
+        `http://localhost:5001/proyectos/${id_socio}?status=${filter}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
         }
-      } catch (error) {
-        console.error("Error al obtener los proyectos:", error);
-        setError("Error de red");
-      }
-    };
+      );
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.message || "Error al cargar proyectos");
+      setProyectos(data);
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Error de red");
+    }
+  }, [id_socio, token]);
 
-    fetchProyectos();
-  }, [statusFilter]);  // Ejecutar cada vez que cambie el filtro
+  // Primera carga + cada vez que statusFilter cambie
+  React.useEffect(() => {
+    fetchProjects(statusFilter);
+  }, [statusFilter, fetchProjects]);
 
-  const handleCardClick = (proyecto) => {
-    setProyectoSeleccionado(proyecto); // Establece el proyecto seleccionado
+  return {
+    proyectos,
+    error,
+    statusFilter,
+    setStatusFilter,
   };
+}
 
-  const handleCloseModal = () => {
-    setProyectoSeleccionado(null); // Cierra el modal
-  };
+/******************************
+ * Componentes presentacionales
+ ******************************/
 
-  // Cambiar el filtro de status
-  const handleFilterChange = (e) => {
-    setStatusFilter(e.target.value);
-  };
+const FilterSelect = ({ value, onChange }) => (
+  <select value={value} onChange={(e) => onChange(e.target.value)}>
+    <option value="todos">Todos</option>
+    <option value="Aprobado">Aprobados</option>
+    <option value="No aprobado">No aprobados</option>
+    <option value="En revisión">En revisión</option>
+  </select>
+);
+
+const ProyectoCard = React.memo(({ proyecto, onClick }) => (
+  <div className={styles.proyectoCard} onClick={onClick}>
+    {proyecto.img_proyecto && (
+      <img
+        src={`http://localhost:5001${proyecto.img_proyecto}`}
+        alt={proyecto.nombre_proyecto}
+        className={styles.proyectoImage}
+      />
+    )}
+    <h2>{proyecto.nombre_proyecto}</h2>
+    <p>{proyecto.descripcion}</p>
+    <p>Modalidad: {proyecto.modalidad}</p>
+    <p>Status: {proyecto.status_proyecto}</p>
+  </div>
+));
+
+/******************************
+ * Componente principal         
+ ******************************/
+
+export default function NuestrosProyectosS() {
+  const {
+    proyectos,
+    error,
+    statusFilter,
+    setStatusFilter,
+  } = useProjects();
+
+  const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
+
+  // Handlers (nombres originales)
+  const handleFilterChange = useCallback((f) => setStatusFilter(f), []);
+  const handleCardClick = useCallback((p) => setProyectoSeleccionado(p), []);
+  const handleCloseModal = useCallback(() => setProyectoSeleccionado(null), []);
 
   return (
     <div className="cube">
@@ -83,34 +118,16 @@ function NuestrosProyectosS() {
 
       {error && <p>{error}</p>}
 
-      {/* Filtro por status */}
-      <select value={statusFilter} onChange={handleFilterChange}>
-        <option value="todos">Todos</option>
-        <option value="Aprobado">Aprobados</option>
-        <option value="No aprobado">No aprobados</option>
-        <option value="En revisión">En revisión</option>
-      </select>
+      <FilterSelect value={statusFilter} onChange={handleFilterChange} />
 
       <div className={styles.proyectosContainer}>
-        {proyectos.length > 0 ? (
-          proyectos.map((proyecto) => (
-            <div
-              key={proyecto.id_proyecto}
-              className={styles.proyectoCard}
-              onClick={() => handleCardClick(proyecto)}  // Abre el modal al hacer clic en la card
-            >
-              {proyecto.img_proyecto && (
-                <img
-                  src={`http://localhost:5001${proyecto.img_proyecto}`}
-                  alt={proyecto.nombre_proyecto}
-                  className={styles.proyectoImage}
-                />
-              )}
-              <h2>{proyecto.nombre_proyecto}</h2>
-              <p>{proyecto.descripcion}</p>
-              <p>Modalidad: {proyecto.modalidad}</p>
-              <p>Status: {proyecto.status_proyecto}</p>
-            </div>
+        {proyectos.length ? (
+          proyectos.map((p) => (
+            <ProyectoCard
+              key={p.id_proyecto}
+              proyecto={p}
+              onClick={() => handleCardClick(p)}
+            />
           ))
         ) : (
           <p>No tienes proyectos registrados.</p>
@@ -118,13 +135,8 @@ function NuestrosProyectosS() {
       </div>
 
       {proyectoSeleccionado && (
-        <ModalProyecto
-          proyecto={proyectoSeleccionado}
-          onClose={handleCloseModal}  // Cierra el modal
-        />
+        <ModalProyecto proyecto={proyectoSeleccionado} onClose={handleCloseModal} />
       )}
     </div>
   );
 }
-
-export default NuestrosProyectosS;

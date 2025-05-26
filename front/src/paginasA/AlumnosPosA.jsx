@@ -12,18 +12,33 @@ function AlumnosPos() {
     const [valorEditado, setValorEditado] = useState('');
     const [valorOriginal, setValorOriginal] = useState('');
     const [filteredText, setFilteredText] = useState('');
-    const columnasFijas = ['nombre_proyecto', 'nombre'];
+    const columnasFijas = ['nombre_proyecto', 'nombre', 'status'];
+    const [proyectos, setProyectos] = useState([]);
+
     const [mostrarFiltros, setMostrarFiltros] = useState(false);
+    const [socios, setSocios] = useState([]);
+
+const totalCupos = proyectos.reduce((total, proyecto) => total + proyecto.cupos_proyecto, 0);
+const totalInscritos = postulaciones.filter(p => p.status === 'Inscrito').length;
+const cuposDisponibles = totalCupos - totalInscritos;
+
 
     const columnasDisponibles = {
-        nombre_proyecto: 'nombre_proyecto',
+        nombre_proyecto: 'nombre del proyecto',
         nombre: 'Nombre Estudiante',
         fecha_postulacion: 'Fecha Postulación',
         expectativa: 'Expectativa',
         razon: 'Razón',
         motivo: 'Motivo',
         pregunta_descarte: 'descarte',
+        status: 'Status',
     };
+
+    useEffect(() => {
+    axios.get('http://localhost:5003/proyectos/aprobados')
+      .then(response => setProyectos(response.data))
+      .catch(error => console.error('Error al obtener proyectos:', error));
+  }, []);
 
     const exportarAExcel = async () => {
         const workbook = new ExcelJS.Workbook();
@@ -155,9 +170,9 @@ function AlumnosPos() {
     );
 
     return (
-        <div className="main">
+        <div className="cube" style={{ marginLeft: '260px', padding: '20px' }}>
             <NavCub />
-            <h1 className="titulo">Postulaciones de Alumnos</h1>
+            <h1>Postulaciones de Alumnos</h1>
 
             <button
                 onClick={() => setMostrarFiltros(prev => !prev)}
@@ -258,6 +273,54 @@ function AlumnosPos() {
                     <button onClick={cancelarEdicion} style={{ marginLeft: '8px' }}>Cancelar</button>
                 </div>
             )}
+            <div className="resumen-container">
+  <div className="resumen-card purple">
+    <div className="resumen-header">
+      <span>Estudiantes postulados</span>
+      <img src="src/assets/icon_users.png" alt="Icono" />
+    </div>
+    <div className="resumen-value">{postulaciones.length}</div>
+  </div>
+
+  <div className="resumen-card yellow">
+    <div className="resumen-header">
+      <span>Estudiantes aceptados</span>
+      <img src="src/assets/icon_accept.png" alt="Icono" />
+    </div>
+    <div className="resumen-value">
+      {postulaciones.filter(p => p.status === 'Aceptadx').length}
+    </div>
+  </div>
+
+  <div className="resumen-card red">
+    <div className="resumen-header">
+      <span>Estudiantes no aceptados</span>
+      <img src="src/assets/icon_reject.png" alt="Icono" />
+    </div>
+    <div className="resumen-value">
+      {postulaciones.filter(p => p.status === 'No aceptadx').length}
+    </div>
+  </div>
+
+  <div className="resumen-card red">
+    <div className="resumen-header">
+      <span>Estudiantes inscritos</span>
+      <img src="src/assets/icon_reject.png" alt="Icono" />
+    </div>
+    <div className="resumen-value">
+      {postulaciones.filter(p => p.status === 'Inscrito').length}
+    </div>
+  </div>
+
+  <div className="resumen-card green">
+    <div className="resumen-header">
+      <span>Cupos disponibles</span>
+      <img src="src/assets/icon_chart.png" alt="Icono" />
+    </div>
+    <div className="resumen-value">{cuposDisponibles}</div> 
+  </div>
+</div>
+
         </div>
     );
 }
