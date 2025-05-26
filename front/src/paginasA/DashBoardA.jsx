@@ -1,11 +1,10 @@
-import React from 'react';
 import NavCub from '../componentes/navegacion';
 
 function Dashboard() {
     return (
-        <div className="main">
+        <div className="cube">
           <NavCub />
-          <h1 className="titulo">Dashboard</h1>
+          <h1>Dashboar</h1>
         </div>
       );
     }
