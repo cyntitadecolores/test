@@ -1,8 +1,17 @@
-import React, { useEffect, useState } from "react";
+// PostularProyectoS.jsx — Versión refactorizada (Clean Code)
+// ▸ Mantiene los mismos nombres de constantes, campos y handlers externos.
+// ▸ Extrae lógica a hooks y helpers.
+// ▸ Reduce tamaño del JSX principal.
+// ▸ Sin cambiar API: los objetos enviados al backend conservan las mismas claves.
+
+import React, { useState, useEffect, useCallback } from "react";
 import { jwtDecode } from "jwt-decode";
 import NavCub from "../componentes/navegacionS";
 import styles from "./PostularProyectoS.module.css";
 
+/* ----------------------------------------------------------------------
+   Constantes de catálogo (se mantienen nombres originales)
+------------------------------------------------------------------------*/
 const VULNERABILIDADES = [
   "Mujeres",
   "Migrantes",
@@ -31,17 +40,13 @@ const EDADES_POBLACION = [
 ];
 
 const ZONAS = ["Rural", "Urbana"];
-
 const DIAS_ACTIVIDADES = ["Por acordar con OSF", "Específico"];
-
 const MODALIDADES = [
   "CLIN Proyecto Solidario Línea",
   "CLIP | Proyecto Solidario Mixto",
   "PSP | Proyecto Solidario Presencial",
 ];
-
 const DURACIONES = ["5 semanas", "10 semanas", "15 semanas"];
-
 const VALORES_PROYECTO = [
   "Compasión",
   "Compromiso",
@@ -49,16 +54,15 @@ const VALORES_PROYECTO = [
   "Participación ciudadana",
 ];
 
-/* ----------------------------------------------------------
-   Helpers reutilizables
-----------------------------------------------------------*/
-// Normaliza strings u objetos a { value, label }
-const normalizeOption = (o) =>
-  typeof o === "object" ? o : { value: o, label: o };
-
-// Convierte rápidamente un arreglo de strings a objetos
+/* ----------------------------------------------------------------------
+   Helpers genéricos
+------------------------------------------------------------------------*/
+const normalizeOption = (o) => (typeof o === "object" ? o : { value: o, label: o });
 const asOptions = (arr) => arr.map((v) => ({ value: v, label: v }));
 
+/* ----------------------------------------------------------------------
+   Controles presentacionales reutilizables
+------------------------------------------------------------------------*/
 const TextInput = ({ label, name, value, onChange, ...props }) => (
   <div className={styles.field}>
     <label htmlFor={name}>{label}</label>
@@ -74,7 +78,6 @@ const TextInput = ({ label, name, value, onChange, ...props }) => (
   </div>
 );
 
-// Nuevo componente para textareas (textos largos)
 const TextAreaInput = ({ label, name, value, onChange, ...props }) => (
   <div className={styles.field}>
     <label htmlFor={name}>{label}</label>
@@ -130,25 +133,98 @@ const CheckboxInput = ({ label, name, checked, onChange }) => (
   </div>
 );
 
-/* ----------------------------------------------------------
-   Componente principal
-----------------------------------------------------------*/
-export default function PostularProyectoS() {
-  // Catálogos desde el backend
-  const [imagen, setImagen] = useState(null); // archivo seleccionado
+/* ----------------------------------------------------------------------
+   Hooks reutilizables
+------------------------------------------------------------------------*/
+// 1) Cargar catálogos backend
+function useCatalogs() {
   const [ods, setOds] = useState([]);
   const [carreras, setCarreras] = useState([]);
+  const [error, setError] = useState(null);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const base = import.meta.env.VITE_API_URL || "http://localhost:5001";
+        const [oRes, caRes] = await Promise.all([
+          fetch(`${base}/ods`),
+          fetch(`${base}/carreras`),
+        ]);
+        if (!oRes.ok || !caRes.ok) throw new Error();
+        setOds(await oRes.json());
+        setCarreras(await caRes.json());
+      } catch {
+        setError("No se pudieron cargar los catálogos");
+      }
+    })();
+  }, []);
+
+  return { ods, carreras, catError: error };
+}
+
+// 2) Obtener id_socio desde JWT (sin cambiar nombres)
+function getIdSocio() {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+  try {
+    const d = jwtDecode(token);
+    return d.id || d.id_socio || d.userId || null;
+  } catch {
+    return null;
+  }
+}
+
+/* ----------------------------------------------------------------------
+   Validaciones — extraídas para limpieza del submit
+------------------------------------------------------------------------*/
+function validateForm(form) {
+  // Helpers
+  const err = (msg) => ({ ok: false, msg });
+
+  // Fecha implementación
+  if (!form.fecha_implementacion) return window.alert("La fecha de implementación es obligatoria");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(form.fecha_implementacion))
+    return window.alert("Formato de fecha inválido (YYYY-MM-DD)");
+  if (isNaN(new Date(form.fecha_implementacion).getTime()))
+    return window.alert("La fecha de implementación no es válida");
+
+  // Producto / servicio a entregar
+  if (!form.producto_servicio_entregar)
+    return window.alert("'Producto o servicio a entregar' es obligatorio");
+  if (form.producto_servicio_entregar.length > 30)
+    return window.alert("'Producto o servicio' máx. 30 caracteres");
+
+  // Entregable esperado
+  if (!form.entregable_esperado)
+    return window.alert("'Entregable esperado' es obligatorio");
+  if (form.entregable_esperado.length > 200)
+    return window.alert("'Entregable esperado' máx. 200 caracteres");
+
+  // Dirección si modalidad presencial/mixta
+  if (
+    form.modalidad?.toLowerCase().includes("presencial") ||
+    form.modalidad?.toLowerCase().includes("mixto")
+  ) {
+    if (!form.direccion_escrita?.trim())
+      return window.alert("Dirección escrita obligatoria en modalidad presencial/mixta");
+  }
+
+  return { ok: true };
+}
+
+/* ----------------------------------------------------------------------
+   Componente principal
+------------------------------------------------------------------------*/
+export default function PostularProyectoS() {
+  const { ods, carreras, catError } = useCatalogs();
+  const [imagen, setImagen] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [okMsg, setOkMsg] = useState(null);
 
-  // Todos los campos del formulario
+  // --- state del formulario (se conservan los mismos campos) -----
   const [form, setForm] = useState({
-    // encabezado
     fecha_implementacion: "",
-
-    // proyecto
     nombre_proyecto: "",
     problema_social: "",
     vulnerabilidad_atendida_1: "",
@@ -174,175 +250,72 @@ export default function PostularProyectoS() {
     direccion_escrita: "",
     duracion_experiencia: "",
     valor_proyecto: "",
-
     // flags
     periodo_repetido: false,
     induccion_ss: false,
     propuesta_semana_tec: false,
     propuesta_inmersion_social: false,
     propuesta_bloque: false,
-
     entrevista: false,
     pregunta_descarte: "",
     enlace_maps: "",
   });
 
-  /* ------------------------------------------------------
-     Cargar catálogos al montar
-  ------------------------------------------------------*/
-  useEffect(() => {
-    (async () => {
-      try {
-        const base = import.meta.env.VITE_API_URL || "http://localhost:5001";
-        const [oRes, caRes] = await Promise.all([
-          fetch(`${base}/ods`),
-          fetch(`${base}/carreras`),
-        ]);
-
-        if (!oRes.ok || !caRes.ok) {
-          throw new Error("Error al cargar los catálogos");
-        }
-
-        setOds(await oRes.json());
-        setCarreras(await caRes.json());
-      } catch (e) {
-        console.error(e);
-        setError("No se pudieron cargar los catálogos");
-      }
-    })();
-  }, []);
-
-  /* ------------------------------------------------------
-     Manejadores
-  ------------------------------------------------------*/
-  const handleChange = (e) => {
+  // --- Handlers universales ------------------------------------
+  const handleChange = useCallback((e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
-  };
+  }, []);
 
-  /* --------------------------------------------------------
-   ENVÍO DEL FORMULARIO
-  ---------------------------------------------------------*/
+  /* --------------------------------------------------
+     Submit
+  --------------------------------------------------*/
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     setOkMsg(null);
 
-    // Obtener el ID del socio del localStorage
-    const getIdSocio = () => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        try {
-          const decoded = jwtDecode(token);
-          console.log("ID socio extraído del token:", decoded.id || decoded.id_socio || decoded.userId);
-          return decoded.id || decoded.id_socio || decoded.userId;
-        } catch (error) {
-          console.error("Error al decodificar el token:", error);
-          return null;
-        }
-      }
-      return null;
-    };
+    // 1) Validaciones
+    const val = validateForm(form);
+    if (!val.ok) {
+      setError(val.msg);
+      setLoading(false);
+      return;
+    }
 
+    // 2) id_socio
+    const id_socio = getIdSocio();
+    if (!id_socio) {
+      setError("No se pudo obtener el ID del socio");
+      setLoading(false);
+      return;
+    }
+
+    // 3) FormData → API
     try {
-      /* 1 ── token e id_socio */
-      const id_socio = getIdSocio();
-
-      if (!id_socio) {
-        setError("No se pudo obtener el ID del socio.");
-        return;
-      }
-
-      /* 2 ── prepara datos (multipart) */
-      const formData = new FormData();
-      if (imagen) formData.append("imagen", imagen);
+      const fd = new FormData();
+      if (imagen) fd.append("imagen", imagen);
       Object.entries({ ...form, id_socio, status_proyecto: "En revisión" }).forEach(
         ([k, v]) => {
-          // booleanos como 0/1; no envíes strings vacíos
-          if (typeof v === "boolean") formData.append(k, v ? 1 : 0);
-          else if (v !== "") formData.append(k, v);
+          if (typeof v === "boolean") fd.append(k, v ? 1 : 0);
+          else if (v !== "") fd.append(k, v);
         }
       );
 
-      // --- Validar Fecha Implementación ---
-      if (!form.fecha_implementacion) {
-        window.alert("La Fecha de implementación es obligatoria.");
-        setLoading(false);
-        return;
-      }
-      // Validar formato YYYY-MM-DD con regex simple
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(form.fecha_implementacion)) {
-        window.alert("La Fecha de implementación debe tener el formato YYYY-MM-DD.");
-        setLoading(false);
-        return;
-      }
-      // Validar que sea una fecha válida
-      const fecha = new Date(form.fecha_implementacion);
-      if (isNaN(fecha.getTime())) {
-        window.alert("La Fecha de implementación no es una fecha válida.");
-        setLoading(false);
-        return;
-      }
-
-      // --- Validar Producto o Servicio a entregar ---
-      if (!form.producto_servicio_entregar) {
-        window.alert("El campo 'Producto o Servicio a entregar' es obligatorio.");
-        setLoading(false);
-        return;
-      }
-      if (form.producto_servicio_entregar.length > 30) {
-        window.alert("El campo 'Producto o Servicio a entregar' debe tener máximo 30 caracteres.");
-        setLoading(false);
-        return;
-      }
-
-      // --- Validar Entregable esperado ---
-      if (!form.entregable_esperado) {
-        window.alert("El campo 'Entregable esperado' es obligatorio.");
-        setLoading(false);
-        return;
-      }
-      if (form.entregable_esperado.length > 200) {
-        window.alert("El campo 'Entregable esperado' debe tener máximo 200 caracteres.");
-        setLoading(false);
-        return;
-      }
-
-      // --- Validar Dirección Escrita si modalidad es PRESENCIAL o MIXTA ---
-      if (
-        form.modalidad &&
-        (form.modalidad.toLowerCase().includes("presencial") ||
-        form.modalidad.toLowerCase().includes("mixto"))
-      ) {
-        if (!form.direccion_escrita || form.direccion_escrita.trim() === "") {
-          setError("La Dirección escrita es obligatoria para modalidades PRESENCIALES o MIXTAS.");
-          setLoading(false);
-          return;
-        }
-      }
-
-      /* 3 ── ENVÍA al endpoint correcto */
       const res = await fetch("http://localhost:5001/proyecto", {
         method: "POST",
-        body: formData,
+        body: fd,
       });
 
       if (!res.ok) {
-        // intenta leer JSON; si falla, usa texto plano
-        const errMsg =
-          (await res.json().catch(() => ({}))).message ||
-          (await res.text());
-        throw new Error(errMsg || "Error al crear el proyecto");
+        const msg = (await res.json().catch(() => ({}))).message || (await res.text());
+        throw new Error(msg || "Error al crear el proyecto");
       }
 
-      /* 4 ── éxito */
-      window.alert("¡Proyecto postulado correctamente!");
-      setForm((f) => ({
-        ...f,
-        nombre_proyecto: "",
-        objetivo_proyecto: "",
-      }));
+      setOkMsg("¡Proyecto postulado correctamente!");
+      // limpia algunos campos
+      setForm((f) => ({ ...f, nombre_proyecto: "", objetivo_proyecto: "" }));
     } catch (err) {
       console.error(err);
       setError(err.message);
@@ -351,9 +324,9 @@ export default function PostularProyectoS() {
     }
   };
 
-  /* ------------------------------------------------------
+  /* --------------------------------------------------
      Render
-  ------------------------------------------------------*/
+  --------------------------------------------------*/
   return (
     <>
       <NavCub />
@@ -362,12 +335,12 @@ export default function PostularProyectoS() {
 
         {error && <div className={styles.err}>{error}</div>}
         {okMsg && <div className={styles.ok}>{okMsg}</div>}
+        {catError && <div className={styles.err}>{catError}</div>}
 
         <form onSubmit={handleSubmit} className={styles.form}>
-          {/* Información general */}
+          {/* Fieldsets reutilizando controles — se recortó por brevedad */}
           <fieldset className={styles.fieldset}>
             <legend>Información general</legend>
-
             <div className={styles.field}>
               <label htmlFor="imagen">Imagen del proyecto</label>
               <input
@@ -375,10 +348,9 @@ export default function PostularProyectoS() {
                 type="file"
                 name="imagen"
                 accept="image/*"
-                onChange={e => setImagen(e.target.files[0])}
+                onChange={(e) => setImagen(e.target.files[0])}
               />
             </div>
-
             <TextInput
               label="Fecha implementación"
               name="fecha_implementacion"
@@ -388,7 +360,10 @@ export default function PostularProyectoS() {
             />
           </fieldset>
 
-          {/* Descripción del proyecto */}
+          {/* Resto de fieldsets/controles idénticos a la versión previa… */}
+          {/* Para mantener nombre de constantes, no se cambia ninguna prop */}
+
+                    {/* Descripción del proyecto */}
           <fieldset className={styles.fieldset}>
             <legend>Descripción del proyecto</legend>
 
@@ -654,12 +629,7 @@ Vespertino: entre 2:00 pm y 5:00 pm`}
               onChange={handleChange}
             />
           </fieldset>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className={styles.submitButton}
-          >
+          <button type="submit" disabled={loading} className={styles.submitButton}>
             {loading ? "Enviando…" : "Postular proyecto"}
           </button>
         </form>
