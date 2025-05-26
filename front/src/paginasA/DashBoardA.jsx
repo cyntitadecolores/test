@@ -72,10 +72,10 @@ export default function DashBoardA() {
   return (
     
     
-    <div style={{ height: 600, width: '100%', padding: '20px' }}>
+    <div className="main">
       <NavCub />
       
-      <h2>Panel de Proyectos</h2>
+      <h2 className="titulo">Panel de Proyectos</h2>
 
 
 

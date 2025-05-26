@@ -59,7 +59,7 @@ app.get('/administradores', (req, res) => {
 
 // Obtener postulaciones alumnos En revisión
 app.get('/postulaciones_alumnos', (req, res) => {
-    db.query('SELECT * FROM Postulacion JOIN Proyecto ON Postulacion.id_proyecto = Proyecto.id_proyecto JOIN estudiante ON postulacion.id_estudiante = estudiante.id_estudiante WHERE postulacion.status = "En revisión"', (err, results) => {
+    db.query('SELECT * FROM Postulacion JOIN Proyecto ON Postulacion.id_proyecto = Proyecto.id_proyecto JOIN estudiante ON postulacion.id_estudiante = estudiante.id_estudiante ', (err, results) => {
         if (err) return res.status(500).json({ message: 'Error al obtener postulaciones' });
         res.json(results);
     });
