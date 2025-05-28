@@ -170,9 +170,9 @@ const cuposDisponibles = totalCupos - totalInscritos;
     );
 
     return (
-        <div className="cube" style={{ marginLeft: '260px', padding: '20px' }}>
+        <div className="main">
             <NavCub />
-            <h1>Postulaciones de Alumnos</h1>
+            <h1 className="titulo">Postulaciones de Alumnos</h1>
 
             <button
                 onClick={() => setMostrarFiltros(prev => !prev)}

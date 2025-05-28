@@ -3,6 +3,7 @@ import axios from 'axios';
 import NavCub from '../componentes/navegacionE';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import "./PaginasE.css";
 
 
 function VisualizarProyectos() {
@@ -136,7 +137,7 @@ const masinfo = () => {
 
     const result = await response.json();
     if (response.ok) {
-      toast.error('Postulación registrada con éxito');
+      toast.success('Postulación registrada con éxito');
     } else {
       toast.error('Error: ' + result.mensaje);
     }
@@ -151,7 +152,7 @@ const masinfo = () => {
   };
 
   return (
-    <div className="cube">
+    <div className="main">
       <NavCub />
       <h1 className="titulo">Catálogo de Proyectos</h1>
 
@@ -163,7 +164,7 @@ const masinfo = () => {
                 <th>Nombre</th>
                 <th>CRN</th>
                 <th>Grupo</th>
-                <th>clave materia</th>
+                <th>Clave Materia</th>
                 <th>Modalidad</th>
                 <th>Perido </th>
                 <th>Campus </th>

@@ -451,9 +451,9 @@ if (config.tipo === 'datetime') {
     );
 
     return (
-    <div className="cube" style={{ marginLeft: '260px', padding: '20px' }}>
+    <div className="main">
         <NavCub />
-        <h1>Proyectos Postulados Pendientes</h1>
+        <h1 className="titulo">Proyectos Postulados Pendientes</h1>
 
         <button
             onClick={() => setMostrarFiltros(prev => !prev)}
