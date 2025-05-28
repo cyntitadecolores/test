@@ -1,9 +1,3 @@
-// PostularProyectoS.jsx — Versión refactorizada (Clean Code)
-// ▸ Mantiene los mismos nombres de constantes, campos y handlers externos.
-// ▸ Extrae lógica a hooks y helpers.
-// ▸ Reduce tamaño del JSX principal.
-// ▸ Sin cambiar API: los objetos enviados al backend conservan las mismas claves.
-
 import React, { useState, useEffect, useCallback } from "react";
 import { jwtDecode } from "jwt-decode";
 import NavCub from "../componentes/navegacionS";

@@ -10,7 +10,7 @@ import { jwtDecode } from "jwt-decode";
 
 // 1) Extraer id_socio desde el JWT almacenado
 function useSocioId() {
-  const token = localStorage.getItem("jwt") || localStorage.getItem("token");
+  const token = localStorage.getItem("token");
   if (!token) return null;
   try {
     const d = jwtDecode(token);
