@@ -142,7 +142,7 @@ app.get('/proyectos/aprobados', (req, res) => {
 
 app.get('/proyectoss/:id', (req, res) => {
     const { id } = req.params;
-    db.query('SELECT * FROM Proyecto p  WHERE p.id_proyecto = ?', [id], (err, results) => {
+    db.query('SELECT * FROM Proyecto p JOIN periodo per ON per.id_periodo = p.id_periodo WHERE p.id_proyecto = ?', [id], (err, results) => {
       if (err) {
         console.error('Error al obtener socio:', err);
         return res.status(500).json({ message: 'Error del servidor' });
@@ -183,7 +183,6 @@ app.get('/proyectos', (req, res) => {
         JOIN socio ON Proyecto.id_socio = socio.id_socio 
         JOIN campus ON Proyecto.id_campus = campus.id_campus 
         JOIN ods ON Proyecto.ods_osf = ods.id_ods 
-        WHERE Proyecto.status_proyecto = "En revisión"
     `, (err, results) => {
         if (err) return res.status(500).json({ message: 'Error al obtener proyectos' });
         res.json(results);

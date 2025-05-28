@@ -6,16 +6,27 @@ import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 
 function ProyectosPos() {
+    //Proyectos que se ven
     const [proyectos, setProyectos] = useState([]);
+    //COlumnas visibles en el momento
     const [columnasVisibles, setColumnasVisibles] = useState([]);
+    //Celda seleccionada para editar valor
     const [celdaSeleccionada, setCeldaSeleccionada] = useState(null); 
+    //Nuevo valor
     const [valorEditado, setValorEditado] = useState('');
     const [valorOriginal, setValorOriginal] = useState('');
+    //Valor de filtro, barra superior
     const [filteredText, setFilteredText] = useState('');
-    const columnasFijas = ['Nombre OSF', 'nombre_proyecto'];
+    //columnas siempre visibles
+    const columnasFijas = ['Nombre OSF', 'nombre_proyecto', 'status_proyecto'];
+    //lista de filtros
     const [mostrarFiltros, setMostrarFiltros] = useState(false);
 
+    const [postulaciones, setPostulaciones] = useState([]);
+    const [mostrarTablaPostulaciones, setMostrarTablaPostulaciones] = useState(false);
+    const cerrarTablaPostulaciones = () => setMostrarTablaPostulaciones(false);
 
+    //Lista de filtros
     const columnasDisponibles = {
     id_proyecto: 'ID Proyecto',
     correo_registro_info: 'Correo Registro',
@@ -88,7 +99,8 @@ function ProyectosPos() {
     Nota: 'Nota',
     id_socio: 'ID Socio',
 };
-    
+
+//Tipo de valor de la columna
 const tiposDeColumna = {
   id_proyecto: { tipo: 'int' },
   id_socio: { tipo: 'int' },
@@ -275,7 +287,7 @@ const exportarAExcel = async () => {
     worksheet.columns = todasLasColumnas.map(col => ({
         header: columnasDisponibles[col],
         key: col,
-        width: 25, // Puedes ajustar el ancho si lo necesitas
+        width: 25,
     }));
 
     // Agregar los datos
@@ -313,7 +325,7 @@ const exportarAExcel = async () => {
     saveAs(blob, 'proyectosPostulados.xlsx');
 };
 
-
+//Obtener proyectos 
     useEffect(() => {
         axios.get('http://localhost:5003/proyectos')
             .then(response => {
@@ -324,6 +336,7 @@ const exportarAExcel = async () => {
             });
     }, []);
 
+    //edicion de valor en tabla
     const handleCeldaClick = (filaId, columna, valorActual) => {
         setCeldaSeleccionada({ filaId, columna });
         setValorEditado(valorActual);
@@ -335,6 +348,7 @@ const exportarAExcel = async () => {
 
     if (!config) return { valido: true };
 
+    //MANEJO DE ERRORES DEPENDIENDO EL TIPO DE VALOR
     if (config.tipo === 'enum') {
         const esValido = config.valores.includes(valor);
         return {
@@ -421,6 +435,18 @@ if (config.tipo === 'datetime') {
     }
 }
 
+const handleVerPostulaciones = (id_proyecto) => {
+  console.log('Cargando postulaciones para el proyecto ID:', id_proyecto); // Verificar el ID
+  axios.get(`http://localhost:5003/proyectos/${id_proyecto}/postulaciones`)
+    .then(response => {
+      console.log('Postulaciones:', response.data); // Verificar los datos obtenidos
+      setPostulaciones(response.data);
+      setMostrarTablaPostulaciones(true);
+    })
+    .catch(error => {
+      console.error('Error al obtener postulaciones:', error);
+    });
+};
 
     const cancelarEdicion = () => {
         setCeldaSeleccionada(null);
@@ -428,6 +454,7 @@ if (config.tipo === 'datetime') {
         setValorOriginal('');
     };
 
+    //PUT que actualiza el status del proyecto
     function actualizarStatus(id, nuevoStatus) {
     axios.put(`http://localhost:5003/proyecto/${id}/status`, { status: nuevoStatus })
         .then(() => {
@@ -455,6 +482,7 @@ if (config.tipo === 'datetime') {
         <NavCub />
         <h1 className="titulo">Proyectos Postulados Pendientes</h1>
 
+{/* Boton de cambio de vista */}
         <button
             onClick={() => setMostrarFiltros(prev => !prev)}
             className="bttn-filtro"
@@ -462,6 +490,7 @@ if (config.tipo === 'datetime') {
             {mostrarFiltros ? 'Ver Tabla' : 'Aplicar Filtros'}
         </button>
 
+{/* Lista de filtros para ver tabla*/}
         {mostrarFiltros ? (
             <div className="filtros-columnas-wrapper">
                 <h3>Selecciona las columnas que deseas mostrar:</h3>
@@ -497,6 +526,7 @@ if (config.tipo === 'datetime') {
                 <div className="tabla-scroll-wrapper">
                     <table className="tabla-proyectos">
                         <thead>
+                            {/* Columas que siempre se muestran */}
                             <tr>
                                 {[...columnasFijas, ...columnasVisibles].map(col => (
                                     <th key={col}>{columnasDisponibles[col]}</th>
@@ -505,6 +535,7 @@ if (config.tipo === 'datetime') {
                             </tr>
                         </thead>
                         <tbody>
+                            {/* MAP para mostrar filtros en la tabla*/}
                             {proyectosFiltrados.map(proyecto => (
                                 <tr key={proyecto.id_proyecto}>
                                     {[...columnasFijas, ...columnasVisibles].map(col => (
@@ -525,6 +556,7 @@ if (config.tipo === 'datetime') {
                                                     autoFocus
                                                 />
                                             ) : (
+                                                // Clumna que sirven como links
                                                 (col === 'enlace_maps' || col === 'enlace_whatsApp') ? (
     <a
         href={proyecto[col]}
@@ -541,21 +573,42 @@ if (config.tipo === 'datetime') {
                                             )}
                                         </td>
                                     ))}
+                                    {/* Formato parra cambiar el status del proyecto*/}
                                     <td>
-                                        <button
-                                            className="aprobar"
-                                            onClick={() => actualizarStatus(proyecto.id_proyecto, 'Aprobado')}
-                                        >
-                                            Aprobado
-                                        </button>
-                                        <button
-                                            className="rechazar"
-                                            onClick={() => actualizarStatus(proyecto.id_proyecto, 'No aprobado')}
-                                            style={{ marginLeft: '8px' }}
-                                        >
-                                            No aprobado
-                                        </button>
-                                    </td>
+  {proyecto.status_proyecto === 'En revisión' ? (
+    <>
+      <button
+        className="aprobar"
+        onClick={() => actualizarStatus(proyecto.id_proyecto, 'Aprobado')}
+      >
+        Aprobado
+      </button>
+      <button
+        className="rechazar"
+        onClick={() => actualizarStatus(proyecto.id_proyecto, 'No aprobado')}
+        style={{ marginLeft: '8px' }}
+      >
+        No aprobado
+      </button>
+    </>
+    ) : proyecto.status_proyecto === 'Aprobado' ? (
+    <>
+      <span style={{ fontWeight: 'bold', marginRight: '10px' }}>
+        {postulaciones.filter(p => p.id_proyecto === proyecto.id_proyecto).length} postulaciones
+      </span>
+      <button
+        className="ver-postulaciones"
+        onClick={() => handleVerPostulaciones(proyecto.id_proyecto)}
+      >
+        Ver postulaciones
+      </button>
+    </>
+  ) : (
+    proyecto.status_proyecto
+  )}
+
+</td>
+
                                 </tr>
                             ))}
                         </tbody>
@@ -581,6 +634,44 @@ if (config.tipo === 'datetime') {
                 <button onClick={cancelarEdicion} style={{ marginLeft: '8px' }}>Cancelar</button>
             </div>
         )}
+
+        {mostrarTablaPostulaciones && (
+  <div className="tabla-emergente">
+    <div className="tabla-emergente-header">
+      <h3>Postulaciones del Proyecto</h3>
+      <button onClick={cerrarTablaPostulaciones} style={{ float: 'right' }}>Cerrar</button>
+    </div>
+    <table className="tabla-postulaciones">
+      <thead>
+        <tr>
+          <th>Nombre Estudiante</th>
+          <th>Status</th>
+          <th>Fecha</th>
+          <th>Expectativa</th>
+          <th>Razón</th>
+          <th>Motivo</th>
+          <th>Descartado</th>
+          <th>Nota</th>
+        </tr>
+      </thead>
+      <tbody>
+        {postulaciones.map(p => (
+          <tr key={p.id_postulacion}>
+            <td>{p.nombre_estudiante}</td>
+            <td>{p.status}</td>
+            <td>{new Date(p.fecha_postulacion).toLocaleDateString()}</td>
+            <td>{p.expectativa}</td>
+            <td>{p.razon}</td>
+            <td>{p.motivo}</td>
+            <td>{p.pregunta_descarte}</td>
+            <td>{p.Nota}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
     </div>
 );
 

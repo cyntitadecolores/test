@@ -209,7 +209,7 @@ const masinfo = () => {
           <div className="modal-content">
             <h2>Detalles del Proyecto</h2>
             <p><strong>Nombre:</strong> {proyectoSeleccionado.nombre_proyecto}</p>
-            <p><strong>Periodo:</strong> {proyectoSeleccionado.periodo}</p>
+            <p><strong>Periodo:</strong> {proyectoSeleccionado.id_periodo}</p>
             <p><strong>Modalidad:</strong> {proyectoSeleccionado.modalidad}</p>
             <p><strong>Socio:</strong> {proyectoSeleccionado.nombre_osf}</p>
             <p><strong>Poblacion:</strong> {proyectoSeleccionado.poblacion_osf}</p> 
