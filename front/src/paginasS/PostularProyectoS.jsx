@@ -330,8 +330,8 @@ export default function PostularProyectoS() {
   return (
     <>
       <NavCub />
-      <div className={styles.container}>
-        <h1>Postular nuevo proyecto</h1>
+      <div className="main">
+        <h1 className="titulo">Postular nuevo proyecto</h1>
 
         {error && <div className={styles.err}>{error}</div>}
         {okMsg && <div className={styles.ok}>{okMsg}</div>}

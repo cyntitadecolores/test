@@ -269,18 +269,10 @@ const masinfo = () => {
       )}
        {mostrarPostularme && (
   <div className="info-extra formulario-postulacion">
-    <h3 style={{ textAlign: 'center' }}>Formulario de Postulación</h3>
+    <h3 className="nontitle">Formulario de Postulación</h3>
 
     {errores.length > 0 && (
-      <div style={{
-        backgroundColor: '#ffe0e0',
-        padding: '15px',
-        marginBottom: '20px',
-        borderRadius: '8px',
-        border: '1px solid red',
-        maxWidth: '700px',
-        margin: '0 auto'
-      }}>
+      <div>
         <strong style={{ color: 'red' }}>Errores encontrados:</strong>
         <ul style={{ marginTop: '10px' }}>
           {errores.map((err, index) => (
@@ -290,13 +282,7 @@ const masinfo = () => {
       </div>
     )}
 
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '20px',
-      maxWidth: '700px',
-      margin: '0 auto'
-    }}>
+    <div>
       <div>
         <label>Expectativa:</label>
         <textarea 

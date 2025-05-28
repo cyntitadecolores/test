@@ -1,15 +1,28 @@
 /* InicioSo.module.css */
-.cube {
-  background-color: #f7f9fc;
-  padding: 20px;
-  font-family: Arial, sans-serif;
+.main {
+  margin-left: 250px;
+  margin-top: 60px; 
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
 }
 
-h1 {
-  font-size: 2rem;
-  color: #0033a0; /* Color azul consistente con otros componentes */
+.titulo {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: black;
+  margin-bottom: 2rem;
+}
+
+.nontitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: black;
+  margin-bottom: 0.5rem;
   text-align: center;
-  margin-bottom: 20px;
 }
 
 button {
@@ -36,6 +49,7 @@ button {
   flex-wrap: wrap;
   justify-content: center;
   gap: 20px;
+  margin-top: 1rem;
 }
 
 .proyectoCard {
@@ -61,7 +75,6 @@ button {
 }
 
 .proyectoCard h2 {
-  color: #0033a0;
   margin-top: 15px;
   font-size: 1.5rem;
 }
