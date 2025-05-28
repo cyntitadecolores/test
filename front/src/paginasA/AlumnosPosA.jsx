@@ -6,21 +6,31 @@ import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 
 function AlumnosPos() {
+    //obtener postulaciones
     const [postulaciones, setPostulaciones] = useState([]);
+    //columnas que se mostraran
     const [columnasVisibles, setColumnasVisibles] = useState([]);
+    //celda seleccionada para modificar info
     const [celdaSeleccionada, setCeldaSeleccionada] = useState(null);
+    //valor nuevo de la celda
     const [valorEditado, setValorEditado] = useState('');
     const [valorOriginal, setValorOriginal] = useState('');
+    //texto filtrado
     const [filteredText, setFilteredText] = useState('');
+    //columnas que siempre se muestran
     const columnasFijas = ['nombre_proyecto', 'nombre', 'status'];
+    //obtener proyectos
     const [proyectos, setProyectos] = useState([]);
 
     const [mostrarFiltros, setMostrarFiltros] = useState(false);
     const [socios, setSocios] = useState([]);
-
+//cuenta de resumen de postulaciones 
 const totalCupos = proyectos.reduce((total, proyecto) => total + proyecto.cupos_proyecto, 0);
 const totalInscritos = postulaciones.filter(p => p.status === 'Inscrito').length;
 const cuposDisponibles = totalCupos - totalInscritos;
+
+const [statusFiltro, setStatusFiltro] = useState('');
+
 
 
     const columnasDisponibles = {
@@ -34,6 +44,7 @@ const cuposDisponibles = totalCupos - totalInscritos;
         status: 'Status',
     };
 
+    //GET de proyectos aprobados 
     useEffect(() => {
     axios.get('http://localhost:5003/proyectos/aprobados')
       .then(response => setProyectos(response.data))
@@ -87,6 +98,7 @@ const cuposDisponibles = totalCupos - totalInscritos;
         saveAs(blob, 'alumnosPostulados.xlsx');
     };
 
+    //GET de postulaciones 
     useEffect(() => {
         axios.get('http://localhost:5003/postulaciones_alumnos')
             .then(response => {
@@ -108,6 +120,7 @@ const cuposDisponibles = totalCupos - totalInscritos;
         const nuevoValor = valorEditado;
 
         try {
+            //edicion de informacion 
             const response = await fetch(`http://localhost:5003/postulaciones_alumnos/${filaId.id_proyecto}/${filaId.id_estudiante}/editar`, {
                 method: 'PUT',
                 headers: {
@@ -136,6 +149,7 @@ const cuposDisponibles = totalCupos - totalInscritos;
         setValorOriginal('');
     };
 
+    //se puede borrar ya no se usa
     const actualizarStatus = (idProyecto, idEstudiante, nuevoStatus) => {
         axios.put(`http://localhost:5003/postulaciones_alumnos/${idProyecto}/${idEstudiante}/editar`, {
             columna: 'status',
@@ -161,13 +175,15 @@ const cuposDisponibles = totalCupos - totalInscritos;
 
     // Filtro con las nuevas columnas
     const postulacionesFiltrados = postulaciones.filter(post =>
-        Object.entries(post).some(([key, valor]) => {
-            if (columnasVisibles.includes(key) || columnasFijas.includes(key)) {
-                return valor && valor.toString().toLowerCase().includes(filteredText);
-            }
-            return false;
-        })
-    );
+    (statusFiltro === '' || post.status === statusFiltro) &&
+    Object.entries(post).some(([key, valor]) => {
+        if (columnasVisibles.includes(key) || columnasFijas.includes(key)) {
+            return valor && valor.toString().toLowerCase().includes(filteredText);
+        }
+        return false;
+    })
+);
+
 
     return (
         <div className="main">
@@ -209,6 +225,17 @@ const cuposDisponibles = totalCupos - totalInscritos;
                 <div className="tabla-container">
                     <p>Buscar:</p>
                     <input type="text" value={filteredText} onChange={handleChange} />
+                    <div style={{ marginTop: '10px', marginBottom: '10px' }}>
+  <label>Filtrar por status:&nbsp;</label>
+  <select value={statusFiltro} onChange={(e) => setStatusFiltro(e.target.value)}>
+    <option value="">Todos</option>
+    <option value="En revision">En revisión</option>
+    <option value="Aceptadx">Aceptadx</option>
+    <option value="No aceptadx">No aceptadx</option>
+    <option value="Alumno declinó participación">Alumno declinó participación</option>
+  </select>
+</div>
+
                     <div className="tabla-scroll-wrapper">
                         <table className="tabla-proyectos">
                             <thead>
