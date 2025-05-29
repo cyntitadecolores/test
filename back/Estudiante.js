@@ -170,7 +170,7 @@ app.get('/proyectos', (req, res) => {
         JOIN campus ON Proyecto.id_campus = campus.id_campus
         JOIN periodo ON Proyecto.id_periodo = periodo.id_periodo
         JOIN ods ON Proyecto.ods_osf = ods.id_ods
-        WHERE status_proyecto  = "aprobado" AND status_actividad = 1
+        WHERE status_proyecto  = "Aprobado" AND status_actividad = 1
     `, (err, results) => {
         if (err) return res.status(500).json({ message: 'Error al obtener proyectos' });
         res.json(results);
