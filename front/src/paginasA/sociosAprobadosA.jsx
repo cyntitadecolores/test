@@ -157,7 +157,7 @@ function SociosAprobados() {
                   <td>{socio.nombre_osf || socio.detalles?.nombre_socio}</td>
 
                   <td>{socio.correo}</td>
-                  <td><span className="badge aprobado">{socio.tipo_socio}</span></td>
+                  <td><span>{socio.tipo_socio}</span></td>
                   <td>
                     <button className="ver-mas-link" onClick={() => handleVerMas(socio.id_socio)}>
                       Ver más
