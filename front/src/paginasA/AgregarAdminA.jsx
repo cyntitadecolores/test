@@ -42,16 +42,16 @@ export default function CrearCuentaAdmin() {
   };
 
   return (
-    <div className="cube">
+    <div className="main">
     <NavCub />
+    <Link to="/" className="back-btn">← Volver</Link>
+    <h1 className="nontitle">Agrega un administrador</h1>
       <div className="form-box">
-        <h1 className="title">Agrega un administrador</h1>
-
         <div className="input-group">
           <label>Correo</label>
           <input
             type="email"
-            placeholder="correo@gmail.com"
+            placeholder="ej. correo@gmail.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -62,7 +62,7 @@ export default function CrearCuentaAdmin() {
           <div className="input-box">
             <input
               type={showPassword ? "text" : "password"}
-              placeholder="Introduce tu contraseña"
+              placeholder="Introduce contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -87,7 +87,7 @@ export default function CrearCuentaAdmin() {
           <label>Nombre completo</label>
           <input
             type="text"
-            placeholder="Tu nombre"
+            placeholder="Nombre"
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
           />

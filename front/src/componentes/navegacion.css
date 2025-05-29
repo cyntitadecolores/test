@@ -1,103 +1,66 @@
+/* Barra lateral */
 .nav-bar {
   display: flex;
+  background-color: #ffffff;
   flex-direction: column;
   justify-content: flex-start;
   height: 100vh;
-  padding: 20px;
-  width: 200px;
+  padding: 2vh 1vw;
+  width: 20%;
+  min-width: 180px;
+  max-width: 240px;
   position: fixed;
   left: 0;
   top: 0;
-  border-right: 2px solid rgb(34, 84, 173);
+  z-index: 1000;
   font-family: 'Segoe UI', sans-serif;
-  
+}
+
+.nav-bar img {
+  height: auto;
+  width: 120px;
+  margin-left: 15px;
+  margin-top: 20px;
 }
 
 .nav-items {
   display: flex;
   flex-direction: column;
-  align-items: center; 
+  align-items: center;
 }
 
-
 .nav-bar ul {
-    list-style: none;
-    padding: 0;
-    flex-direction: column;
-    align-items: center;
+  list-style: none;
+  padding: 0;
+  flex-direction: column;
+  align-items: center;
 }
 
 .nav-bar li {
-    margin-bottom: 20px;
-    margin-top: 20px; 
-    width: 100%;
+  margin: 2vh 0;
+  width: 100%;
 }
 
 .nav-bar li a {
   display: block;
-  background-color: rgb(34, 84, 173);
+  background-color: #5A6F8E;
   color: white;
   text-align: center;
-  padding: 15px;
+  padding: 1em;
   text-decoration: none;
   border-radius: 8px;
   font-weight: bold;
-  font-size: 15px;
+  font-size: 1rem;
   transition: background-color 0.3s ease;
 }
 
-.nav-bar img {
-    height: auto;
-    width: 120px;
-    margin-left: 15px;
-    margin-top: 20px;
-}
-
-
-.top-bar {
-    background-color: white;
-    padding: 10px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: fixed;
-    width: calc(100% - 280px);
-    top: 0;
-    left: 240px;
-    height: 80px;
-    color: black;
-    border-bottom: 2px solid rgb(34, 84, 173);
-    font-family: 'Segoe UI', sans-serif;
-}
-
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 10px; 
-    margin-left: auto;
-}
-
-.notifications {
-    font-size: 1.5em;
-}
-
-.username {
-    margin-left: 10px;
-}
-
-.user-avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%; 
-  object-fit: cover;  
-}
-
 .logout-btn {
-  margin-top: auto; 
-  margin-left: 20px;
+  margin-top: auto;
+  margin-left: auto;
+  margin-right: auto;
   background-color: #7f0000;
   color: white;
-  padding: 10px 20px;
+  padding: 0.8em 1.5em;
   border: none;
   border-radius: 8px;
   font-weight: bold;
@@ -106,120 +69,162 @@
   align-items: center;
   justify-content: center;
   width: 80%;
-  margin-bottom: 100px;
+  margin-bottom: 5vh;
 }
-  
-  .logout-btn:hover {
-    background-color: #f12e2e;
-    transition: background-color 0.3s ease;
+
+.logout-btn:hover {
+  background-color: #f12e2e;
+  transition: background-color 0.3s ease;
+}
+
+/* Barra superior */
+.top-bar {
+  background-image: url('./src/assets/designtop.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #ffffff;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  width: calc(100% - 18.35%);
+  left: 18.35%;
+  top: 0;
+  height: 80px;
+  color: black;
+  z-index: 1000;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.notifications {
+  font-size: 1.5em;
+}
+
+.username {
+  margin-left: 10px;
+  margin-right: 2rem;
+}
+
+.user-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Hovers de admin */
+.nav-inicio a:hover { background-color: #00ad8c; }
+.nav-dashboard a:hover { background-color: #fc712c; }
+.nav-proyectos a:hover { background-color: #951ead; }
+.nav-alumnos a:hover { background-color: #e9604b; }
+.nav-socios a:hover { background-color: #56b3e4; }
+.nav-aprobados a:hover { background-color: black; }
+
+/* Hovers socio */
+.nav-inicio-s a:hover { background-color: #00ad8c; }
+.nav-postular-s a:hover { background-color: #fc712c; }
+.nav-proyectos-s a:hover { background-color: #951ead; }
+
+/* Hovers estudiante */
+.nav-inicio-e a:hover { background-color: #56b3e4; }
+.nav-visualizar-e a:hover { background-color: #951ead; }
+.nav-postulaciones-e a:hover { background-color: #e9604b; }
+
+/* Links activos admin */
+.nav-inicio .active-link { background-color: #00ad8c; }
+.nav-dashboard .active-link { background-color: #fc712c; }
+.nav-proyectos .active-link { background-color: #951ead; }
+.nav-alumnos .active-link { background-color: #e9604b; }
+.nav-socios .active-link { background-color: #56b3e4; }
+.nav-aprobados .active-link { background-color: black; }
+
+/* Links activos socio */
+.nav-inicio-s .active-link { background-color: #00ad8c; }
+.nav-postular-s .active-link { background-color: #fc712c; }
+.nav-proyectos-s .active-link { background-color: #951ead; }
+
+/* Links activos estudiante */
+.nav-inicio-e .active-link { background-color: #00ad8c; }
+.nav-visualizar-e .active-link { background-color: #951ead; }
+.nav-postulaciones-e .active-link { background-color: #e9604b; }
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .nav-bar {
+    position: relative;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: auto;
+    padding: 1em;
+    z-index: 1001;
   }
-  
 
-  /* CAMBIOS HOVER DE BOTONES */
+  .nav-bar img {
+    width: 80px;
+    margin: 0;
+  }
 
-  /* admin */
-  .nav-inicio a:hover {
-  background-color: #00ad8c; /* Verde */
-}
+  .nav-items {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    width: 100%;
+    margin-top: 10px;
+  }
 
-.nav-dashboard a:hover {
-  background-color: #fc712c; /* Naranja */
-}
+  .nav-bar ul {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 0;
+    justify-content: center;
+    width: 100%;
+  }
 
-.nav-proyectos a:hover {
-  background-color: #951ead; /* Morado */
-}
+  .nav-bar li {
+    width: auto;
+    margin: 5px;
+  }
 
-.nav-alumnos a:hover {
-  background-color: #e9604b; /* Rojo */
-}
+  .nav-bar li a {
+    font-size: 0.8rem;
+    padding: 0.6em 1em;
+  }
 
-.nav-socios a:hover {
-  background-color: #56b3e4; /* Azul claro */
-}
+  .logout-btn {
+    width: auto;
+    padding: 0.5em 1em;
+    margin: 10px auto;
+  }
 
-.nav-aprobados a:hover {
-  background-color: black; /* Negro */
-}
+  .top-bar {
+    width: 100%;
+    left: 0;
+    padding: 10px;
+    top: 0;
+  }
 
-/* socio */
-.nav-inicio-s a:hover {
-  background-color: #00ad8c;
-}
+  .top-bar .user-info {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-right: 0;
+  }
 
-.nav-postular-s a:hover {
-  background-color: #fc712c;
-}
-
-.nav-proyectos-s a:hover {
-  background-color: #951ead;
-}
-
-/* estudiante */
-.nav-inicio-e a:hover {
-  background-color: #00ad8c; /* Verde */
-}
-
-.nav-visualizar-e a:hover {
-  background-color: #951ead; /* Azul */
-}
-
-.nav-postulaciones-e a:hover {
-  background-color: #e9604b; /* Naranja */
-}
-
-
-
-
-/* SE QUEDEN EN COLOR */
-
-/* admin */
-.nav-inicio .active-link {
-  background-color: #00ad8c;
-}
-
-.nav-dashboard .active-link {
-  background-color: #fc712c;
-}
-
-.nav-proyectos .active-link {
-  background-color: #951ead;
-}
-
-.nav-alumnos .active-link {
-  background-color: #e9604b;
-}
-
-.nav-socios .active-link {
-  background-color: #56b3e4;
-}
-
-.nav-aprobados .active-link {
-  background-color: black;
-}
-
-/* socio */
-.nav-inicio-s .active-link {
-  background-color: #00ad8c;
-}
-
-.nav-postular-s .active-link {
-  background-color: #fc712c;
-}
-
-.nav-proyectos-s .active-link {
-  background-color: #951ead;
-}
-
-/* estudiante */
-.nav-inicio-e .active-link {
-  background-color: #00ad8c;
-}
-
-.nav-visualizar-e .active-link {
-  background-color: #951ead;
-}
-
-.nav-postulaciones-e .active-link {
-  background-color: #e9604b;
+  .username {
+    margin: 0;
+    font-size: 0.9rem;
+  }
 }

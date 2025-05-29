@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import './Login.css';
 import logo from './assets/logo_servicio.png';
+import { toast } from 'react-toastify';
 
 
 const Login = () => {
@@ -21,7 +22,7 @@ const Login = () => {
       else if (rol === 'administrador') navigate('/');
       else if (rol === 'socio') navigate('/inicioS');
     } catch (err) {
-      alert(err.response?.data?.error || 'Error al iniciar sesión');
+      toast.error(err.response?.data?.error || 'Error al iniciar sesión');
     }
   };
 

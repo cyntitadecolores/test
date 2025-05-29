@@ -6,16 +6,27 @@ import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 
 function ProyectosPos() {
+    //Proyectos que se ven
     const [proyectos, setProyectos] = useState([]);
+    //COlumnas visibles en el momento
     const [columnasVisibles, setColumnasVisibles] = useState([]);
+    //Celda seleccionada para editar valor
     const [celdaSeleccionada, setCeldaSeleccionada] = useState(null); 
+    //Nuevo valor
     const [valorEditado, setValorEditado] = useState('');
     const [valorOriginal, setValorOriginal] = useState('');
+    //Valor de filtro, barra superior
     const [filteredText, setFilteredText] = useState('');
-    const columnasFijas = ['Nombre OSF', 'nombre_proyecto'];
+    //columnas siempre visibles
+    const columnasFijas = ['Nombre OSF', 'nombre_proyecto', 'status_proyecto'];
+    //lista de filtros
     const [mostrarFiltros, setMostrarFiltros] = useState(false);
 
+    const [postulaciones, setPostulaciones] = useState([]);
+    const [mostrarTablaPostulaciones, setMostrarTablaPostulaciones] = useState(false);
+    const cerrarTablaPostulaciones = () => setMostrarTablaPostulaciones(false);
 
+    //Lista de filtros
     const columnasDisponibles = {
     id_proyecto: 'ID Proyecto',
     correo_registro_info: 'Correo Registro',
@@ -88,7 +99,185 @@ function ProyectosPos() {
     Nota: 'Nota',
     id_socio: 'ID Socio',
 };
-    
+
+//Tipo de valor de la columna
+const tiposDeColumna = {
+  id_proyecto: { tipo: 'int' },
+  id_socio: { tipo: 'int' },
+  correo_registro_info: { tipo: 'varchar' },
+  region_proyecto: {
+    tipo: 'enum',
+    valores: ['Centro-Occidente', 'CDMX', 'Monterrey', 'Noroeste'],
+  },
+  id_campus: { tipo: 'int' },
+  crn: { tipo: 'varchar' },
+  grupo: { tipo: 'varchar' },
+  clave_materia: {
+    tipo: 'enum',
+    valores: ['WA1065', 'WA3041', 'WA1066', 'WA1067', 'WA1068', 'WA1058', 'WA3020'],
+  },
+  id_periodo: { tipo: 'int' },
+  nombre_osf: { tipo: 'varchar' },
+  razon_osf: { tipo: 'varchar' },
+  poblacion_osf: {
+    tipo: 'enum',
+    valores: [
+      'Comunidades urbano marginadas',
+      'Comunidades rurales',
+      'Comunidades indígenas',
+      'Primera infancia (0 a 6 años)',
+      'Niños y niñas de nivel primaria',
+      'Niños, niñas y adolescentes',
+      'Mujeres en situación vulnerable',
+      'Adultos mayores',
+      'Personas con discapacidad',
+      'Personas con enfermedades crónicas/terminales',
+      'Personas con problemas de adicciones',
+      'Personas migrantes o situación de movilidad',
+      'Otros',
+    ],
+  },
+  num_beneficiarios_osf: { tipo: 'varchar' },
+  ods_osf: { tipo: 'int' },
+  telefono_osf: { tipo: 'varchar' },
+  datos_osf: { tipo: 'varchar' },
+  contacto_coordinador: { tipo: 'varchar' },
+  redes_sociales: { tipo: 'varchar' },
+  nombre_proyecto: { tipo: 'varchar' },
+  nomenclatura_registro: { tipo: 'varchar' },
+  diagnostico_previo: { tipo: 'boolean' },
+  problema_social: { tipo: 'varchar' },
+  vulnerabilidad_atendida_1: {
+    tipo: 'enum',
+    valores: [
+      'Mujeres',
+      'Migrantes',
+      'Discapacidad auditiva',
+      'Discapacidad motriz',
+      'Discapacidad mental',
+      'Discapacidad visual',
+      'Personas en situación de pobreza',
+      'Pertenecen a un grupo indígena',
+      'Personas en situación de calle',
+      'Personas con enfermedades crónicas/terminales',
+      'Comunidad LGBTIQ+',
+      'Medio ambiente',
+      'Niños, Niñas y Adolescentes',
+      'Personas con discapacidad',
+      'Jóvenes',
+    ],
+  },
+  edad_poblacion_1: {
+    tipo: 'enum',
+    valores: [
+      'Edad entre 0 y 5 años',
+      'Edad entre 6 y 12 años',
+      'Edad entre 13 y 18 años',
+      'Edad entre 19 y 30 años',
+      'Edad entre 31 y 59 años',
+      'Edad de 60 años o más',
+      'No aplica',
+    ],
+  },
+  vulnerabilidad_atendida_2: {
+    tipo: 'enum',
+    valores: [
+      'Mujeres',
+      'Migrantes',
+      'Discapacidad auditiva',
+      'Discapacidad motriz',
+      'Discapacidad mental',
+      'Discapacidad visual',
+      'Personas en situación de pobreza',
+      'Pertenecen a un grupo indígena',
+      'Personas en situación de calle',
+      'Personas con enfermedades crónicas/terminales',
+      'Comunidad LGBTIQ+',
+      'Medio ambiente',
+      'Niños, Niñas y Adolescentes',
+      'Personas con discapacidad',
+      'Jóvenes',
+    ],
+  },
+  edad_poblacion_2: {
+    tipo: 'enum',
+    valores: [
+      'Edad entre 0 y 5 años',
+      'Edad entre 6 y 12 años',
+      'Edad entre 13 y 18 años',
+      'Edad entre 19 y 30 años',
+      'Edad entre 31 y 59 años',
+      'Edad de 60 años o más',
+      'No aplica',
+    ],
+  },
+  zona_poblacion: {
+    tipo: 'enum',
+    valores: ['Rural', 'Urbana'],
+  },
+  numero_beneficiarios_proyecto: { tipo: 'varchar' },
+  objetivo_proyecto: { tipo: 'varchar' },
+  ods_proyecto_1: { tipo: 'int' },
+  ods_proyecto_2: { tipo: 'int' },
+  acciones_estudiantado: { tipo: 'varchar' },
+  producto_servicio_entregar: { tipo: 'varchar' },
+  entregable_esperado: { tipo: 'varchar' },
+  medida_impacto: { tipo: 'varchar' },
+  dias_actividades: {
+    tipo: 'enum',
+    valores: ['Por acordar con OSF', 'Específico'],
+  },
+  horario_proyecto: { tipo: 'varchar' },
+  carreras_proyecto_1: { tipo: 'int' },
+  carreras_proyecto_2: { tipo: 'int' },
+  habilidades_alumno: { tipo: 'varchar' },
+  cupos_proyecto: { tipo: 'int' },
+  modalidad: {
+    tipo: 'enum',
+    valores: [
+      'CLIN Proyecto Solidario Línea',
+      'CLIP | Proyecto Solidario Mixto',
+      'PSP | Proyecto Solidario Presencial',
+    ],
+  },
+  direccion_escrita: { tipo: 'varchar' },
+  duracion_experiencia: {
+    tipo: 'enum',
+    valores: ['5 semanas', '10 semanas', '15 semanas'],
+  },
+  valor_proyecto: {
+    tipo: 'enum',
+    valores: ['Compasión', 'Compromiso', 'Tolerancia', 'Participación ciudadana'],
+  },
+  periodo_repetido: { tipo: 'boolean' },
+  induccion_ss: { tipo: 'boolean' },
+  propuesta_semana_tec: { tipo: 'boolean' },
+  propuesta_inmersion_social: { tipo: 'boolean' },
+  propuesta_bloque: { tipo: 'boolean' },
+  indicaciones_especiales: { tipo: 'text' },
+  status_proyecto: {
+    tipo: 'enum',
+    valores: ['Aprobado', 'No aprobado', 'En revisión'],
+  },
+  entrevista: { tipo: 'boolean' },
+  pregunta_descarte: { tipo: 'text' },
+  enlace_maps: { tipo: 'varchar' },
+  enlace_whatsApp: { tipo: 'varchar' },
+  nombre_whatsApp: { tipo: 'varchar' },
+  status_whatsapp: { tipo: 'varchar' },
+  alumnos_postulados: { tipo: 'int' },
+  alumnos_aceptados: { tipo: 'int' },
+  alumnos_rechazados: { tipo: 'int' },
+  cupos_disponibles: { tipo: 'int' },
+  datatime_postulacion: { tipo: 'datetime' },
+  inicio_actividades: { tipo: 'varchar' },
+  carta_exclusion: { tipo: 'varchar' },
+  anuncio_canvas: { tipo: 'text' },
+  porcentaje_canvas: { tipo: 'varchar' },
+  status_actividad: { tipo: 'boolean' },
+};
+
+
 const exportarAExcel = async () => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('proyectosPostulados');
@@ -98,7 +287,7 @@ const exportarAExcel = async () => {
     worksheet.columns = todasLasColumnas.map(col => ({
         header: columnasDisponibles[col],
         key: col,
-        width: 25, // Puedes ajustar el ancho si lo necesitas
+        width: 25,
     }));
 
     // Agregar los datos
@@ -136,7 +325,7 @@ const exportarAExcel = async () => {
     saveAs(blob, 'proyectosPostulados.xlsx');
 };
 
-
+//Obtener proyectos 
     useEffect(() => {
         axios.get('http://localhost:5003/proyectos')
             .then(response => {
@@ -147,16 +336,73 @@ const exportarAExcel = async () => {
             });
     }, []);
 
+    //edicion de valor en tabla
     const handleCeldaClick = (filaId, columna, valorActual) => {
         setCeldaSeleccionada({ filaId, columna });
         setValorEditado(valorActual);
         setValorOriginal(valorActual);
     };
 
+    function validarValor(columna, valor) {
+    const config = tiposDeColumna[columna];
+
+    if (!config) return { valido: true };
+
+    //MANEJO DE ERRORES DEPENDIENDO EL TIPO DE VALOR
+    if (config.tipo === 'enum') {
+        const esValido = config.valores.includes(valor);
+        return {
+            valido: esValido,
+            mensaje: esValido ? '' : `Valor inválido. Opciones válidas: ${config.valores.join(', ')}`
+        };
+    }
+
+    if (config.tipo === 'int') {
+        const esValido = /^\d{1,3}$/.test(valor);
+        return {
+            valido: esValido,
+            mensaje: esValido ? '' : 'Debe ser un número de hasta 3 dígitos.'
+        };
+    }
+
+    if (config.tipo === 'varchar') {
+        const esValido = valor.trim() !== '';
+        return {
+            valido: esValido,
+            mensaje: esValido ? '' : 'Este campo no puede estar vacío.'
+        };
+    }
+
+    if (config.tipo === 'boolean') {
+    const esValido = typeof valor === 'boolean';
+    return {
+        valido: esValido,
+        mensaje: esValido ? '' : 'Debe ser verdadero o falso.'
+    };
+}
+
+if (config.tipo === 'datetime') {
+    const esValido = !isNaN(Date.parse(valor));
+    return {
+        valido: esValido,
+        mensaje: esValido ? '' : 'Debe ser una fecha y hora válidas.'
+    };
+}
+
+    return { valido: true };
+}
+
+
     const guardarCambio = async () => {
         const { filaId, columna } = celdaSeleccionada;  
         const nuevoValor = valorEditado;  
     
+        const resultadoValidacion = validarValor(columna, nuevoValor);
+    if (!resultadoValidacion.valido) {
+        alert(`Error en "${columnasDisponibles[columna]}": ${resultadoValidacion.mensaje}`);
+        return;
+    }
+
         try {
             const response = await fetch(`http://localhost:5003/proyecto/${filaId}/editar`, {
                 method: 'PUT',
@@ -180,6 +426,27 @@ const exportarAExcel = async () => {
         }
     };
     
+    function validarURL(url) {
+    try {
+        const parsed = new URL(url);
+        return parsed.protocol === "http:" || parsed.protocol === "https:";
+    } catch (_) {
+        return false;
+    }
+}
+
+const handleVerPostulaciones = (id_proyecto) => {
+  console.log('Cargando postulaciones para el proyecto ID:', id_proyecto); // Verificar el ID
+  axios.get(`http://localhost:5003/proyectos/${id_proyecto}/postulaciones`)
+    .then(response => {
+      console.log('Postulaciones:', response.data); // Verificar los datos obtenidos
+      setPostulaciones(response.data);
+      setMostrarTablaPostulaciones(true);
+    })
+    .catch(error => {
+      console.error('Error al obtener postulaciones:', error);
+    });
+};
 
     const cancelarEdicion = () => {
         setCeldaSeleccionada(null);
@@ -187,6 +454,7 @@ const exportarAExcel = async () => {
         setValorOriginal('');
     };
 
+    //PUT que actualiza el status del proyecto
     function actualizarStatus(id, nuevoStatus) {
     axios.put(`http://localhost:5003/proyecto/${id}/status`, { status: nuevoStatus })
         .then(() => {
@@ -210,17 +478,19 @@ const exportarAExcel = async () => {
     );
 
     return (
-    <div className="cube" style={{ marginLeft: '260px', padding: '20px' }}>
+    <div className="main">
         <NavCub />
-        <h1>Proyectos Postulados Pendientes</h1>
+        <h1 className="titulo">Proyectos Postulados Pendientes</h1>
 
+{/* Boton de cambio de vista */}
         <button
             onClick={() => setMostrarFiltros(prev => !prev)}
-            style={{ marginBottom: '20px' }}
+            className="bttn-filtro"
         >
             {mostrarFiltros ? 'Ver Tabla' : 'Aplicar Filtros'}
         </button>
 
+{/* Lista de filtros para ver tabla*/}
         {mostrarFiltros ? (
             <div className="filtros-columnas-wrapper">
                 <h3>Selecciona las columnas que deseas mostrar:</h3>
@@ -256,6 +526,7 @@ const exportarAExcel = async () => {
                 <div className="tabla-scroll-wrapper">
                     <table className="tabla-proyectos">
                         <thead>
+                            {/* Columas que siempre se muestran */}
                             <tr>
                                 {[...columnasFijas, ...columnasVisibles].map(col => (
                                     <th key={col}>{columnasDisponibles[col]}</th>
@@ -264,6 +535,7 @@ const exportarAExcel = async () => {
                             </tr>
                         </thead>
                         <tbody>
+                            {/* MAP para mostrar filtros en la tabla*/}
                             {proyectosFiltrados.map(proyecto => (
                                 <tr key={proyecto.id_proyecto}>
                                     {[...columnasFijas, ...columnasVisibles].map(col => (
@@ -284,25 +556,59 @@ const exportarAExcel = async () => {
                                                     autoFocus
                                                 />
                                             ) : (
-                                                proyecto[col]
+                                                // Clumna que sirven como links
+                                                (col === 'enlace_maps' || col === 'enlace_whatsApp') ? (
+    <a
+        href={proyecto[col]}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ color: validarURL(proyecto[col]) ? 'green' : 'red' }}
+    >
+        {proyecto[col]}
+    </a>
+) : (
+    proyecto[col]
+)
+
                                             )}
                                         </td>
                                     ))}
+                                    {/* Formato parra cambiar el status del proyecto*/}
                                     <td>
-                                        <button
-                                            className="aprobar"
-                                            onClick={() => actualizarStatus(proyecto.id_proyecto, 'Aprobado')}
-                                        >
-                                            Aprobado
-                                        </button>
-                                        <button
-                                            className="rechazar"
-                                            onClick={() => actualizarStatus(proyecto.id_proyecto, 'No aprobado')}
-                                            style={{ marginLeft: '8px' }}
-                                        >
-                                            No aprobado
-                                        </button>
-                                    </td>
+  {proyecto.status_proyecto === 'En revisión' ? (
+    <>
+      <button
+        className="aprobar"
+        onClick={() => actualizarStatus(proyecto.id_proyecto, 'Aprobado')}
+      >
+        Aprobado
+      </button>
+      <button
+        className="rechazar"
+        onClick={() => actualizarStatus(proyecto.id_proyecto, 'No aprobado')}
+        style={{ marginLeft: '8px' }}
+      >
+        No aprobado
+      </button>
+    </>
+    ) : proyecto.status_proyecto === 'Aprobado' ? (
+    <>
+      <span style={{ fontWeight: 'bold', marginRight: '10px' }}>
+        {postulaciones.filter(p => p.id_proyecto === proyecto.id_proyecto).length} postulaciones
+      </span>
+      <button
+        className="ver-postulaciones"
+        onClick={() => handleVerPostulaciones(proyecto.id_proyecto)}
+      >
+        Ver postulaciones
+      </button>
+    </>
+  ) : (
+    proyecto.status_proyecto
+  )}
+
+</td>
+
                                 </tr>
                             ))}
                         </tbody>
@@ -328,6 +634,44 @@ const exportarAExcel = async () => {
                 <button onClick={cancelarEdicion} style={{ marginLeft: '8px' }}>Cancelar</button>
             </div>
         )}
+
+        {mostrarTablaPostulaciones && (
+  <div className="tabla-emergente">
+    <div className="tabla-emergente-header">
+      <h3>Postulaciones del Proyecto</h3>
+      <button onClick={cerrarTablaPostulaciones} style={{ float: 'right' }}>Cerrar</button>
+    </div>
+    <table className="tabla-postulaciones">
+      <thead>
+        <tr>
+          <th>Nombre Estudiante</th>
+          <th>Status</th>
+          <th>Fecha</th>
+          <th>Expectativa</th>
+          <th>Razón</th>
+          <th>Motivo</th>
+          <th>Descartado</th>
+          <th>Nota</th>
+        </tr>
+      </thead>
+      <tbody>
+        {postulaciones.map(p => (
+          <tr key={p.id_postulacion}>
+            <td>{p.nombre_estudiante}</td>
+            <td>{p.status}</td>
+            <td>{new Date(p.fecha_postulacion).toLocaleDateString()}</td>
+            <td>{p.expectativa}</td>
+            <td>{p.razon}</td>
+            <td>{p.motivo}</td>
+            <td>{p.pregunta_descarte}</td>
+            <td>{p.Nota}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
     </div>
 );
 

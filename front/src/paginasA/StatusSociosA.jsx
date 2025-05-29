@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import NavCub from '../componentes/navegacion';
+import { Link } from "react-router-dom";
 import './PaginasA.css';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -10,10 +11,10 @@ function StatusSocios() {
   const [socioSeleccionado, setSocioSeleccionado] = useState(null);
 
   useEffect(() => {
-    // Obtener socios en estado "En revisión"
+    //Obtener socios en estado "En revisión"
     axios.get('http://localhost:5003/socio/pendiente')
-      .then(response => setSocios(response.data))
-      .catch(error => console.error('Error al obtener socios:', error));
+   .then(response => setSocios(response.data))
+    .catch(error => console.error('Error al obtener socios:', error));
   }, []);
 
   // Cambiar el estado de un socio
@@ -53,9 +54,10 @@ function StatusSocios() {
   };
 
   return (
-    <div className="cube">
+    <div className="main">
       <NavCub />
-      <h1>Socios pendientes</h1>
+      <Link to="/" className="back-btn">← Volver</Link>
+      <h1 className="nontitle">Socios pendientes</h1>
 
       {/* Tabla de socios */}
       {!socioSeleccionado && (
@@ -67,7 +69,7 @@ function StatusSocios() {
               <th>Correo</th>
               <th>Estado</th>
               <th>Cambiar Estado</th>
-              <th>Ver más</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -97,7 +99,7 @@ function StatusSocios() {
       {socioSeleccionado && (
         <div className="modal">
           <div className="modal-content">
-            <h2>Detalles del Socio</h2>
+            <h2 className="nontitle">Detalles del Socio</h2>
 
             {socioSeleccionado.tipo_socio === 'Estudiante' && socioSeleccionado.detalles && (
               <div className="detalle-estudiante">
@@ -105,7 +107,7 @@ function StatusSocios() {
                 <p><strong>Correo:</strong> {socioSeleccionado.correo}</p>
                 <p><strong>Teléfono:</strong> {socioSeleccionado.telefono_osf}</p>
                 <p><strong>Status:</strong> <span className={badgeClass(socioSeleccionado.status)}>{socioSeleccionado.status}</span></p>
-                <p><strong>Tipo de Socio:</strong> <span className="badge aprobado">{socioSeleccionado.tipo_socio}</span></p>
+                <p><strong>Tipo de Socio:</strong> <span>{socioSeleccionado.tipo_socio}</span></p>
                 <p><strong>Nombre:</strong> {socioSeleccionado.detalles.nombre_socio}</p>
                 <p><strong>Matrícula:</strong> {socioSeleccionado.detalles.matricula}</p>
                 <p><strong>Semestre Acreditado:</strong> {socioSeleccionado.detalles.semestre_acreditado}</p>
@@ -122,7 +124,7 @@ function StatusSocios() {
             <p><strong>Teléfono:</strong> {socioSeleccionado.telefono_osf}</p>
             <p><strong>Redes Sociales:</strong> {socioSeleccionado.redes_sociales}</p>
             <p><strong>Status:</strong> <span className={badgeClass(socioSeleccionado.status)}>{socioSeleccionado.status}</span></p>
-            <p><strong>Tipo de Socio:</strong> <span className="badge aprobado">{socioSeleccionado.tipo_socio}</span></p>
+            <p><strong>Tipo de Socio:</strong> <span>{socioSeleccionado.tipo_socio}</span></p>
             <p><strong>Visión:</strong> {socioSeleccionado.vision}</p>
             <p><strong>Misión:</strong> {socioSeleccionado.mision}</p>
             <p><strong>Objetivos:</strong> {socioSeleccionado.objetivos}</p>
@@ -136,7 +138,7 @@ function StatusSocios() {
               </div>
             )}
 
-            <button className="cerrar-btn" onClick={cerrarInfo}>Cerrar socio</button>
+            <button className="cerrar-btn" onClick={cerrarInfo}>Cerrar</button>
           </div>
         </div>
       )}

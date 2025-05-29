@@ -3,6 +3,7 @@ import axios from 'axios';
 import NavCub from '../componentes/navegacionE';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import "./PaginasE.css";
 
 
 function MisPostulaciones() {
@@ -45,7 +46,7 @@ function MisPostulaciones() {
       .catch(error => {
       if (error.response && error.response.status === 400) {
         // Aquí mostramos el mensaje del backend
-        toast.error(error.response.data.message);
+        toast.success(error.response.data.message);
       } else {
         console.error('Error al actualizar el status:', error);
       }
@@ -66,11 +67,9 @@ function MisPostulaciones() {
   };
 
   return (
-    <div className="cube">
+    <div className="main">
       <NavCub />
-      <div className="contenedor-principal">
-        <div className="contenido-centro">
-          <h1>Mis Postulaciones</h1>
+          <h1 className="titulo">Mis Postulaciones</h1>
           <table className="tabla-postulaciones">
             <thead>
               <tr>
@@ -124,8 +123,6 @@ function MisPostulaciones() {
             </tbody>
           </table>
         </div>
-      </div>
-    </div>
   );
 }
 

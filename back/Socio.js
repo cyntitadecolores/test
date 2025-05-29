@@ -244,7 +244,7 @@ app.post(
             'id_estudiante', E.id_estudiante,
             'estudiante_nombre', E.nombre,
             'estudiante_correo', E.correo,
-            'estudiante_carrera', C.nombre,                     -- ⚠️ aquí cambia
+            'estudiante_carrera', C.nombre,                     
             'fecha_postulacion_estudiante', Po.fecha_postulacion,
             'expectativa', Po.expectativa,
             'razon', Po.razon,

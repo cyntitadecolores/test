@@ -85,7 +85,7 @@ const ProyectoCard = React.memo(({ proyecto, onClick }) => (
         className={styles.proyectoImage}
       />
     )}
-    <h2>{proyecto.nombre_proyecto}</h2>
+    <h2 className="nontitle">{proyecto.nombre_proyecto}</h2>
     <p>{proyecto.descripcion}</p>
     <p>Modalidad: {proyecto.modalidad}</p>
     <p>Status: {proyecto.status_proyecto}</p>
@@ -112,9 +112,9 @@ export default function NuestrosProyectosS() {
   const handleCloseModal = useCallback(() => setProyectoSeleccionado(null), []);
 
   return (
-    <div className="cube">
+    <div className="main">
       <NavCub />
-      <h1>Nuestros proyectos</h1>
+      <h1 className="titulo">Nuestros proyectos</h1>
 
       {error && <p>{error}</p>}
 

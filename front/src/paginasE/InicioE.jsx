@@ -4,15 +4,13 @@ import NavCub from "../componentes/navegacionE";
 
 function InicioE() {
   return (
-    <div className="cube-container">
+    <div className="main">
       <NavCub />
-      <div className="dashboard">
-        <h1>Hola Estudiante</h1>
 
         <div className="dashboard-content">
           {/* Sección de Periodos */}
           <div className="widgets-periodos">
-            <h2>Opciones de Servicio Social</h2>
+            <h2 className="nontitle">Opciones de Servicio Social</h2>
             <div className="combo">
               <h3>Combo 1</h3>
               <div className="periodo-widget">Periodo 1<br />11 Feb - 13 Mar<br />60 HORAS</div>
@@ -59,7 +57,6 @@ function InicioE() {
           <p>Recuerda que necesitas cursar tu <strong>Semana Tec de Introducción al Servicio Social</strong> antes de poder iniciar tus horas.</p>
         </div>
       </div>
-    </div>
   );
 }
 

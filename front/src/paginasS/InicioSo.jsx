@@ -159,10 +159,10 @@ function InicioSo() {
   if (error) return <p className={styles.error}>{error}</p>;
 
   return (
-    <div className={styles.cube}>
+    <div className="main">
       <NavCub onLogout={handleLogout} />
 
-      <h1>Personas Postuladas</h1>
+      <h1 className="titulo">Personas Postuladas</h1>
       {postulaciones.length ? (
         <Table headers={["Proyecto", "Nombre", "Correo", "Carrera", "Fecha", "Respuestas"]}>
           {postulaciones.map(p =>
@@ -175,7 +175,7 @@ function InicioSo() {
                 <td>{new Date(est.fecha_postulacion_estudiante).toLocaleDateString("es-MX")}</td>
                 <td>
                   <button className={styles.respuestaButton} onClick={() => handleRespuestaClick(p)}>
-                    Respuesta
+                    Ver Respuesta
                   </button>
                 </td>
               </tr>
@@ -186,7 +186,7 @@ function InicioSo() {
         <p>No tienes proyectos con estudiantes postulados.</p>
       )}
 
-      <h2>Alumnos aceptados / inscritos</h2>
+      <h2 className="nontitle">Alumnos aceptados / inscritos</h2>
       {inscritos.length ? (
         <Table headers={["Proyecto", "Nombre", "Correo", "Carrera", "Fecha", "Status"]}>
           {inscritos.map(p =>

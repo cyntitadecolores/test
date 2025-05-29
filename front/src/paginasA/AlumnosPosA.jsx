@@ -6,24 +6,50 @@ import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 
 function AlumnosPos() {
+    //obtener postulaciones
     const [postulaciones, setPostulaciones] = useState([]);
+    //columnas que se mostraran
     const [columnasVisibles, setColumnasVisibles] = useState([]);
+    //celda seleccionada para modificar info
     const [celdaSeleccionada, setCeldaSeleccionada] = useState(null);
+    //valor nuevo de la celda
     const [valorEditado, setValorEditado] = useState('');
     const [valorOriginal, setValorOriginal] = useState('');
+    //texto filtrado
     const [filteredText, setFilteredText] = useState('');
-    const columnasFijas = ['nombre_proyecto', 'nombre'];
+    //columnas que siempre se muestran
+    const columnasFijas = ['nombre_proyecto', 'nombre', 'status'];
+    //obtener proyectos
+    const [proyectos, setProyectos] = useState([]);
+
     const [mostrarFiltros, setMostrarFiltros] = useState(false);
+    const [socios, setSocios] = useState([]);
+//cuenta de resumen de postulaciones 
+const totalCupos = proyectos.reduce((total, proyecto) => total + proyecto.cupos_proyecto, 0);
+const totalInscritos = postulaciones.filter(p => p.status === 'Inscrito').length;
+const cuposDisponibles = totalCupos - totalInscritos;
+
+const [statusFiltro, setStatusFiltro] = useState('');
+
+
 
     const columnasDisponibles = {
-        nombre_proyecto: 'nombre_proyecto',
+        nombre_proyecto: 'nombre del proyecto',
         nombre: 'Nombre Estudiante',
         fecha_postulacion: 'Fecha Postulación',
         expectativa: 'Expectativa',
         razon: 'Razón',
         motivo: 'Motivo',
         pregunta_descarte: 'descarte',
+        status: 'Status',
     };
+
+    //GET de proyectos aprobados 
+    useEffect(() => {
+    axios.get('http://localhost:5003/proyectos/aprobados')
+      .then(response => setProyectos(response.data))
+      .catch(error => console.error('Error al obtener proyectos:', error));
+  }, []);
 
     const exportarAExcel = async () => {
         const workbook = new ExcelJS.Workbook();
@@ -72,6 +98,7 @@ function AlumnosPos() {
         saveAs(blob, 'alumnosPostulados.xlsx');
     };
 
+    //GET de postulaciones 
     useEffect(() => {
         axios.get('http://localhost:5003/postulaciones_alumnos')
             .then(response => {
@@ -93,6 +120,7 @@ function AlumnosPos() {
         const nuevoValor = valorEditado;
 
         try {
+            //edicion de informacion 
             const response = await fetch(`http://localhost:5003/postulaciones_alumnos/${filaId.id_proyecto}/${filaId.id_estudiante}/editar`, {
                 method: 'PUT',
                 headers: {
@@ -121,6 +149,7 @@ function AlumnosPos() {
         setValorOriginal('');
     };
 
+    //se puede borrar ya no se usa
     const actualizarStatus = (idProyecto, idEstudiante, nuevoStatus) => {
         axios.put(`http://localhost:5003/postulaciones_alumnos/${idProyecto}/${idEstudiante}/editar`, {
             columna: 'status',
@@ -146,18 +175,20 @@ function AlumnosPos() {
 
     // Filtro con las nuevas columnas
     const postulacionesFiltrados = postulaciones.filter(post =>
-        Object.entries(post).some(([key, valor]) => {
-            if (columnasVisibles.includes(key) || columnasFijas.includes(key)) {
-                return valor && valor.toString().toLowerCase().includes(filteredText);
-            }
-            return false;
-        })
-    );
+    (statusFiltro === '' || post.status === statusFiltro) &&
+    Object.entries(post).some(([key, valor]) => {
+        if (columnasVisibles.includes(key) || columnasFijas.includes(key)) {
+            return valor && valor.toString().toLowerCase().includes(filteredText);
+        }
+        return false;
+    })
+);
+
 
     return (
-        <div className="cube" style={{ marginLeft: '260px', padding: '20px' }}>
+        <div className="main">
             <NavCub />
-            <h1>Postulaciones de Alumnos</h1>
+            <h1 className="titulo">Postulaciones de Alumnos</h1>
 
             <button
                 onClick={() => setMostrarFiltros(prev => !prev)}
@@ -194,6 +225,17 @@ function AlumnosPos() {
                 <div className="tabla-container">
                     <p>Buscar:</p>
                     <input type="text" value={filteredText} onChange={handleChange} />
+                    <div style={{ marginTop: '10px', marginBottom: '10px' }}>
+  <label>Filtrar por status:&nbsp;</label>
+  <select value={statusFiltro} onChange={(e) => setStatusFiltro(e.target.value)}>
+    <option value="">Todos</option>
+    <option value="En revision">En revisión</option>
+    <option value="Aceptadx">Aceptadx</option>
+    <option value="No aceptadx">No aceptadx</option>
+    <option value="Alumno declinó participación">Alumno declinó participación</option>
+  </select>
+</div>
+
                     <div className="tabla-scroll-wrapper">
                         <table className="tabla-proyectos">
                             <thead>
@@ -258,6 +300,54 @@ function AlumnosPos() {
                     <button onClick={cancelarEdicion} style={{ marginLeft: '8px' }}>Cancelar</button>
                 </div>
             )}
+            <div className="resumen-container">
+  <div className="resumen-card purple">
+    <div className="resumen-header">
+      <span>Estudiantes postulados</span>
+      <img src="src/assets/icon_users.png" alt="Icono" />
+    </div>
+    <div className="resumen-value">{postulaciones.length}</div>
+  </div>
+
+  <div className="resumen-card yellow">
+    <div className="resumen-header">
+      <span>Estudiantes aceptados</span>
+      <img src="src/assets/icon_accept.png" alt="Icono" />
+    </div>
+    <div className="resumen-value">
+      {postulaciones.filter(p => p.status === 'Aceptadx').length}
+    </div>
+  </div>
+
+  <div className="resumen-card red">
+    <div className="resumen-header">
+      <span>Estudiantes no aceptados</span>
+      <img src="src/assets/icon_reject.png" alt="Icono" />
+    </div>
+    <div className="resumen-value">
+      {postulaciones.filter(p => p.status === 'No aceptadx').length}
+    </div>
+  </div>
+
+  <div className="resumen-card red">
+    <div className="resumen-header">
+      <span>Estudiantes inscritos</span>
+      <img src="src/assets/icon_reject.png" alt="Icono" />
+    </div>
+    <div className="resumen-value">
+      {postulaciones.filter(p => p.status === 'Inscrito').length}
+    </div>
+  </div>
+
+  <div className="resumen-card green">
+    <div className="resumen-header">
+      <span>Cupos disponibles</span>
+      <img src="src/assets/icon_chart.png" alt="Icono" />
+    </div>
+    <div className="resumen-value">{cuposDisponibles}</div> 
+  </div>
+</div>
+
         </div>
     );
 }

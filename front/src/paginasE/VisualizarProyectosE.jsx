@@ -3,6 +3,7 @@ import axios from 'axios';
 import NavCub from '../componentes/navegacionE';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import "./PaginasE.css";
 
 
 function VisualizarProyectos() {
@@ -136,7 +137,7 @@ const masinfo = () => {
 
     const result = await response.json();
     if (response.ok) {
-      toast.error('Postulación registrada con éxito');
+      toast.success('Postulación registrada con éxito');
     } else {
       toast.error('Error: ' + result.mensaje);
     }
@@ -151,7 +152,7 @@ const masinfo = () => {
   };
 
   return (
-    <div className="cube">
+    <div className="main">
       <NavCub />
       <h1 className="titulo">Catálogo de Proyectos</h1>
 
@@ -163,7 +164,7 @@ const masinfo = () => {
                 <th>Nombre</th>
                 <th>CRN</th>
                 <th>Grupo</th>
-                <th>clave materia</th>
+                <th>Clave Materia</th>
                 <th>Modalidad</th>
                 <th>Perido </th>
                 <th>Campus </th>
@@ -208,7 +209,7 @@ const masinfo = () => {
           <div className="modal-content">
             <h2>Detalles del Proyecto</h2>
             <p><strong>Nombre:</strong> {proyectoSeleccionado.nombre_proyecto}</p>
-            <p><strong>Periodo:</strong> {proyectoSeleccionado.periodo}</p>
+            <p><strong>Periodo:</strong> {proyectoSeleccionado.id_periodo}</p>
             <p><strong>Modalidad:</strong> {proyectoSeleccionado.modalidad}</p>
             <p><strong>Socio:</strong> {proyectoSeleccionado.nombre_osf}</p>
             <p><strong>Poblacion:</strong> {proyectoSeleccionado.poblacion_osf}</p> 
@@ -268,18 +269,10 @@ const masinfo = () => {
       )}
        {mostrarPostularme && (
   <div className="info-extra formulario-postulacion">
-    <h3 style={{ textAlign: 'center' }}>Formulario de Postulación</h3>
+    <h3 className="nontitle">Formulario de Postulación</h3>
 
     {errores.length > 0 && (
-      <div style={{
-        backgroundColor: '#ffe0e0',
-        padding: '15px',
-        marginBottom: '20px',
-        borderRadius: '8px',
-        border: '1px solid red',
-        maxWidth: '700px',
-        margin: '0 auto'
-      }}>
+      <div>
         <strong style={{ color: 'red' }}>Errores encontrados:</strong>
         <ul style={{ marginTop: '10px' }}>
           {errores.map((err, index) => (
@@ -289,13 +282,7 @@ const masinfo = () => {
       </div>
     )}
 
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '20px',
-      maxWidth: '700px',
-      margin: '0 auto'
-    }}>
+    <div>
       <div>
         <label>Expectativa:</label>
         <textarea 

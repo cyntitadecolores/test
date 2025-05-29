@@ -110,7 +110,7 @@ function ProyectosAprobados() {
   const cerrarTablaPostulaciones = () => setMostrarTablaPostulaciones(false);
 
   return (
-    <div className="cube">
+    <div className="main">
       <NavCub />
       <h1 className="titulo">Proyectos que han sido aceptados</h1>
 

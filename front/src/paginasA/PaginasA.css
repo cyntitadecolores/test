@@ -1,116 +1,305 @@
-.cube {
-    padding: 2rem;
-    text-align: center;
-    margin-left: 200px;
-    padding-top: 60px;
-    background-color: #fefaf4;
-    min-height: 100vh;
-  }
-  
-  .titulo {
-    font-size: 2rem;
-    margin-bottom: 2rem;
-  }
-  
-  .card-container {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 2rem;
-  }
-  
-  .info-card {
-    background-color: #e0e0e0;
-    padding: 2rem;
-    width: 200px;
-    height: 150px;
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 1.1rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-  }
-  
-  .info-card:hover {
-    background-color: #cfcfcf;
-    transform: scale(1.05);
-  }
-  
-  .socios-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: #fff;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .socios-table th,
-  .socios-table td {
-    padding: 16px;
-    text-align: left;
-    border-bottom: 1px solid #eee;
-    color: #000; /* Asegura texto negro */
-  }
-  
-  .socios-table th {
-    background-color: #f1f1f1;
-    font-weight: 600;
-    color: #000; /* texto negro en encabezados */
-  }
-  
-  .socios-table tr:hover {
-    background-color: #fafafa;
-  }
-  
-  select {
-    padding: 6px 10px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-  }
-  
-  /* Badges */
-  .badge {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 13px;
-    font-weight: 600;
-    text-transform: capitalize;
-  }
-  
-  .aprobado {
-    background-color: #d1fae5;
-    color: #065f46;
-  }
-  
-  .aceptado {
-    background-color: #def7ec;
-    color: #036666;
-  }
-  
-  .rechazado {
-    background-color: #fde8e8;
-    color: #b91c1c;
-  }
-  
-  .pendiente {
-    background-color: #fef3c7;
-    color: #92400e;
-  }
-  
-  .en-proceso {
-    background-color: #ede9fe;
-    color: #6b21a8;
-  }
-  
-
-  .tabla-container {
-    overflow-x: auto;
-    margin-top: 20px;
+.main {
+  margin-left: 250px;
+  margin-top: 60px; 
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
 }
+
+.titulo {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: black;
+  margin-bottom: 4rem;
+  border-bottom: none;
+}
+
+.nontitle {
+  font-size: 2rem;
+  font-weight: bold;
+  color: black;
+  margin-bottom: 0.5rem;
+  border-bottom: none;
+}
+
+.back-btn {
+  align-self: flex-start;
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+  margin-left: 1rem;
+  text-decoration: none;
+  font-size: 1rem;
+  color: #4a90e2;
+  font-weight: bold;
+  transition: color 0.2s ease;
+}
+
+.back-btn:hover {
+  color: #1a5fb4;
+}
+
+/* INICIO */
+.card-container {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  max-width: 800px;
+}
+
+.info-card {
+  width: 200px;
+  height: 200px;
+  border: 4px solid;
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: black;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  min-width: 200px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.info-card:hover {
+  transform: scale(1.08);
+}
+
+.info-card img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  margin-bottom: 1rem;
+  opacity: 0.9;
+}
+
+.info-card-title {
+  position: relative;
+  color: black;
+  width: 100%;
+  text-align: center;
+  padding: 0.5rem;
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+
+/* AGREGAR ADMIN*/
+
+.form-box {
+  background-color: #ffffff;
+  padding: 2rem 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-group label {
+  font-weight: bold;
+  font-size: 1rem;
+  color: #333;
+}
+
+.input-group input {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1.5px solid #ccc;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.input-group input:focus {
+  border-color: #ed9235;
+  outline: none;
+}
+
+.input-box {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.input-box input {
+  flex: 1;
+  padding-right: 3rem;
+}
+
+.toggle-btn {
+  position: absolute;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.toggle-btn img.icon {
+  width: 24px;
+  height: 24px;
+  opacity: 0.8;
+}
+
+.signup-btn {
+  background-color: black;
+  color: white;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.signup-btn:hover {
+  background-color: #ed9235;
+}
+
+/* STATUS SOCIOS */
+
+.socios-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 1.5rem;
+}
+
+.socios-table th,
+.socios-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.socios-table th {
+  background-color: #b9e4fb;
+  color: #444;
+  font-weight: 600;
+}
+
+.socios-table tr:hover {
+  background-color: #fafafa;
+}
+
+.ver-mas-link {
+  background-color: #56b3e4;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.ver-mas-link:hover {
+  background-color: #4d9fcb;
+}
+
+select {
+  padding: 0.4rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* Badges por estado */
+.badge {
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.badge.aprobado,
+.badge.aceptado {
+  background-color: #4caf50;
+}
+
+.badge.en-proceso {
+  background-color: #ffa726;
+}
+
+.badge.rechazado {
+  background-color: #e53935;
+}
+
+.badge.pendiente {
+  background-color: #9e9e9e;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 700px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.detalle-estudiante p {
+  margin: 0.5rem 0;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.detalle-estudiante h3 {
+  margin-bottom: 1rem;
+  color: black;
+}
+
+.cerrar-btn {
+  margin-top: 1.5rem;
+  background-color: #56b3e4;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.cerrar-btn:hover {
+  background-color: #4d9fcb;
+}
+

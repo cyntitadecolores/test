@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import './Signup.css';
 import logo from './assets/logo_servicio.png';
+import { toast } from 'react-toastify';
 
 const formDataInicial = {
   // Globales
@@ -151,13 +152,13 @@ const Signup = () => {
         notificaciones: !!formData.notificaciones
       });
 
-      alert(res.data.mensaje || 'Registro exitoso');
+      toast.success(res.data.mensaje || 'Registro exitoso');
       setFormData(formDataInicial);
       setTipo('');
       setPerfilSocio('');
       navigate('/login');
     } catch (err) {
-      alert(err.response?.data?.error || 'Error al registrar');
+      toast.error(err.response?.data?.error || 'Error al registrar');
     } finally {
       setLoading(false); // Finaliza la carga
     }
