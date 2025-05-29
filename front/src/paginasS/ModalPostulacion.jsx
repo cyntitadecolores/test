@@ -17,6 +17,7 @@ const ModalPostulacion = ({ data, onClose, onAccept, onReject }) => {
         
         <div className={styles.buttonContainer}>
           <button onClick={() => onAccept(data.id_proyecto, data.id_estudiante)} className={styles.aceptarButton}>Aceptar</button>
+        
           <button onClick={() => onReject(data.id_proyecto, data.id_estudiante)} className={styles.rechazarButton}>Rechazar</button>
         </div>
       </div>
