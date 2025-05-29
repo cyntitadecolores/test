@@ -75,6 +75,7 @@ app.get('/postulaciones', verifyToken, (req, res) => {
       pr.direccion_escrita,
       p.fecha_postulacion,
       p.status,
+      pr.id_periodo, 
       p.expectativa,
       p.razon,
       p.motivo,
@@ -177,90 +178,111 @@ app.get('/proyectos', (req, res) => {
     });
 });
 
-app.put('/postulaciones_alumnos/:id_proyecto/status', verifyToken, (req, res) => {
-  const { id_proyecto } = req.params;
-  const id_estudiante = req.user.id; // sacado del token
-  const { status } = req.body;
 
-  if (status === 'Inscrito') {
-    // Primero obtenemos el id_periodo del proyecto que quiere aceptar
-    db.query(
-      'SELECT id_periodo FROM Proyecto WHERE id_proyecto = ?',
-      [id_proyecto],
-      (err, proyectoResults) => {
-        if (err) {
-          console.error('Error al obtener proyecto:', err);
-          return res.status(500).json({ message: 'Error al obtener proyecto' });
-        }
-        if (proyectoResults.length === 0) {
-          return res.status(404).json({ message: 'Proyecto no encontrado' });
-        }
+app.get('/mis-postulaciones', verifyToken, (req, res) => {
+  const idEstudiante = req.user.id;
 
-        const idPeriodoNuevo = proyectoResults[0].id_periodo;
+  const sql = `
+    SELECT p.id_proyecto, p.status, pr.id_periodo
+    FROM postulacion p
+    JOIN proyecto pr ON p.id_proyecto = pr.id_proyecto
+    WHERE p.id_estudiante = ?
+  `;
 
-        // Luego obtenemos los proyectos inscritos del estudiante con sus id_periodo
-        db.query(
-          `SELECT p.id_periodo FROM Postulacion ps
-           JOIN Proyecto p ON ps.id_proyecto = p.id_proyecto
-           WHERE ps.id_estudiante = ? AND ps.status = 'Inscrito'`,
-          [id_estudiante],
-          (err, postulacionesInscritas) => {
-            if (err) {
-              console.error('Error al obtener postulaciones inscritas:', err);
-              return res.status(500).json({ message: 'Error al obtener postulaciones' });
-            }
-
-            // Definimos los empalmes
-            const empalmes = {
-              1: [1,4,6],
-              2: [2,4,5,6],
-              3: [3,5,6],
-              4: [1,2,4,6,5],
-              5: [2,3,4,6,6],
-              6: [1,2,3,4,5,6],
-            };
-
-            // Revisamos conflictos
-            for (const post of postulacionesInscritas) {
-              const periodosEmpalmes = empalmes[post.id_periodo] || [];
-              if (periodosEmpalmes.includes(idPeriodoNuevo)) {
-                return res.status(400).json({
-                  message: `No puedes aceptar la postulacion porque tienes un proyecto inscrito en periodo ${post.id_periodo} que empalma con el periodo ${idPeriodoNuevo}`
-                });
-              }
-            }
-
-            // No hay conflictos, actualizamos el status
-            db.query(
-              'UPDATE Postulacion SET status = ? WHERE id_proyecto = ? AND id_estudiante = ?',
-              [status, id_proyecto, id_estudiante],
-              (err, result) => {
-                if (err) {
-                  console.error('Error al actualizar el status:', err);
-                  return res.status(500).json({ message: 'Error al actualizar status' });
-                }
-                res.json({ message: 'Status actualizado correctamente' });
-              }
-            );
-          }
-        );
-      }
-    );
-  } else {
-    // Si el status no es 'Inscrito', actualizar directamente
-    db.query(
-      'UPDATE Postulacion SET status = ? WHERE id_proyecto = ? AND id_estudiante = ?',
-      [status, id_proyecto, id_estudiante],
-      (err, result) => {
-        if (err) {
-          console.error('Error al actualizar el status:', err);
-          return res.status(500).json({ message: 'Error al actualizar status' });
-        }
-        res.json({ message: 'Status actualizado correctamente' });
-      }
-    );
-  }
+  db.query(sql, [idEstudiante], (err, resultados) => {
+    if (err) {
+      console.error('Error al obtener postulaciones:', err);
+      return res.status(500).json({ mensaje: 'Error al obtener postulaciones' });
+    }
+    res.json(resultados);
+  });
 });
+
+
+  app.put('/postulaciones_alumnos/:id_proyecto/status', verifyToken, (req, res) => {
+    const { id_proyecto } = req.params;
+    const id_estudiante = req.user.id; // sacado del token
+    const { status } = req.body;
+
+    if (status === 'Inscrito') {
+      // Primero obtenemos el id_periodo del proyecto que quiere aceptar
+      db.query(
+        'SELECT id_periodo FROM Proyecto WHERE id_proyecto = ?',
+        [id_proyecto],
+        (err, proyectoResults) => {
+          if (err) {
+            console.error('Error al obtener proyecto:', err);
+            return res.status(500).json({ message: 'Error al obtener proyecto' });
+          }
+          if (proyectoResults.length === 0) {
+            return res.status(404).json({ message: 'Proyecto no encontrado' });
+          }
+
+          const idPeriodoNuevo = proyectoResults[0].id_periodo;
+
+          // Luego obtenemos los proyectos inscritos del estudiante con sus id_periodo
+          db.query(
+            `SELECT p.id_periodo FROM Postulacion ps
+            JOIN Proyecto p ON ps.id_proyecto = p.id_proyecto
+            WHERE ps.id_estudiante = ? AND ps.status = 'Inscrito'`,
+            [id_estudiante],
+            (err, postulacionesInscritas) => {
+              if (err) {
+                console.error('Error al obtener postulaciones inscritas:', err);
+                return res.status(500).json({ message: 'Error al obtener postulaciones' });
+              }
+
+              // Definimos los empalmes
+              const empalmes = {
+                1: [1,4,6],
+                2: [2,4,5,6],
+                3: [3,5,6],
+                4: [1,2,4,6,5],
+                5: [2,3,4,6,6],
+                6: [1,2,3,4,5,6],
+              };
+
+              // Revisamos conflictos
+              for (const post of postulacionesInscritas) {
+                const periodosEmpalmes = empalmes[post.id_periodo] || [];
+                if (periodosEmpalmes.includes(idPeriodoNuevo)) {
+                  return res.status(400).json({
+                    message: `No puedes aceptar la postulacion porque tienes un proyecto inscrito en periodo ${post.id_periodo} que empalma con el periodo ${idPeriodoNuevo}`
+                  });
+                }
+              }
+
+              // No hay conflictos, actualizamos el status
+              db.query(
+                'UPDATE Postulacion SET status = ? WHERE id_proyecto = ? AND id_estudiante = ?',
+                [status, id_proyecto, id_estudiante],
+                (err, result) => {
+                  if (err) {
+                    console.error('Error al actualizar el status:', err);
+                    return res.status(500).json({ message: 'Error al actualizar status' });
+                  }
+                  res.json({ message: 'Status actualizado correctamente' });
+                }
+              );
+            }
+          );
+        }
+      );
+    } else {
+      // Si el status no es 'Inscrito', actualizar directamente
+      db.query(
+        'UPDATE Postulacion SET status = ? WHERE id_proyecto = ? AND id_estudiante = ?',
+        [status, id_proyecto, id_estudiante],
+        (err, result) => {
+          if (err) {
+            console.error('Error al actualizar el status:', err);
+            return res.status(500).json({ message: 'Error al actualizar status' });
+          }
+          res.json({ message: 'Status actualizado correctamente' });
+        }
+      );
+    }
+  });
 
 
 

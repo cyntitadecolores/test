@@ -174,7 +174,7 @@ tr:hover {
 
 .cerrar-btn {
   margin: 10px 10px 0 0;
-  background-color: #ef476f;
+  background-color: #0033a0;
   color: white;
   border: none;
   padding: 10px 14px;
@@ -184,7 +184,7 @@ tr:hover {
 }
 
 .cerrar-btn:hover {
-  background-color: #d62839;
+  background-color: #012b87;
 }
 
 .info-extra {

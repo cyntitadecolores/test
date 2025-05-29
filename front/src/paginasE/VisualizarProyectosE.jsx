@@ -21,6 +21,7 @@ const [preguntaDescarte, setPreguntaDescarte] = useState('');
 const [nota, setNota] = useState('');
 const [idProyectoPostulacion, setIdProyectoPostulacion] = useState(null);
 const [errores, setErrores] = useState([]);
+const [postulaciones, setPostulaciones] = useState([]);
 
 
 
@@ -113,6 +114,35 @@ const masinfo = () => {
       .catch(err => setError(err.message));
   }, []);
 
+  useEffect(() => {
+  const token = localStorage.getItem('token');
+
+  fetch('http://localhost:5004/mis-postulaciones', {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+    .then(res => res.json())
+    .then(data => setPostulaciones(data))
+    .catch(err => console.error('Error al obtener postulaciones:', err));
+}, []);
+
+
+const tieneEmpalmeInscrito = (periodoNuevo) => {
+  const empalmes = {
+    1: [1,4,6],
+    2: [2,4,5,6],
+    3: [3,5,6],
+    4: [1,2,4,6,5],
+    5: [2,3,4,6,6],
+    6: [1,2,3,4,5,6],
+  };
+
+  const postulacionesInscritas = postulaciones.filter(p => p.status === 'Inscrito');
+
+  return postulacionesInscritas.some(p => empalmes[periodoNuevo]?.includes(p.id_periodo));
+};
+
   const handleInformacion = (id) => {
     axios.get(`http://localhost:5003/proyectoss/${id}`)
       .then(response => {
@@ -147,6 +177,20 @@ const masinfo = () => {
   }
 };
 
+const handleClickPostularme = () => {
+  if (tieneEmpalmeInscrito(proyectoSeleccionado.id_periodo)) {
+    toast.error('Ya estás inscrito en un proyecto con periodo que se empalma.');
+    return;
+  }
+
+  setIdProyectoPostulacion(proyectoSeleccionado.id_proyecto);
+  setMostrarPostularme(true);
+  setProyectoSeleccionado(null);
+  setMostrarMasInfo(false);
+  setMostrarRequiere(false);
+};
+
+
   const cerrarInfo = () => {
     setProyectoSeleccionado(null);
   };
@@ -178,7 +222,12 @@ const masinfo = () => {
                 <tr><td >No hay proyectos disponibles.</td></tr>
               ) : (
                 proyectos.map(proyecto => (
-                  <tr key={proyecto.id_proyecto}>
+                  <tr
+  key={proyecto.id_proyecto}
+  style={{
+    backgroundColor: postulaciones.some(p => p.id_proyecto === proyecto.id_proyecto) ? '#cdeccb' : 'transparent'
+  }}
+>
                     <td>{proyecto.nombre_proyecto}</td>
                     <td>{proyecto.crn}</td>
                     <td>{proyecto.grupo}</td>
@@ -215,20 +264,12 @@ const masinfo = () => {
             <p><strong>Poblacion:</strong> {proyectoSeleccionado.poblacion_osf}</p> 
             <p><strong>Problematica:</strong> {proyectoSeleccionado.problema_social}</p>
             <p><strong>Razon:</strong> {proyectoSeleccionado.razon_osf}</p>
-            <button className="cerrar-btn" onClick={requiere}>que se espera de mi?</button>
-            <button className="cerrar-btn" onClick={masinfo}>saber aun mas..</button>
-            <button
-  className="cerrar-btn"
-  onClick={() => {
-    setIdProyectoPostulacion(proyectoSeleccionado.id_proyecto); // ✅
-    setMostrarPostularme(true);
-    setProyectoSeleccionado(null);
-    setMostrarMasInfo(false);
-    setMostrarRequiere(false);
-  }}
->
+            <button className="cerrar-btn" onClick={requiere}>Que se espera de mi?</button>
+            <button className="cerrar-btn" onClick={masinfo}>Saber aun mas..</button>
+            <button className="cerrar-btn" onClick={handleClickPostularme}>
   Postularme
 </button>
+
 
             <button className="cerrar-btn" onClick={cerrarInfo}>Cerrar</button>
 
@@ -273,7 +314,7 @@ const masinfo = () => {
 
     {errores.length > 0 && (
       <div>
-        <strong style={{ color: 'red' }}>Errores encontrados:</strong>
+        <strong>Errores encontrados:</strong>
         <ul style={{ marginTop: '10px' }}>
           {errores.map((err, index) => (
             <li key={index}>{err}</li>

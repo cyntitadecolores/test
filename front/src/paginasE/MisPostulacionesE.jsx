@@ -53,6 +53,25 @@ function MisPostulaciones() {
     });
   };
 
+  const empalmes = {
+  1: [1, 4, 6],
+  2: [2, 4, 5, 6],
+  3: [3, 5, 6],
+  4: [1, 2, 4, 6, 5],
+  5: [2, 3, 4, 6, 6],
+  6: [1, 2, 3, 4, 5, 6],
+};
+
+// Revisa si un proyecto se empalma con uno inscrito
+const seEmpalmaConInscrito = (idPeriodoActual) => {
+  const periodosInscritos = datos
+    .filter(p => p.status === 'Inscrito')
+    .map(p => p.id_periodo);
+
+  return periodosInscritos.some(pIns => empalmes[idPeriodoActual]?.includes(pIns));
+};
+
+
   const obtenerClaseEstado = (estado) => {
     switch (estado) {
       case 'Aceptado':
@@ -98,26 +117,40 @@ function MisPostulaciones() {
                   <td>{item.Nota}</td>
                   <td className={obtenerClaseEstado(item.status)}>{item.status}</td>
                   <td>
-                    {item.status === 'Aceptadx' ? (
-                      <>
-                        <button
-                          className="aprobar"
-                          onClick={() => actualizarStatus(item.id_proyecto, 'Inscrito')}
-                        >
-                          Aceptar participación
-                        </button>
-                        <button
-                          className="rechazar"
-                          onClick={() => actualizarStatus(item.id_proyecto, 'Alumno declinó participación')}
-                          style={{ marginLeft: '8px' }}
-                        >
-                          Declinar participación
-                        </button>
-                      </>
-                    ) : (
-                      '—'
-                    )}
-                  </td>
+  {item.status === 'Aceptadx' ? (
+    seEmpalmaConInscrito(item.id_periodo) ? (
+      <>
+        <button
+          className="rechazar"
+          onClick={() => actualizarStatus(item.id_proyecto, 'Alumno declinó participación')}
+        >
+          Declinar participación
+        </button>
+        <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>
+          No puedes aceptar porque se empalma con otro proyecto en el que ya estás inscrito.
+        </div>
+      </>
+    ) : (
+      <>
+        <button
+          className="aprobar"
+          onClick={() => actualizarStatus(item.id_proyecto, 'Inscrito')}
+        >
+          Aceptar participación
+        </button>
+        <button
+          className="rechazar"
+          onClick={() => actualizarStatus(item.id_proyecto, 'Alumno declinó participación')}
+          style={{ marginLeft: '8px' }}
+        >
+          Declinar participación
+        </button>
+      </>
+    )
+  ) : (
+    '—'
+  )}
+</td>
                 </tr>
               ))}
             </tbody>
