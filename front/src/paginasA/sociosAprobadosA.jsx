@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import NavCub from '../componentes/navegacion';
-import "./PaginasA.css";
+import './tablasA.css';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 
@@ -126,15 +126,22 @@ function SociosAprobados() {
       <NavCub />
       <h1 className="titulo">Socios que han sido aprobados</h1>
 
+       <button onClick={exportarAExcel} className="bttn-excel">
+            Descargar Excel
+      </button>
+
       {!socioSeleccionado && (
         <div className="tabla-container">
-          <label>Buscar: </label>
-          <input
-            type="text"
-            value={filteredText}
-            onChange={(e) => setFilteredText(e.target.value)}
-            placeholder="Buscar socio..."
-          />
+          <div className="buscador">
+            <label>Buscar: </label>
+            <input
+              type="text"
+              value={filteredText}
+              onChange={(e) => setFilteredText(e.target.value)}
+              className="input-busqueda"
+              placeholder="Buscar socio..."
+            />
+          </div>
           <table className="tabla-proyectos">
             <thead>
               <tr>
@@ -160,9 +167,6 @@ function SociosAprobados() {
               ))}
             </tbody>
           </table>
-          <button onClick={exportarAExcel} style={{ marginBottom: '20px', marginLeft: '10px' }}>
-    Descargar Excel
-</button>
         </div>
       )}
 

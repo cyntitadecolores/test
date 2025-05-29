@@ -483,12 +483,17 @@ const handleVerPostulaciones = (id_proyecto) => {
         <h1 className="titulo">Proyectos Postulados Pendientes</h1>
 
 {/* Boton de cambio de vista */}
-        <button
+        <div className="botones-acciones">
+          <button
             onClick={() => setMostrarFiltros(prev => !prev)}
             className="bttn-filtro"
-        >
+          >
             {mostrarFiltros ? 'Ver Tabla' : 'Aplicar Filtros'}
-        </button>
+          </button>
+          <button onClick={exportarAExcel} className="bttn-excel">
+            Descargar Excel
+          </button>
+        </div>
 
 {/* Lista de filtros para ver tabla*/}
         {mostrarFiltros ? (
@@ -517,12 +522,17 @@ const handleVerPostulaciones = (id_proyecto) => {
             </div>
         ) : (
             <div className="tabla-container">
-                <p>Buscar:</p>
-                <input
+                <div className="buscador">
+                  <label htmlFor="busqueda">Buscar:</label>
+                  <input
+                    id="busqueda"
                     type="text"
                     value={filteredText}
                     onChange={handleChange}
-                />
+                    className="input-busqueda"
+                    placeholder="Buscar proyecto..."
+                  />
+                </div>
                 <div className="tabla-scroll-wrapper">
                     <table className="tabla-proyectos">
                         <thead>
@@ -612,11 +622,7 @@ const handleVerPostulaciones = (id_proyecto) => {
                                 </tr>
                             ))}
                         </tbody>
-                    </table>
-                    <button onClick={exportarAExcel} style={{ marginBottom: '20px', marginLeft: '10px' }}>
-    Descargar Excel
-</button>
-
+                    </table>       
                 </div>
             </div>
         )}

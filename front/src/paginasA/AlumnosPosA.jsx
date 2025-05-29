@@ -34,7 +34,7 @@ const [statusFiltro, setStatusFiltro] = useState('');
 
 
     const columnasDisponibles = {
-        nombre_proyecto: 'nombre del proyecto',
+        nombre_proyecto: 'Nombre de Proyecto',
         nombre: 'Nombre Estudiante',
         fecha_postulacion: 'Fecha Postulación',
         expectativa: 'Expectativa',
@@ -190,12 +190,17 @@ const [statusFiltro, setStatusFiltro] = useState('');
             <NavCub />
             <h1 className="titulo">Postulaciones de Alumnos</h1>
 
-            <button
-                onClick={() => setMostrarFiltros(prev => !prev)}
-                style={{ marginBottom: '20px' }}
-            >
-                {mostrarFiltros ? 'Ver Tabla' : 'Aplicar Filtros'}
-            </button>
+            <div className="botones-acciones">
+                <button
+                    onClick={() => setMostrarFiltros(prev => !prev)}
+                    className="bttn-filtro"
+                >
+                    {mostrarFiltros ? 'Ver Tabla' : 'Aplicar Filtros'}
+                </button>
+                <button onClick={exportarAExcel} className="bttn-excel">
+                    Descargar Excel
+                </button>
+            </div>
 
             {mostrarFiltros ? (
                 <div className="filtros-columnas-wrapper">
@@ -223,18 +228,25 @@ const [statusFiltro, setStatusFiltro] = useState('');
                 </div>
             ) : (
                 <div className="tabla-container">
-                    <p>Buscar:</p>
-                    <input type="text" value={filteredText} onChange={handleChange} />
-                    <div style={{ marginTop: '10px', marginBottom: '10px' }}>
-  <label>Filtrar por status:&nbsp;</label>
-  <select value={statusFiltro} onChange={(e) => setStatusFiltro(e.target.value)}>
-    <option value="">Todos</option>
-    <option value="En revision">En revisión</option>
-    <option value="Aceptadx">Aceptadx</option>
-    <option value="No aceptadx">No aceptadx</option>
-    <option value="Alumno declinó participación">Alumno declinó participación</option>
-  </select>
-</div>
+                    <div className="buscador">
+                    <label htmlFor="busqueda">Buscar:</label>
+                        <input
+                            id="busqueda"
+                            type="text"
+                            value={filteredText}
+                            onChange={handleChange}
+                            className="input-busqueda"
+                            placeholder="Buscar alumno..."
+                        />
+                        <label>Filtrar por status:&nbsp;</label>
+                        <select value={statusFiltro} onChange={(e) => setStatusFiltro(e.target.value)}>
+                            <option value="">Todos</option>
+                            <option value="En revision">En revisión</option>
+                            <option value="Aceptadx">Aceptadx</option>
+                            <option value="No aceptadx">No aceptadx</option>
+                            <option value="Alumno declinó participación">Alumno declinó participación</option>
+                        </select>
+                    </div>
 
                     <div className="tabla-scroll-wrapper">
                         <table className="tabla-proyectos">
@@ -280,9 +292,6 @@ const [statusFiltro, setStatusFiltro] = useState('');
                                 ))}
                             </tbody>
                         </table>
-                        <button onClick={exportarAExcel} style={{ marginBottom: '20px', marginLeft: '10px' }}>
-    Descargar Excel
-</button>
                     </div>
                 </div>
             )}
@@ -304,7 +313,6 @@ const [statusFiltro, setStatusFiltro] = useState('');
   <div className="resumen-card purple">
     <div className="resumen-header">
       <span>Estudiantes postulados</span>
-      <img src="src/assets/icon_users.png" alt="Icono" />
     </div>
     <div className="resumen-value">{postulaciones.length}</div>
   </div>
@@ -312,7 +320,6 @@ const [statusFiltro, setStatusFiltro] = useState('');
   <div className="resumen-card yellow">
     <div className="resumen-header">
       <span>Estudiantes aceptados</span>
-      <img src="src/assets/icon_accept.png" alt="Icono" />
     </div>
     <div className="resumen-value">
       {postulaciones.filter(p => p.status === 'Aceptadx').length}
@@ -322,17 +329,15 @@ const [statusFiltro, setStatusFiltro] = useState('');
   <div className="resumen-card red">
     <div className="resumen-header">
       <span>Estudiantes no aceptados</span>
-      <img src="src/assets/icon_reject.png" alt="Icono" />
     </div>
     <div className="resumen-value">
       {postulaciones.filter(p => p.status === 'No aceptadx').length}
     </div>
   </div>
 
-  <div className="resumen-card red">
+  <div className="resumen-card blue">
     <div className="resumen-header">
       <span>Estudiantes inscritos</span>
-      <img src="src/assets/icon_reject.png" alt="Icono" />
     </div>
     <div className="resumen-value">
       {postulaciones.filter(p => p.status === 'Inscrito').length}
@@ -342,7 +347,6 @@ const [statusFiltro, setStatusFiltro] = useState('');
   <div className="resumen-card green">
     <div className="resumen-header">
       <span>Cupos disponibles</span>
-      <img src="src/assets/icon_chart.png" alt="Icono" />
     </div>
     <div className="resumen-value">{cuposDisponibles}</div> 
   </div>

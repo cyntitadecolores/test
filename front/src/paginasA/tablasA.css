@@ -42,7 +42,7 @@
 }
 
 .bttn-filtro {
-    background-color: #00ad8c;
+    background-color: #4a90e2;
   color: white;
   padding: 0.75rem 1rem;
   border: none;
@@ -81,6 +81,7 @@
     border: 1px solid #ddd;
     border-radius: 8px;
     margin-bottom: 20px;
+    width: 80%;
 }
 
 .filtros-columnas {
@@ -104,46 +105,91 @@
     line-height: 1.2;
 }
 
+.botones-acciones {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 20px;
+}
 
+.bttn-excel {
+  background-color: #00ad8c;
+  color: white;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.bttn-excel:hover {
+  background-color: #017963;
+}
 
 .tabla-container {
     overflow-x: auto;
-    margin-top: 20px;
+    margin-top: 10px;
     direction: ltr;
     padding-left: 0;
     position: relative;
     width: calc(100vw - 260px); 
-    box-sizing: border-box; 
-    left: 260px;
+    box-sizing: border-box;
+    margin-left: 3rem;
 }
 
+.buscador {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
 
+.buscador label {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.input-busqueda {
+  padding: 8px 12px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 250px;
+  max-width: 100%;
+  transition: border-color 0.3s ease;
+}
+
+.input-busqueda:focus {
+  outline: none;
+  border-color: #00ad8c;
+  box-shadow: 0 0 0 2px rgba(0, 173, 140, 0.2);
+}
 
 /* Nuevo diseño estilo mockup */
 .tabla-proyectos {
-    border-collapse: separate;
-    border-spacing: 0 12px;
     width: 100%;
-    margin-bottom: 20px;
+  border-collapse: collapse;
+  background-color: white;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 1.5rem;
 }
 
 .tabla-proyectos th {
-    background-color: transparent;
-    font-weight: 600;
-    font-size: 13px;
-    color: #777;
-    text-transform: uppercase;
-    padding: 10px 16px;
-    border-bottom: 1px solid #ddd;
+  background-color: #b9e4fb;
+  color: #444;
+  font-weight: 600;
 }
 
 .tabla-proyectos td {
-    background-color: #fff;
-    font-size: 14px;
-    color: #333;
-    padding: 12px 16px;
-    border: none;
-    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
 }
 
 .tabla-proyectos tr {
@@ -216,6 +262,106 @@
   font-size: 0.85rem;
 }
 
+.resumen-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center; /* centra las tarjetas */
+  margin: 1rem 0;
+}
+
+.resumen-card {
+  flex: 1 1 160px; /* tarjetas flexibles con ancho mínimo de 180px */
+  max-width: 220px;
+  background-color: #f5f5f5;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease;
+  cursor: default;
+}
+
+.resumen-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.resumen-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
+.resumen-header span {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.resumen-header img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+/* Valor destacado */
+.resumen-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #222;
+  text-align: right;
+  user-select: none;
+}
+
+/* Colores por categoría */
+.resumen-card.purple {
+  background-color: #6a4c93;
+  color: #f0e9ff;
+}
+
+.resumen-card.purple .resumen-value {
+  color: #d8cfff;
+}
+
+.resumen-card.yellow {
+  background-color: #f0c419;
+  color: #5a4a01;
+}
+
+.resumen-card.yellow .resumen-value {
+  color: #423700;
+}
+
+.resumen-card.red {
+  background-color: #e74c3c;
+  color: #fff5f5;
+}
+
+.resumen-card.red .resumen-value {
+  color: #ffe6e5;
+}
+
+.resumen-card.blue {
+  background-color: #3ca5e7;
+  color: #fff5f5;
+}
+
+.resumen-card.blue .resumen-value {
+  color: #423700;
+}
+
+.resumen-card.green {
+  background-color: #27ae60;
+  color: #dff6e4;
+}
+
+.resumen-card.green .resumen-value {
+  color: #b8e994;
+}
 
 /* Estilos adicionales para la tabla */
 @media (max-width: 768px) {
@@ -226,5 +372,13 @@
 
     .tabla-proyectos {
         font-size: 12px;
+    }
+
+    .resumen-container {
+    flex-direction: column;
+    align-items: center;
+    }
+    .resumen-card {
+      max-width: 90vw;
     }
 }
