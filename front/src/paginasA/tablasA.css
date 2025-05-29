@@ -271,9 +271,9 @@
 }
 
 .resumen-card {
-  flex: 1 1 160px; /* tarjetas flexibles con ancho mínimo de 180px */
+  flex: 1 1 150px; /* tarjetas flexibles con ancho mínimo de 180px */
   max-width: 220px;
-  background-color: #f5f5f5;
+  background-color: #ffffff;
   border-radius: 10px;
   box-shadow: 0 3px 8px rgba(0,0,0,0.1);
   padding: 1rem 1.5rem;
@@ -299,68 +299,43 @@
 .resumen-header span {
   font-weight: 600;
   font-size: 1.1rem;
-  color: #333;
-}
-
-.resumen-header img {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
+  color: black;
 }
 
 /* Valor destacado */
 .resumen-value {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #222;
+  color: black;
   text-align: right;
   user-select: none;
 }
 
 /* Colores por categoría */
 .resumen-card.purple {
-  background-color: #6a4c93;
-  color: #f0e9ff;
-}
-
-.resumen-card.purple .resumen-value {
-  color: #d8cfff;
+  background-color: white;
+  border: 4px solid #951ead;
 }
 
 .resumen-card.yellow {
-  background-color: #f0c419;
-  color: #5a4a01;
-}
-
-.resumen-card.yellow .resumen-value {
-  color: #423700;
+  background-color: white;
+  border: 4px solid #ed9235;
 }
 
 .resumen-card.red {
-  background-color: #e74c3c;
-  color: #fff5f5;
+  background-color: white;
+  border: 4px solid #e9604b;
 }
 
-.resumen-card.red .resumen-value {
-  color: #ffe6e5;
-}
 
 .resumen-card.blue {
-  background-color: #3ca5e7;
-  color: #fff5f5;
-}
-
-.resumen-card.blue .resumen-value {
-  color: #423700;
+  background-color: white;
+  border: 4px solid #56b3e4;
 }
 
 .resumen-card.green {
-  background-color: #27ae60;
-  color: #dff6e4;
-}
-
-.resumen-card.green .resumen-value {
-  color: #b8e994;
+  background-color: white;
+  border: 4px solid #00ad8c;
 }
 
 /* Estilos adicionales para la tabla */

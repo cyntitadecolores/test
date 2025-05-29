@@ -46,17 +46,14 @@ function NavCub() {
           <li className="nav-dashboard">
             <NavLink to="/dashBoardA" className={({ isActive }) => isActive ? 'active-link' : ''}>Dashboard</NavLink>
           </li>
-          <li className="nav-proyectos">
-            <NavLink to="/proyectosPosA" className={({ isActive }) => isActive ? 'active-link' : ''}>Proyectos Postulados</NavLink>
-          </li>
-          <li className="nav-alumnos">
-            <NavLink to="/alumnosPosA" className={({ isActive }) => isActive ? 'active-link' : ''}>Alumnos Postulados</NavLink>
-          </li>
           <li className="nav-socios">
             <NavLink to="/sociosAprobadosA" className={({ isActive }) => isActive ? 'active-link' : ''}>Socios</NavLink>
           </li>
-          <li className="nav-aprobados">
-            <NavLink to="/proyectosAprobadosA" className={({ isActive }) => isActive ? 'active-link' : ''}>Proyectos Aceptados</NavLink>
+          <li className="nav-proyectos">
+            <NavLink to="/proyectosPosA" className={({ isActive }) => isActive ? 'active-link' : ''}>Proyectos</NavLink>
+          </li>
+          <li className="nav-alumnos">
+            <NavLink to="/alumnosPosA" className={({ isActive }) => isActive ? 'active-link' : ''}>Alumnos</NavLink>
           </li>
         </ul>
         </div>

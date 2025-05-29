@@ -47,6 +47,7 @@
   color: white;
   text-align: center;
   padding: 1em;
+  width: 11rem;
   text-decoration: none;
   border-radius: 8px;
   font-weight: bold;
@@ -127,7 +128,6 @@
 .nav-proyectos a:hover { background-color: #951ead; }
 .nav-alumnos a:hover { background-color: #e9604b; }
 .nav-socios a:hover { background-color: #56b3e4; }
-.nav-aprobados a:hover { background-color: black; }
 
 /* Hovers socio */
 .nav-inicio-s a:hover { background-color: #00ad8c; }
@@ -145,7 +145,6 @@
 .nav-proyectos .active-link { background-color: #951ead; }
 .nav-alumnos .active-link { background-color: #e9604b; }
 .nav-socios .active-link { background-color: #56b3e4; }
-.nav-aprobados .active-link { background-color: black; }
 
 /* Links activos socio */
 .nav-inicio-s .active-link { background-color: #00ad8c; }

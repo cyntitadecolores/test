@@ -603,9 +603,6 @@ const handleVerPostulaciones = (id_proyecto) => {
     </>
     ) : proyecto.status_proyecto === 'Aprobado' ? (
     <>
-      <span style={{ fontWeight: 'bold', marginRight: '10px' }}>
-        {postulaciones.filter(p => p.id_proyecto === proyecto.id_proyecto).length} postulaciones
-      </span>
       <button
         className="ver-postulaciones"
         onClick={() => handleVerPostulaciones(proyecto.id_proyecto)}
