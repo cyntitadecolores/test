@@ -190,6 +190,49 @@ const [statusFiltro, setStatusFiltro] = useState('');
             <NavCub />
             <h1 className="titulo">Postulaciones de Alumnos</h1>
 
+            <div className="resumen-container">
+  <div className="resumen-card purple">
+    <div className="resumen-header">
+      <span>Estudiantes postulados</span>
+    </div>
+    <div className="resumen-value">{postulaciones.length}</div>
+  </div>
+
+  <div className="resumen-card yellow">
+    <div className="resumen-header">
+      <span>Estudiantes aceptados</span>
+    </div>
+    <div className="resumen-value">
+      {postulaciones.filter(p => p.status === 'Aceptadx').length}
+    </div>
+  </div>
+
+  <div className="resumen-card red">
+    <div className="resumen-header">
+      <span>Estudiantes no aceptados</span>
+    </div>
+    <div className="resumen-value">
+      {postulaciones.filter(p => p.status === 'No aceptadx').length}
+    </div>
+  </div>
+
+  <div className="resumen-card blue">
+    <div className="resumen-header">
+      <span>Estudiantes inscritos</span>
+    </div>
+    <div className="resumen-value">
+      {postulaciones.filter(p => p.status === 'Inscrito').length}
+    </div>
+  </div>
+
+  <div className="resumen-card green">
+    <div className="resumen-header">
+      <span>Cupos disponibles</span>
+    </div>
+    <div className="resumen-value">{cuposDisponibles}</div> 
+  </div>
+</div>
+
             <div className="botones-acciones">
                 <button
                     onClick={() => setMostrarFiltros(prev => !prev)}
@@ -309,48 +352,6 @@ const [statusFiltro, setStatusFiltro] = useState('');
                     <button onClick={cancelarEdicion} style={{ marginLeft: '8px' }}>Cancelar</button>
                 </div>
             )}
-            <div className="resumen-container">
-  <div className="resumen-card purple">
-    <div className="resumen-header">
-      <span>Estudiantes postulados</span>
-    </div>
-    <div className="resumen-value">{postulaciones.length}</div>
-  </div>
-
-  <div className="resumen-card yellow">
-    <div className="resumen-header">
-      <span>Estudiantes aceptados</span>
-    </div>
-    <div className="resumen-value">
-      {postulaciones.filter(p => p.status === 'Aceptadx').length}
-    </div>
-  </div>
-
-  <div className="resumen-card red">
-    <div className="resumen-header">
-      <span>Estudiantes no aceptados</span>
-    </div>
-    <div className="resumen-value">
-      {postulaciones.filter(p => p.status === 'No aceptadx').length}
-    </div>
-  </div>
-
-  <div className="resumen-card blue">
-    <div className="resumen-header">
-      <span>Estudiantes inscritos</span>
-    </div>
-    <div className="resumen-value">
-      {postulaciones.filter(p => p.status === 'Inscrito').length}
-    </div>
-  </div>
-
-  <div className="resumen-card green">
-    <div className="resumen-header">
-      <span>Cupos disponibles</span>
-    </div>
-    <div className="resumen-value">{cuposDisponibles}</div> 
-  </div>
-</div>
 
         </div>
     );

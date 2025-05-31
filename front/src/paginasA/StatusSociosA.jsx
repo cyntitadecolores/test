@@ -7,6 +7,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function StatusSocios() {
+  //socios que se muestran y socio con detalles
   const [socios, setSocios] = useState([]);
   const [socioSeleccionado, setSocioSeleccionado] = useState(null);
 
@@ -18,14 +19,46 @@ function StatusSocios() {
   }, []);
 
   // Cambiar el estado de un socio
-  const cambiarStatus = (id, nuevoStatus) => {
-    axios.put(`http://localhost:5003/socio/${id}/status`, { status: nuevoStatus })
-      .then(() => {
-        toast.error('Status actualizado');
-        window.location.reload();
-      })
-      .catch(error => console.error('Error al actualizar status:', error));
-  };
+  const cambiarStatusConConfirmacion = (id, nuevoStatus) => {
+  const toastId = toast(
+    ({ closeToast }) => (
+      <div>
+        <p>¿Estás seguro que quieres cambiar el estado a <strong>{nuevoStatus}</strong>?</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
+          <button
+            onClick={() => {
+              toast.dismiss(toastId);
+              cambiarStatus(id, nuevoStatus);
+            }}
+            style={{ marginRight: '10px', backgroundColor: '#4CAF50', color: 'white', border: 'none', padding: '5px 10px', cursor: 'pointer' }}
+          >
+            Aceptar
+          </button>
+          <button
+            onClick={() => toast.dismiss(toastId)}
+            style={{ backgroundColor: '#f44336', color: 'white', border: 'none', padding: '5px 10px', cursor: 'pointer' }}
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    ),
+    { autoClose: false }
+  );
+};
+
+const cambiarStatus = (id, nuevoStatus) => {
+  axios.put(`http://localhost:5003/socio/${id}/status`, { status: nuevoStatus })
+    .then(() => {
+      toast.success('Estado actualizado');
+      setTimeout(() => window.location.reload(), 1000); // Espera antes de recargar
+    })
+    .catch(error => {
+      console.error('Error al actualizar status:', error);
+      toast.error('Hubo un error al actualizar el estado');
+    });
+};
+
 
   // Obtener más detalles de un socio al hacer clic en "Ver más"
   const handleVerMas = (id) => {
@@ -38,7 +71,7 @@ function StatusSocios() {
       .catch(error => console.error('Error al obtener info del socio:', error));
   };
 
-  // Cerrar el modal de detalles
+  // Cerrar el modal de detalles con null al set
   const cerrarInfo = () => setSocioSeleccionado(null);
 
   // Asignar clase CSS según el estado
@@ -58,8 +91,7 @@ function StatusSocios() {
       <NavCub />
       <Link to="/" className="back-btn">← Volver</Link>
       <h1 className="nontitle">Socios pendientes</h1>
-
-      {/* Tabla de socios */}
+      {/* Mapeo de socio que se muestran */}
       {!socioSeleccionado && (
         <table className="socios-table">
           <thead>
@@ -80,7 +112,15 @@ function StatusSocios() {
                 <td>{socio.correo}</td>
                 <td><span className={badgeClass(socio.status)}>{socio.status}</span></td>
                 <td>
-                  <select onChange={(e) => cambiarStatus(socio.id_socio, e.target.value)} defaultValue="">
+                  <select
+  onChange={(e) => {
+    const nuevoStatus = e.target.value;
+    cambiarStatusConConfirmacion(socio.id_socio, nuevoStatus);
+  }}
+  defaultValue=""
+>
+
+
                     <option value="" disabled>Selecciona</option>
                     <option value="aceptado">Aceptado</option>
                     <option value="no aceptado">No Aceptado</option>
@@ -95,7 +135,7 @@ function StatusSocios() {
         </table>
       )}
 
-      {/* Modal con detalles del socio */}
+      {/* Modal de vista ver mas */}
       {socioSeleccionado && (
         <div className="modal">
           <div className="modal-content">

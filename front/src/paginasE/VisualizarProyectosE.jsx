@@ -228,7 +228,15 @@ const handleClickPostularme = () => {
     backgroundColor: postulaciones.some(p => p.id_proyecto === proyecto.id_proyecto) ? '#cdeccb' : 'transparent'
   }}
 >
-                    <td>{proyecto.nombre_proyecto}</td>
+                    <td>
+  {proyecto.nombre_proyecto}
+  {postulaciones.some(p => p.id_proyecto === proyecto.id_proyecto) && (
+    <span style={{ marginLeft: '8px', color: 'green', fontWeight: 'bold' }}>
+      (Postulado)
+    </span>
+  )}
+</td>
+
                     <td>{proyecto.crn}</td>
                     <td>{proyecto.grupo}</td>
                     <td>{proyecto.clave_materia}</td>

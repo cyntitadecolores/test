@@ -7,6 +7,11 @@ function InicioE() {
     <div className="main">
       <NavCub />
 
+{/* Recordatorio final */}
+        <div className="reminder-box">
+          <h3>Si eres de primer semestre</h3>
+          <p>Recuerda que necesitas cursar tu <strong>Semana Tec de Introducción al Servicio Social</strong> antes de poder iniciar tus horas.</p>
+        </div>
         <div className="dashboard-content">
           {/* Sección de Periodos */}
           <div className="widgets-periodos">
@@ -51,11 +56,7 @@ function InicioE() {
           </div>
         </div>
 
-        {/* Recordatorio final */}
-        <div className="reminder-box">
-          <h3>Si eres de primer semestre</h3>
-          <p>Recuerda que necesitas cursar tu <strong>Semana Tec de Introducción al Servicio Social</strong> antes de poder iniciar tus horas.</p>
-        </div>
+        
       </div>
   );
 }
