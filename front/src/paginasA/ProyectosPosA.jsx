@@ -26,79 +26,192 @@ function ProyectosPos() {
     const [mostrarTablaPostulaciones, setMostrarTablaPostulaciones] = useState(false);
     const cerrarTablaPostulaciones = () => setMostrarTablaPostulaciones(false);
 
+
+    
     //Lista de filtros
     const columnasDisponibles = {
+    //amarillos
     id_proyecto: 'ID Proyecto',
-    correo_registro_info: 'Correo Registro',
-    region_proyecto: 'Región Proyecto',
-    id_campus: 'ID Campus',
+    correo_registro_info: 'Dirección de correo electrónico de quien registra la información',
+    region_proyecto: 'Región',
+    campus: 'Campus',
     crn: 'CRN',
     grupo: 'Grupo',
-    clave_materia: 'Clave Materia',
-    id_periodo: 'ID Periodo',
-    fecha_implementacion: 'Fecha Implementación',
-    nombre_osf: 'Nombre OSF',
-    razon_osf: 'Razón OSF',
-    poblacion_osf: 'Población OSF',
-    num_beneficiarios_osf: 'Número Beneficiarios OSF',
-    ods_osf: 'ODS OSF',
-    telefono_osf: 'Teléfono OSF',
-    datos_osf: 'Datos OSF',
-    contacto_coordinador: 'Contacto Coordinador',
+    clave_materia: 'Clave de la Materia',
+    periodo: 'Periodo PMT#)',
+    fecha_implementacion: 'Fecha',
+    //verde
+    nombre_osf: 'OSF',
+    razon_osf: '¿Cuál es la razón de ser, visión y objetivos de la OSF?',
+    poblacion_osf: 'Población que atiende la OSF (características: edad, sexo, discapacidad, necesidad etc)',
+    num_beneficiarios_osf: 'Número de beneficiarios que atiende la OSF anualmente:',
+    ods_osf: 'ODS en el que se enfoca la OSF',
+    telefono_osf: 'Teléfono',
+    datos_osf: 'Contacto General',
+    contacto_coordinador: 'Contacto General del Coordinador del proyecto',
     redes_sociales: 'Redes Sociales OSF',
-    nombre_proyecto: 'Nombre Proyecto',
-    nomenclatura_registro: 'Nomenclatura Registro',
-    diagnostico_previo: 'Diagnóstico Previo',
-    problema_social: 'Problema Social',
-    vulnerabilidad_atendida_1: 'Vulnerabilidad Atendida 1',
-    edad_poblacion_1: 'Edad Población 1',
-    vulnerabilidad_atendida_2: 'Vulnerabilidad Atendida 2',
-    edad_poblacion_2: 'Edad Población 2',
-    zona_poblacion: 'Zona Población',
-    numero_beneficiarios_proyecto: 'Número Beneficiarios Proyecto',
-    objetivo_proyecto: 'Objetivo del Proyecto',
-    ods_proyecto_1: 'ODS Proyecto 1',
-    ods_proyecto_2: 'ODS Proyecto 2',
-    acciones_estudiantado: 'Acciones del Estudiantado',
+    //azul
+    nombre_proyecto: 'Proyecto',
+    nomenclatura_registro: 'Alto',
+    diagnostico_previo: 'Para definir el Proyecto Solidario, ¿se realizó algún diagnóstico previo?', // si es 1 es si, 0 es no
+    problema_social: ' Describa el problema social específico que atenderá el estudiantado',
+    vulnerabilidad_atendida_1: 'Tipo de vulnerabilidad de la población atendida',
+    edad_poblacion_1: 'Rango de edad de la población atendida',
+    vulnerabilidad_atendida_2: 'Otro tipo de vulnerabilidad de la población atendida',
+    edad_poblacion_2: 'Otro rango de edad de la población atendida',
+    zona_poblacion: 'Zona a la que pertenece la población atendida',
+    numero_beneficiarios_proyecto: 'Número Aproximado de Beneficiarios',
+    objetivo_proyecto: 'Objetivo del Proyecto Solidario',
+    ods_proyecto_1: 'Objetivo de Desarrollo Sostenible 1',
+    ods_proyecto_2: 'Objetivo de Desarrollo Sostenible 1',
+    acciones_estudiantado: 'principales actividades/acciones a realizar por parte del estudiantado',
     producto_servicio_entregar: 'Producto/Servicio a Entregar',
-    entregable_esperado: 'Entregable Esperado',
-    medida_impacto: 'Medida de Impacto',
+    entregable_esperado: 'Entregable Esperado por Parte del Estudiante',
+    medida_impacto: 'Medida de Impacto del Servicio Social',
+    //Rosa
     dias_actividades: 'Días de Actividades',
     horario_proyecto: 'Horario del Proyecto',
     carreras_proyecto_1: 'Carrera Proyecto 1',
     carreras_proyecto_2: 'Carrera Proyecto 2',
-    habilidades_alumno: 'Habilidades Requeridas',
+    habilidades_alumno: 'Habilidades/Competencias Requeridas',
     cupos_proyecto: 'Cupos del Proyecto',
     modalidad: 'Modalidad',
     direccion_escrita: 'Dirección Escrita',
+    enlace_maps: 'Enlace a Google Maps',
     duracion_experiencia: 'Duración de la Experiencia',
-    valor_proyecto: 'Valor del Proyecto',
-    periodo_repetido: '¿Periodo Repetido?',
-    induccion_ss: 'Inducción SS',
-    propuesta_semana_tec: 'Propuesta Semana TEC',
-    propuesta_inmersion_social: 'Propuesta Inmersión Social',
-    propuesta_bloque: 'Propuesta Bloque',
+    valor_proyecto: 'Valor o actitud que promueve en el estudiantado con las acciones a llevar a cabo',
+    //verde azulado
+    periodo_repetido: '¿Periodo Repetido?', // 1 es si, 0 es no
+    induccion_ss: 'Surgió de una propuesta de Inducción', // 1 es si, 0 es no
+    propuesta_semana_tec: 'Surgió de una Propuesta Semana TEC', // 1 es si, 0 es no
+    propuesta_inmersion_social: 'Surgió de una Propuesta Inmersión Social', // 1 es si, 0 es no
+    propuesta_bloque: 'Surgió de una Propuesta Bloque',
+    //azul claro
     indicaciones_especiales: 'Indicaciones Campus',
+    //verde fosforecente
     status_proyecto: 'Status del Proyecto',
     entrevista: '¿Entrevista?',
     pregunta_descarte: 'Pregunta de Descarte',
-    enlace_maps: 'Enlace a Google Maps',
+    //azul fuerte
     enlace_whatsApp: 'Enlace WhatsApp',
     nombre_whatsApp: 'Nombre Grupo WhatsApp',
     status_whatsapp: 'Status Grupo WhatsApp',
+    //verde aceituna
     alumnos_postulados: 'Alumnos Postulados',
     alumnos_aceptados: 'Alumnos Aceptados',
     alumnos_rechazados: 'Alumnos Rechazados',
     cupos_disponibles: 'Cupos Disponibles',
-    datatime_postulacion: 'Fecha Postulación Proyecto',
+    //blanco
     inicio_actividades: 'Inicio de Actividades',
     carta_exclusion: 'Carta de Exclusión',
     anuncio_canvas: 'Anuncio en Canvas',
     porcentaje_canvas: 'Porcentaje en Canvas',
+
+    datatime_postulacion: 'Fecha Postulación Proyecto',
     status_actividad: 'Status de Actividad',
     Nota: 'Nota',
     id_socio: 'ID Socio',
 };
+
+const gruposColumnas = {
+  amarillos: [
+    'id_proyecto',
+    'correo_registro_info',
+    'region_proyecto',
+    'campus',
+    'crn',
+    'grupo',
+    'clave_materia',
+    'periodo',
+    'fecha_implementacion'
+  ],
+  verdes: [
+    'nombre_osf',
+    'razon_osf',
+    'poblacion_osf',
+    'num_beneficiarios_osf',
+    'ods_osf',
+    'telefono_osf',
+    'datos_osf',
+    'contacto_coordinador',
+    'redes_sociales'
+  ],
+  azules: [
+    'nombre_proyecto',
+    'nomenclatura_registro',
+    'diagnostico_previo',
+    'problema_social',
+    'vulnerabilidad_atendida_1',
+    'edad_poblacion_1',
+    'vulnerabilidad_atendida_2',
+    'edad_poblacion_2',
+    'zona_poblacion',
+    'numero_beneficiarios_proyecto',
+    'objetivo_proyecto',
+    'ods_proyecto_1',
+    'ods_proyecto_2',
+    'acciones_estudiantado',
+    'producto_servicio_entregar',
+    'entregable_esperado',
+    'medida_impacto'
+  ],
+  rosa: [
+    'dias_actividades',
+    'horario_proyecto',
+    'carreras_proyecto_1',
+    'carreras_proyecto_2',
+    'habilidades_alumno',
+    'cupos_proyecto',
+    'modalidad',
+    'direccion_escrita',
+    'enlace_maps',
+    'duracion_experiencia',
+    'valor_proyecto'
+  ],
+  verdeAzulado: [
+    'periodo_repetido',
+    'induccion_ss',
+    'propuesta_semana_tec',
+    'propuesta_inmersion_social',
+    'propuesta_bloque'
+  ],
+  azulClaro: [
+    'indicaciones_especiales'
+  ],
+  verdeFosforescente: [
+    'status_proyecto',
+    'entrevista',
+    'pregunta_descarte'
+  ],
+  azulFuerte: [
+    'enlace_whatsApp',
+    'nombre_whatsApp',
+    'status_whatsapp'
+  ],
+  verdeAceituna: [
+    'alumnos_postulados',
+    'alumnos_aceptados',
+    'alumnos_rechazados',
+    'cupos_disponibles'
+  ],
+  blanco: [
+    'inicio_actividades','carta_exclusion','anuncio_canvas','porcentaje_canvas','datatime_postulacion','status_actividad','Nota','id_socio'
+  ]
+};
+
+const coloresColumnas = {
+  amarillos: 'FFFFFF99', // amarillo claro
+  verdes: 'FFCCFFCC',    // verde claro
+  azules: 'FFCCE5FF',    // azul claro
+  rosa: 'FFFFCCE5',       // rosa claro
+  verdeAzulado: 'FFCCFFFF',
+  azulClaro: 'FFD9E1F2',
+  verdeFosforescente: 'FFDAF7A6',
+  azulFuerte: 'FF5B9BD5',
+  verdeAceituna: 'FFE2EFDA',
+  blanco: 'FFFFFFFF'
+};
+
 
 //Tipo de valor de la columna
 const tiposDeColumna = {
@@ -277,13 +390,22 @@ const tiposDeColumna = {
   status_actividad: { tipo: 'boolean' },
 };
 
+const booleanToSiNo = (valor) => valor ? 'Sí' : 'No';
+const colorPorColumna = {};
+
+Object.entries(gruposColumnas).forEach(([grupo, columnas]) => {
+  columnas.forEach(col => {
+    colorPorColumna[col] = coloresColumnas[grupo];
+  });
+});
+
 
 const exportarAExcel = async () => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('proyectosPostulados');
 
     // Generar las columnas dinámicamente según columnasFijas y columnasVisibles
-    const todasLasColumnas = [...columnasFijas, ...columnasVisibles];
+    const todasLasColumnas = [...new Set([...columnasFijas, ...columnasVisibles])];
     worksheet.columns = todasLasColumnas.map(col => ({
         header: columnasDisponibles[col],
         key: col,
@@ -297,6 +419,17 @@ const exportarAExcel = async () => {
             fila[col] = p[col];
         });
         worksheet.addRow(fila);
+        const lastRow = worksheet.lastRow;
+todasLasColumnas.forEach((col, idx) => {
+  const celda = lastRow.getCell(idx + 1);
+  const color = colorPorColumna[col] || 'FFFFFFFF'; // blanco por defecto
+  celda.fill = {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: color }
+  };
+});
+
     });
 
     // Estilo para encabezado
@@ -393,38 +526,41 @@ if (config.tipo === 'datetime') {
 }
 
 
-    const guardarCambio = async () => {
-        const { filaId, columna } = celdaSeleccionada;  
-        const nuevoValor = valorEditado;  
-    
-        const resultadoValidacion = validarValor(columna, nuevoValor);
+    const guardarCambio = async (nuevoValorParam) => {
+    const { filaId, columna } = celdaSeleccionada;
+    const nuevoValor = nuevoValorParam ?? valorEditado;
+
+    console.log('Enviando PUT con:', { columna, nuevoValor });
+
+    const resultadoValidacion = validarValor(columna, nuevoValor);
     if (!resultadoValidacion.valido) {
         alert(`Error en "${columnasDisponibles[columna]}": ${resultadoValidacion.mensaje}`);
         return;
     }
 
-        try {
-            const response = await fetch(`http://localhost:5003/proyecto/${filaId}/editar`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ columna, nuevoValor }),  
-            });
+    try {
+        const response = await fetch(`http://localhost:5003/proyecto/${filaId}/editar`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ columna, nuevoValor }),
+        });
 
-            const data = await response.json();
-            if (response.ok) {
-                const proyectosActualizados = await axios.get('http://localhost:5003/proyectos');
-                setProyectos(proyectosActualizados.data);
-                setCeldaSeleccionada(null);  
-                setValorEditado('');  
-            } else {
-                console.error('Error al actualizar proyecto:', data.message);
-            }
-        } catch (error) {
-            console.error('Error al guardar cambio:', error);
+        const data = await response.json();
+        if (response.ok) {
+            const proyectosActualizados = await axios.get('http://localhost:5003/proyectos');
+            setProyectos(proyectosActualizados.data);
+            setCeldaSeleccionada(null);
+            setValorEditado('');
+        } else {
+            console.error('Error al actualizar proyecto:', data.message);
         }
-    };
+    } catch (error) {
+        console.error('Error al guardar cambio:', error);
+    }
+};
+
     
     function validarURL(url) {
     try {
@@ -477,6 +613,28 @@ const handleVerPostulaciones = (id_proyecto) => {
         )
     );
 
+    const activarGrupo = (grupo) => {
+  const columnas = gruposColumnas[grupo];
+  setColumnasVisibles(prev => [
+    ...new Set([...prev, ...columnas]) // evitar duplicados
+  ]);
+};
+
+const desactivarGrupo = (grupo) => {
+  const columnas = gruposColumnas[grupo];
+  setColumnasVisibles(prev => prev.filter(col => !columnas.includes(col)));
+};
+
+const activarTodos = () => {
+  const todas = Object.values(gruposColumnas).flat();
+  setColumnasVisibles([...new Set([...columnasVisibles, ...todas])]);
+};
+
+const desactivarTodos = () => {
+  setColumnasVisibles([]);
+};
+
+
     return (
     <div className="main">
         <NavCub />
@@ -496,31 +654,68 @@ const handleVerPostulaciones = (id_proyecto) => {
         </div>
 
 {/* Lista de filtros para ver tabla*/}
-        {mostrarFiltros ? (
-            <div className="filtros-columnas-wrapper">
-                <h3>Selecciona las columnas que deseas mostrar:</h3>
-                <div className="filtros-columnas">
-                    {Object.entries(columnasDisponibles).map(([key, label]) => (
-                        <label key={key}>
-                            <input
-                                type="checkbox"
-                                checked={columnasVisibles.includes(key) || columnasFijas.includes(key)}
-                                onChange={() => {
-                                    if (columnasFijas.includes(key)) return;
-                                    setColumnasVisibles(prev =>
-                                        prev.includes(key)
-                                            ? prev.filter(col => col !== key)
-                                            : [...prev, key]
-                                    );
-                                }}
-                                disabled={columnasFijas.includes(key)}
-                            />
-                            {label}
-                        </label>
-                    ))}
-                </div>
-            </div>
-        ) : (
+        {mostrarFiltros && (
+  <div className="filtros-columnas-wrapper">
+    <h3>Selecciona las columnas que deseas mostrar:</h3>
+
+  <div className="grid-filtros">
+    {[
+      { nombre: 'Amarillos', clase: 'amarillos' },
+      { nombre: 'Verdes', clase: 'verdes' },
+      { nombre: 'Azules', clase: 'azules' },
+      { nombre: 'Rosa', clase: 'rosa' },
+      { nombre: 'Verde Azulado', clase: 'verdeAzulado' },
+      { nombre: 'Azul Claro', clase: 'azulClaro' },
+      { nombre: 'Verde Fosforescente', clase: 'verdeFosforescente' },
+      { nombre: 'Azul Fuerte', clase: 'azulFuerte' },
+      { nombre: 'Verde Aceituna', clase: 'verdeAceituna' },
+      { nombre: 'Blanco', clase: 'blanco' },
+    ].map(grupo => (
+      <div key={grupo.clase} className="filtro-card">
+        <h3>{grupo.nombre}</h3>
+        <div className="acciones">
+          <button className={`btn activar ${grupo.clase}`} onClick={() => activarGrupo(grupo.clase)}>
+            Activar
+          </button>
+          <button className={`btn ocultar ${grupo.clase}`} onClick={() => desactivarGrupo(grupo.clase)}>
+            Ocultar
+          </button>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <div className="todos-container">
+    <button className="btn-grande activar-todos" onClick={activarTodos}>Activar Todos</button>
+    <button className="btn-grande ocultar-todos" onClick={desactivarTodos}>🚫 Ocultar Todos</button>
+  </div>
+
+
+
+
+    <div className="filtros-columnas">
+      {Object.entries(columnasDisponibles).map(([key, label]) => (
+        <label key={key}>
+          <input
+            type="checkbox"
+            checked={columnasVisibles.includes(key) || columnasFijas.includes(key)}
+            onChange={() => {
+              if (columnasFijas.includes(key)) return;
+              setColumnasVisibles(prev =>
+                prev.includes(key)
+                  ? prev.filter(col => col !== key)
+                  : [...prev, key]
+              );
+            }}
+            disabled={columnasFijas.includes(key)}
+          />
+          {label}
+        </label>
+      ))}
+    </div>
+  </div>
+)}
+
             <div className="tabla-container">
                 <div className="buscador">
                   <label htmlFor="busqueda">Buscar:</label>
@@ -556,31 +751,49 @@ const handleVerPostulaciones = (id_proyecto) => {
                                             }
                                         >
                                             {celdaSeleccionada &&
-                                            celdaSeleccionada.filaId === proyecto.id_proyecto &&
-                                            celdaSeleccionada.columna === col ? (
-                                                <input
-                                                    type="text"
-                                                    value={valorEditado}
-                                                    onChange={e => setValorEditado(e.target.value)}
-                                                    onBlur={guardarCambio}
-                                                    autoFocus
-                                                />
-                                            ) : (
-                                                // Clumna que sirven como links
-                                                (col === 'enlace_maps' || col === 'enlace_whatsApp') ? (
-    <a
-        href={proyecto[col]}
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{ color: validarURL(proyecto[col]) ? 'green' : 'red' }}
-    >
-        {proyecto[col]}
-    </a>
-) : (
-    proyecto[col]
-)
+ celdaSeleccionada.filaId === proyecto.id_proyecto &&
+ celdaSeleccionada.columna === col ? (
+    tiposDeColumna[col]?.tipo === 'enum' ? (
+        <select
+  value={valorEditado}
+  onChange={e => {
+    const nuevoValor = e.target.value;
+    setValorEditado(nuevoValor);
+    guardarCambio(nuevoValor); 
+  }}
+  autoFocus
+>
+  {tiposDeColumna[col].valores.map(opcion => (
+    <option key={opcion} value={opcion}>
+      {opcion}
+    </option>
+  ))}
+</select>
 
-                                            )}
+    ) : (
+        <input
+            type="text"
+            value={valorEditado}
+            onChange={e => setValorEditado(e.target.value)}
+            onBlur={guardarCambio}
+            autoFocus
+        />
+    )
+) : (
+    (col === 'enlace_maps' || col === 'enlace_whatsApp') ? (
+        <a
+            href={proyecto[col]}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: validarURL(proyecto[col]) ? 'green' : 'red' }}
+        >
+            {proyecto[col]}
+        </a>
+    ) : (
+        proyecto[col]
+    )
+)}
+
                                         </td>
                                     ))}
                                     {/* Formato parra cambiar el status del proyecto*/}
@@ -622,7 +835,7 @@ const handleVerPostulaciones = (id_proyecto) => {
                     </table>       
                 </div>
             </div>
-        )}
+        
 
         {celdaSeleccionada && (
             <div className="editor-container" style={{ marginTop: '20px' }}>

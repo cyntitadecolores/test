@@ -57,7 +57,7 @@ app.get('/administradores', (req, res) => {
   });
 });
 
-// Obtener postulaciones alumnos En revisión
+// Obtener postulaciones alumnos En revisión  --tiene pruebas 5
 app.get('/postulaciones_alumnos', (req, res) => {
     db.query('SELECT * FROM Postulacion JOIN Proyecto ON Postulacion.id_proyecto = Proyecto.id_proyecto JOIN estudiante ON postulacion.id_estudiante = estudiante.id_estudiante ', (err, results) => {
         if (err) return res.status(500).json({ message: 'Error al obtener postulaciones' });
@@ -65,7 +65,7 @@ app.get('/postulaciones_alumnos', (req, res) => {
     });
 });
 
-// Actualizar el status de una postulacion de alumnos
+// Actualizar el status de una postulacion de alumnos  --tiene pruebas 4
   app.put('/postulaciones_alumnos/:id_proyecto/:id_estudiante/status', (req, res) => {
     const { id_proyecto, id_estudiante } = req.params;
     const { status } = req.body;
@@ -79,7 +79,7 @@ app.get('/postulaciones_alumnos', (req, res) => {
     });
 });
 
-// Editar valores de las postulaciones
+// Editar valores de las postulaciones  -- tiene pruebas 9
 app.put('/postulaciones_alumnos/:id_proyecto/:id_estudiante/editar', (req, res) => {
     const { id_proyecto, id_estudiante } = req.params;  
     const { columna, nuevoValor } = req.body;  
@@ -102,7 +102,7 @@ app.put('/postulaciones_alumnos/:id_proyecto/:id_estudiante/editar', (req, res) 
     });
 });
 
-// Obtener proyectos aprobados con el periodo
+// Obtener proyectos aprobados con el periodo -- tiene pruebas 8 
 app.get('/proyectos/aprobados', (req, res) => {
   const query = `
     SELECT 
@@ -139,8 +139,8 @@ app.get('/proyectos/aprobados', (req, res) => {
   });
 });
 
-
-app.get('/proyectoss/:id', (req, res) => {
+// ya tiene pruebas 7
+app.get('/proyectoss/:id', (req, res) => { 
     const { id } = req.params;
     db.query('SELECT * FROM Proyecto p JOIN periodo per ON per.id_periodo = p.id_periodo WHERE p.id_proyecto = ?', [id], (err, results) => {
       if (err) {
@@ -154,7 +154,7 @@ app.get('/proyectoss/:id', (req, res) => {
     });
   });
 
-// Obtener postulaciones por id_proyecto
+// Obtener postulaciones por id_proyecto -- ya tiene pruebas 10
 app.get('/proyectos/:id/postulaciones', (req, res) => {
   const idProyecto = req.params.id;
   const sql = `
@@ -180,7 +180,8 @@ app.get('/proyectos', (req, res) => {
     db.query(`
         SELECT * 
         FROM Proyecto 
-        JOIN socio ON Proyecto.id_socio = socio.id_socio 
+        JOIN socio ON Proyecto.id_socio = socio.id_socio
+        JOIN periodo ON Proyecto.id_periodo = periodo.id_periodo  
         JOIN campus ON Proyecto.id_campus = campus.id_campus 
         JOIN ods ON Proyecto.ods_osf = ods.id_ods 
     `, (err, results) => {
@@ -191,12 +192,17 @@ app.get('/proyectos', (req, res) => {
 
 
 // Editar valores del proyecto
-  app.put('/proyecto/:id/editar', (req, res) => {
+app.put('/proyecto/:id/editar', (req, res) => {
     const { id } = req.params;  
     const { columna, nuevoValor } = req.body;  
+
+    // ✅ Aquí puedes loguear lo que recibe el backend
+    console.log('Backend recibió:', { columna, nuevoValor });
+
     if (!columna || nuevoValor === undefined) {
         return res.status(400).json({ message: 'Faltan datos para actualizar' });
     }
+
     const sql = `UPDATE Proyecto SET \`${columna}\` = ? WHERE id_proyecto = ?`;
     db.query(sql, [nuevoValor, id], (err, result) => {
         if (err) {
@@ -209,6 +215,7 @@ app.get('/proyectos', (req, res) => {
         res.json({ message: 'Proyecto actualizado exitosamente' });
     });
 });
+
 
 // Actualizar el status de un proyecto
 app.put('/proyecto/:id/status', (req, res) => {
@@ -224,7 +231,7 @@ app.put('/proyecto/:id/status', (req, res) => {
     });
   });
 
-//obtener socios aprobados
+//obtener socios aprobados -- ya tiene pruebas 10
 app.get('/socioaceptados', (req, res) => {
   const query = 'SELECT * FROM Socio WHERE status = "Aceptado"';
 
@@ -278,7 +285,7 @@ app.get('/socioaceptados', (req, res) => {
   });
 });
 
-//obtener socio En revisión
+//obtener socio En revisión -- tiene pruebas 10
 app.get('/socio/pendiente', (req, res) => {
   db.query('SELECT * FROM socio WHERE status = "En revisión"', (err, results) => {
     if (err) {
@@ -325,7 +332,7 @@ app.get('/socio/:id', (req, res) => {
 
 
   
-  // Actualizar el status de un socio
+  // Actualizar el status de un socio -- ya tiene pruebas 10
   app.put('/socio/:id/status', (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
@@ -340,7 +347,7 @@ app.get('/socio/:id', (req, res) => {
   });
 
 
-// Registro de administrador
+// Registro de administrador -- ya tiene pruebas 10
 app.post('/registro/administrador', (req, res) => {
     const { correo, password, nombre } = req.body;
 
@@ -384,7 +391,7 @@ app.listen(PORT, () => {
 });
 
 
-// Obtener todos los proyectos con búsqueda y filtros
+// Obtener todos los proyectos con búsqueda y filtros --tiene pruebas 10
 app.get('/proyectos_admin', (req, res) => {
   const { search = '', periodo, status_proyecto, status_actividad } = req.query;
 
@@ -425,7 +432,7 @@ app.get('/proyectos_admin', (req, res) => {
 });
 
 
-// Actualizar varios campos del proyecto desde una tabla editable
+// Actualizar varios campos del proyecto desde una tabla editable -- tiene pruebas 10
 app.put('/proyectos_admin/:id', (req, res) => {
   const { id } = req.params;
   const campos = req.body;

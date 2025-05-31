@@ -48,7 +48,7 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-// Obtener lista de campus
+// Obtener lista de campus -- ya tiene pruebas 10
 app.get('/campus', (req, res) => {
   db.query('SELECT id_campus, campus FROM Campus', (err, results) => {
     if (err) return res.status(500).json({ error: 'Error al obtener campus' });
@@ -56,7 +56,7 @@ app.get('/campus', (req, res) => {
   });
 });
 
-// Obtener lista de carreras
+// Obtener lista de carreras -- tiene pruebas 10
 app.get('/carreras', (req, res) => {
   db.query('SELECT id_carrera, siglas_carrera, nombre FROM Carrera', (err, results) => {
     if (err) return res.status(500).json({ error: 'Error al obtener carreras' });
@@ -64,7 +64,7 @@ app.get('/carreras', (req, res) => {
   });
 });
 
-// Obtener lista de ODS
+// Obtener lista de ODS -- tiene pruebas 10
 app.get('/ods', (req, res) => {
   db.query('SELECT id_ods, nombre_ods FROM Ods', (err, results) => {
     if (err) return res.status(500).json({ error: 'Error al obtener ODS' });
@@ -72,7 +72,7 @@ app.get('/ods', (req, res) => {
   });
 });
 
-
+// -- ya tiene pruebas 10
 app.get('/poblaciones', (req, res) => {
   const sql = `SHOW COLUMNS FROM Socio LIKE 'poblacion_osf'`;
   db.query(sql, (err, results) => {
@@ -99,7 +99,7 @@ app.get('/poblaciones', (req, res) => {
 
 
 
-// Endpoint para registro de estudiante y socio
+// Endpoint para registro de estudiante y socio -- ya tiene pruebas 25
 app.post('/signup', async (req, res) => {
   const { tipo, perfilSocio, ...data } = req.body;
 
@@ -208,7 +208,7 @@ app.post('/signup', async (req, res) => {
   }
 });
 
-// Endpoint para registro de administradores
+// Endpoint para registro de administradores -- ya tiene pruebas 15
 app.post('/signup/administrador', async (req, res) => {
   const { nombre, correo, contraseña } = req.body;
 
@@ -239,7 +239,7 @@ app.post('/signup/administrador', async (req, res) => {
 });
 
 
-// Endpoint Login
+// Endpoint Login -- ya tiene pruebas 15
 
 app.post('/login', (req, res) => {
   const { correo, contraseña } = req.body;
@@ -297,7 +297,7 @@ app.post('/login', (req, res) => {
 
 // Obtener los datos de todos los usuarios
 
-// Estudiantes
+// Estudiantes -- ya tiene pruebas 15
 app.get('/estudiantes', (req, res) => {
   const sql = `
     SELECT E.*, C.nombre AS nombre_carrera, CA.campus AS nombre_campus

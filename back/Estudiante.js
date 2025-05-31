@@ -65,6 +65,7 @@ app.get('/estudiantes', (req, res) => {
   });
 });
 
+// ya tiene pruebas 20
 app.get('/postulaciones', verifyToken, (req, res) => {
   const idEstudiante = req.user.id;
 
