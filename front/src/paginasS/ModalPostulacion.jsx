@@ -16,10 +16,19 @@ const ModalPostulacion = ({ data, onClose, onAccept, onReject }) => {
         <p><strong>Motivo:</strong> {data.motivo}</p>
         
         <div className={styles.buttonContainer}>
-          <button onClick={() => onAccept(data.id_proyecto, data.id_estudiante)} className={styles.aceptarButton}>Aceptar</button>
+          <button 
+            onClick={() => onAccept(data.id_proyecto, data.id_estudiante)} 
+            className={styles.aceptarButton}
+            disabled={data.cupo_lleno} // Deshabilita si el cupo está lleno
+          >
+            {data.cupo_lleno ? 'Cupo Lleno' : 'Aceptar'} {/* Cambia el texto del botón */}
+          </button>
         
           <button onClick={() => onReject(data.id_proyecto, data.id_estudiante)} className={styles.rechazarButton}>Rechazar</button>
         </div>
+        {data.cupo_lleno && (
+          <p className={styles.cupoLlenoMessage}>No se puede aceptar más estudiantes para este proyecto, el cupo está lleno.</p>
+        )}
       </div>
     </div>
   );

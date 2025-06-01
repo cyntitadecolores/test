@@ -4,7 +4,7 @@ import NavCub from "../componentes/navegacionS";
 import styles from "./PostularProyectoS.module.css";
 
 /* ----------------------------------------------------------------------
-   Constantes de catálogo (se mantienen nombres originales)
+   Catálogos locales
 ------------------------------------------------------------------------*/
 const VULNERABILIDADES = [
   "Mujeres",
@@ -49,9 +49,34 @@ const VALORES_PROYECTO = [
 ];
 
 /* ----------------------------------------------------------------------
-   Helpers genéricos
+   Campos OBLIGATORIOS (excepto sección “Propuestas y procesos”)
 ------------------------------------------------------------------------*/
-const normalizeOption = (o) => (typeof o === "object" ? o : { value: o, label: o });
+const REQUIRED_FIELDS = [
+  "fecha_implementacion",
+  "nombre_proyecto",
+  "problema_social",
+  "vulnerabilidad_atendida_1",
+  "edad_poblacion_1",
+  "zona_poblacion",
+  "numero_beneficiarios_proyecto",
+  "objetivo_proyecto",
+  "ods_proyecto_1",
+  "acciones_estudiantado",
+  "producto_servicio_entregar",
+  "entregable_esperado",
+  "medida_impacto",
+  "dias_actividades",
+  "modalidad",
+  "duracion_experiencia",
+  "valor_proyecto",
+  "cupos_proyecto",
+];
+
+/* ----------------------------------------------------------------------
+   Helpers
+------------------------------------------------------------------------*/
+const normalizeOption = (o) =>
+  typeof o === "object" ? o : { value: o, label: o };
 const asOptions = (arr) => arr.map((v) => ({ value: v, label: v }));
 
 /* ----------------------------------------------------------------------
@@ -169,39 +194,41 @@ function getIdSocio() {
 }
 
 /* ----------------------------------------------------------------------
-   Validaciones — extraídas para limpieza del submit
+   ✅ VALIDACIÓN COMPLETA
 ------------------------------------------------------------------------*/
 function validateForm(form) {
-  // Helpers
-  const err = (msg) => ({ ok: false, msg });
+  // 0)  Revisión genérica de campos vacíos
+  for (const campo of REQUIRED_FIELDS) {
+    if (!form[campo] || form[campo].trim() === "") {
+      return window.alert(
+        "El campo '" + campo.replace(/_/g, " ") + "' es obligatorio"
+      );
+    }
+  }
 
-  // Fecha implementación
-  if (!form.fecha_implementacion) return window.alert("La fecha de implementación es obligatoria");
+  // 1) Validación específica de fecha
   if (!/^\d{4}-\d{2}-\d{2}$/.test(form.fecha_implementacion))
     return window.alert("Formato de fecha inválido (YYYY-MM-DD)");
   if (isNaN(new Date(form.fecha_implementacion).getTime()))
     return window.alert("La fecha de implementación no es válida");
 
-  // Producto / servicio a entregar
-  if (!form.producto_servicio_entregar)
-    return window.alert("'Producto o servicio a entregar' es obligatorio");
+  // 2) Producto / servicio (longitud ya revisada antes)
   if (form.producto_servicio_entregar.length > 30)
     return window.alert("'Producto o servicio' máx. 30 caracteres");
 
-  // Entregable esperado
-  if (!form.entregable_esperado)
-    return window.alert("'Entregable esperado' es obligatorio");
+  // 3) Entregable esperado
   if (form.entregable_esperado.length > 200)
     return window.alert("'Entregable esperado' máx. 200 caracteres");
 
-  // Dirección si modalidad presencial/mixta
+  // 4) Dirección obligatoria si presencial / mixta
+  const mod = form.modalidad?.toLowerCase() || "";
   if (
-    form.modalidad?.toLowerCase().includes("presencial") ||
-    form.modalidad?.toLowerCase().includes("mixto")
-  ) {
-    if (!form.direccion_escrita?.trim())
-      return window.alert("Dirección escrita obligatoria en modalidad presencial/mixta");
-  }
+    (mod.includes("presencial") || mod.includes("mixto")) &&
+    !form.direccion_escrita.trim()
+  )
+    return window.alert(
+      "Dirección escrita obligatoria en modalidad presencial/mixta"
+    );
 
   return { ok: true };
 }
@@ -273,7 +300,6 @@ export default function PostularProyectoS() {
     // 1) Validaciones
     const val = validateForm(form);
     if (!val.ok) {
-      setError(val.msg);
       setLoading(false);
       return;
     }
@@ -307,7 +333,7 @@ export default function PostularProyectoS() {
         throw new Error(msg || "Error al crear el proyecto");
       }
 
-      setOkMsg("¡Proyecto postulado correctamente!");
+      window.alert("¡Proyecto postulado correctamente!");
       // limpia algunos campos
       setForm((f) => ({ ...f, nombre_proyecto: "", objetivo_proyecto: "" }));
     } catch (err) {
@@ -351,16 +377,16 @@ export default function PostularProyectoS() {
               value={form.fecha_implementacion}
               onChange={handleChange}
               placeholder="YYYY-MM-DD"
+              required /* ← NUEVO */
             />
           </fieldset>
 
           {/* Resto de fieldsets/controles idénticos a la versión previa… */}
           {/* Para mantener nombre de constantes, no se cambia ninguna prop */}
 
-                    {/* Descripción del proyecto */}
+          {/* Descripción del proyecto */}
           <fieldset className={styles.fieldset}>
             <legend>Descripción del proyecto</legend>
-
             <TextInput
               label="Nombre del Proyecto Solidario"
               name="nombre_proyecto"
@@ -368,20 +394,20 @@ export default function PostularProyectoS() {
               onChange={handleChange}
               required
             />
-
             <TextAreaInput
               label="Describa el problema social específico que atenderá el estudiantado"
               name="problema_social"
               value={form.problema_social}
               onChange={handleChange}
+              required /* ← NUEVO */
             />
-
             <SelectInput
               label="Tipo de vulnerabilidad de la población atendida en este proyecto"
               name="vulnerabilidad_atendida_1"
               value={form.vulnerabilidad_atendida_1}
               onChange={handleChange}
               options={asOptions(VULNERABILIDADES)}
+              required /* ← NUEVO */
             />
             <SelectInput
               label="Rango de edad de la población atendida en este proyecto"
@@ -389,6 +415,7 @@ export default function PostularProyectoS() {
               value={form.edad_poblacion_1}
               onChange={handleChange}
               options={asOptions(EDADES_POBLACION)}
+              required /* ← NUEVO */
             />
             <SelectInput
               label="4.3 Otro tipo de vulnerabilidad de la población atendida:"
@@ -410,12 +437,14 @@ export default function PostularProyectoS() {
               value={form.zona_poblacion}
               onChange={handleChange}
               options={asOptions(ZONAS)}
+              required /* ← NUEVO */
             />
             <TextInput
               label="Número aproximado de beneficiarios que estarán en contacto con el estudiantado o que se verán beneficiados durante la realización de ESTE Proyecto Solidario"
               name="numero_beneficiarios_proyecto"
               value={form.numero_beneficiarios_proyecto}
               onChange={handleChange}
+              required /* ← NUEVO */
             />
             <TextInput
               label="Objetivo General del Proyecto Solidario"
@@ -424,7 +453,6 @@ export default function PostularProyectoS() {
               onChange={handleChange}
               required
             />
-
             <h4>Seleccione 2 Objetivos de Desarrollo Sostenible que se impactarán CON ESTE Proyecto Solidario.</h4>
             <SelectInput
               label="ODS 1"
@@ -435,6 +463,7 @@ export default function PostularProyectoS() {
                 value: o.id_ods,
                 label: `${o.id_ods} – ${o.nombre_ods}`,
               }))}
+              required /* ← NUEVO */
             />
             <SelectInput
               label="ODS 2"
@@ -446,7 +475,6 @@ export default function PostularProyectoS() {
                 label: `${o.id_ods} – ${o.nombre_ods}`,
               }))}
             />
-
             <TextAreaInput
               label={`ENLISTE y describe de forma breve LAS PRINCIPALES ACTIVIDADES/ACCIONES a realizar 
 por parte del estudiantado durante el Proyecto Solidario (máximo 200 caracteres), ejemplo: *
@@ -459,27 +487,29 @@ Recuerde que estas, deben propiciar la convivencia entre la organización, los b
               name="acciones_estudiantado"
               value={form.acciones_estudiantado}
               onChange={handleChange}
+              required /* ← NUEVO */
             />
-
             <TextInput
               label="Producto o Servicio a entregar. (Máximo 30 caracteres)"
               name="producto_servicio_entregar"
               value={form.producto_servicio_entregar}
               onChange={handleChange}
+              required /* ← NUEVO */
             />
             <TextInput
               label="Mencione y describa el entregable que se espera que realice el estudiantado para la OSF Producto, Servicio o Resultado del Servicio. (Máximo 200 caracteres)"
               name="entregable_esperado"
               value={form.entregable_esperado}
               onChange={handleChange}
+              required /* ← NUEVO */
             />
             <TextInput
               label="Descripción de manera general cómo medirán el impacto social (Por ejemplo: número de personas beneficiadas, cambio esperado en la comunidad, antes y después, etc.)"
               name="medida_impacto"
               value={form.medida_impacto}
               onChange={handleChange}
+              required /* ← NUEVO */
             />
-
             <SelectInput
               label={`Coloque aquí el día o días de la semana en que deberá llevar a cabo las actividades. EJEMPLO de horario de un Proyecto Solidario MIXTO
 
@@ -495,6 +525,7 @@ Vespertino: entre 2:00 pm y 5:00 pm`}
               value={form.dias_actividades}
               onChange={handleChange}
               options={asOptions(DIAS_ACTIVIDADES)}
+              required /* ← NUEVO */
             />
             <TextInput
               label="Si aplica, Indique el horario: de _________ a _______. (Ejemplo: lunes a viernes de 8 am a 12 pm)"
@@ -502,7 +533,6 @@ Vespertino: entre 2:00 pm y 5:00 pm`}
               value={form.horario_proyecto}
               onChange={handleChange}
             />
-
             <h4>Carreras (se despliega el nombre de la carrera y las siglas)</h4>
             <SelectInput
               label="Carreras 1"
@@ -513,6 +543,7 @@ Vespertino: entre 2:00 pm y 5:00 pm`}
                 value: c.id_carrera,
                 label: c.nombre ?? c.siglas_carrera ?? `Carrera ${c.id_carrera}`,
               }))}
+              required /* ← NUEVO */
             />
             <SelectInput
               label="Carreras 2"
@@ -524,7 +555,6 @@ Vespertino: entre 2:00 pm y 5:00 pm`}
                 label: c.nombre ?? c.siglas_carrera ?? `Carrera ${c.id_carrera}`,
               }))}
             />
-
             <TextInput
               label="Habilidades o competencias que el alumno requiere para participar en el proyecto"
               name="habilidades_alumno"
@@ -537,6 +567,7 @@ Vespertino: entre 2:00 pm y 5:00 pm`}
               type="number"
               value={form.cupos_proyecto}
               onChange={handleChange}
+              required /* ← NUEVO */
             />
             <SelectInput
               label="Modalidad en que se llevará a cabo el proyecto solidario"
@@ -544,6 +575,7 @@ Vespertino: entre 2:00 pm y 5:00 pm`}
               value={form.modalidad}
               onChange={handleChange}
               options={asOptions(MODALIDADES)}
+              required /* ← NUEVO */
             />
             <TextInput
               label="DIRECCIÓN ESCRITA en donde trabajará el estudiantado (sólo para actividades PRESENCIALES o MIXTAS)"
@@ -560,6 +592,7 @@ Vespertino: entre 2:00 pm y 5:00 pm`}
               value={form.duracion_experiencia}
               onChange={handleChange}
               options={asOptions(DURACIONES)}
+              required /* ← NUEVO */
             />
             <SelectInput
               label="Valor o actitud que promueve en el estudiantado con las acciones a llevar a cabo"
@@ -567,13 +600,13 @@ Vespertino: entre 2:00 pm y 5:00 pm`}
               value={form.valor_proyecto}
               onChange={handleChange}
               options={asOptions(VALORES_PROYECTO)}
+              required /* ← NUEVO */
             />
           </fieldset>
 
           {/* Flags */}
           <fieldset className={styles.fieldset}>
             <legend>Propuestas y procesos</legend>
-
             <CheckboxInput
               label="¿Es Proyecto Solidario repetido de periodos anteriores? (Sí/No)?"
               name="periodo_repetido"
