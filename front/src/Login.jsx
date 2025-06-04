@@ -15,8 +15,11 @@ const Login = () => {
     e.preventDefault();
     try {
       const res = await axios.post('http://localhost:5002/login', { correo, contraseña });
-      const { rol, token } = res.data;
+      const { rol, token, status } = res.data;
+
       localStorage.setItem('token', token);
+      localStorage.setItem('rol', rol);
+      if (status) localStorage.setItem('status', status);
 
       if (rol === 'estudiante') navigate('/inicioE');
       else if (rol === 'administrador') navigate('/');

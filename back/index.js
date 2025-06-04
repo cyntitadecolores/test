@@ -7,6 +7,9 @@ const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
 dotenv.config();
 
+// Middleware para verificar el JWT
+const verifyToken = require('./auth'); 
+
 const app = express();
 const corsOptions = {
   origin: 'http://localhost:5173',
@@ -31,22 +34,7 @@ db.connect(err => {
   else console.log('Conectado a la base de datos');
 });
 
-// Middleware para verificar el JWT
-const verifyToken = (req, res, next) => {
-  const token = req.header('Authorization')?.split(' ')[1]; // Obtén el token del encabezado Authorization
 
-  if (!token) {
-    return res.status(401).json({ message: 'Acceso denegado, no se proporcionó el token' });
-  }
-
-  try {
-    const verified = jwt.verify(token, process.env.JWT_SECRET); 
-    req.user = verified; 
-    next(); 
-  } catch (error) {
-    res.status(400).json({ message: 'Token inválido' });
-  }
-};
 
 // Obtener lista de campus -- ya tiene pruebas 10
 app.get('/campus', (req, res) => {
@@ -256,7 +244,7 @@ app.post('/login', (req, res) => {
     }
 
     const { nombre, campoId, rol } = tablas[index];
-    const sql = `SELECT ${campoId}, correo, contraseña FROM ${nombre} WHERE correo = ?`;
+    const sql = `SELECT ${campoId}, correo, contraseña${rol === 'socio' ? ', status' : ''} FROM ${nombre} WHERE correo = ?`;
 
     db.query(sql, [correo], async (err, results) => {
       if (err) {
@@ -275,25 +263,36 @@ app.post('/login', (req, res) => {
         return res.status(401).json({ error: 'Correo o contraseña incorrectos' });
       }
 
+      // Construir payload para JWT
+      const payload = {
+        id: usuario[campoId],
+        tipo: rol,
+      };
+
+      if (rol === 'socio') {
+        payload.status = usuario.status;
+      }
+
       // Generar JWT
-      const token = jwt.sign(
-        {
-          id: usuario[campoId],
-          tipo: rol
-        },
-        process.env.JWT_SECRET,
-        { expiresIn: '1h' }
-      );
+      const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-      return res.json({ mensaje: 'Inicio de sesión exitoso', rol, token });
+      // Respuesta incluye status solo si es socio
+      const responseData = {
+        mensaje: 'Inicio de sesión exitoso',
+        rol,
+        token,
+      };
 
+      if (rol === 'socio') {
+        responseData.status = usuario.status;
+      }
+
+      return res.json(responseData);
     });
   };
 
   intentarLogin();
 });
-
-
 
 // Obtener los datos de todos los usuarios
 
